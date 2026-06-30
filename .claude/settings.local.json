@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(winget upgrade *)",
+      "PowerShell(node --version)",
+      "PowerShell(winget install *)",
+      "PowerShell(npm install *)",
+      "mcp__ide__getDiagnostics",
+      "PowerShell(try { $r = Invoke-WebRequest -Uri \"http://localhost:5174/\" -UseBasicParsing -TimeoutSec 5; \"App OK — HTTP $\\($r.StatusCode\\)\" } catch { \"Dev server pas accessible: $\\($_.Exception.Message\\)\" })",
+      "Skill(update-config)",
+      "PowerShell(npm run *)",
+      "PowerShell(git *)"
+    ]
+  }
+}
