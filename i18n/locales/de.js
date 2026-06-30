@@ -261,6 +261,7 @@ const de = {
     wasCount: ({ count }) => `Es war ${count}`,
     resultStats: ({ time, tl, decks }) => `${time}s / ${tl}s · ${decks}D`,
     promotion: '🎉 AUFSTIEG!',
+    demotion: '⬇ ABSTIEG',
     mmrDelta: ({ delta }) => `${delta > 0 ? '+' : ''}${delta} MMR`,
     promoLockedResult: 'Aufstieg gesperrt — zurück auf 100 grinden',
     placementDoneTitle: '🎲 Platzierung beendet!',
@@ -291,7 +292,7 @@ const de = {
   },
 
   timePicker: {
-    presets: ['Sehr leicht', 'Leicht', 'Mittel', 'Zügig', 'Schwer', 'Sehr schwer', 'Experte', 'Extrem', 'Casino'],
+    presets: ['Anfänger', 'Sehr leicht', 'Leicht', 'Mittel', 'Zügig', 'Schwer', 'Sehr schwer', 'Experte', 'Extrem', 'Casino'],
     manual: 'Manuell',
     hint: 'Tippe auf die Zeit für einen genauen Wert',
     spcCards: ({ spc, cards }) => `${spc}s / Karte · ${cards} Karten`,

@@ -8,13 +8,6 @@
 ### Tutoriel
 - [ ] **Slide 3 du tuto** : quand le joueur se trompe, la carte doit se stopper et afficher un rappel (correction visuelle + explication) avant de continuer — pas de défilement automatique si erreur
 
-### Vitesse & difficulté ranked
-- [ ] **Vitesse par défaut trop rapide** : passer la vitesse de base de 1s/carte à **2.4s/carte** en Training (plus accessible pour un débutant)
-- [ ] **Premier ranked** : 1 deck, 60% de pénétration, 3s/carte
-- [ ] **Progression vitesse Bronze → Master** : vitesse augmente très progressivement de **Bronze 1 → 3s/carte** jusqu'à **Master 3 → 0.42s/carte**. Valeurs intermédiaires à calculer sur 18 paliers (6 rangs × 3 sous-rangs)
-- [ ] **Pénétration par sous-rang** : dans chaque rang, sous-rang 1 = 60%, sous-rang 2 = 70%, sous-rang 3 = 80%
-- [ ] **Games de placement** : difficulté équivalente sous-rang 2 (70% de pénétration)
-
 ### Interface
 - [ ] **UI sélection de langue** : redesigner l'écran/modal de choix de langue — jugé moche par le testeur
 
@@ -34,6 +27,13 @@
 
 ## ✅ Fait
 
+- [x] **Refonte ranked — sous-rangs (I/II/III) + courbe de vitesse** (30/06/2026)
+  - 18 paliers : 6 rangs × 3 sous-rangs. Vitesse géométrique de Bronze I (3.00s/carte) → Master III (0.42s/carte), table `TIER_SPC`.
+  - Pénétration par sous-rang : I=60%, II=70%, III=80% (identique tous rangs). Bronze I = 1 deck · 60% · 3s.
+  - Placement : difficulté = sous-rang 2 (70% pén) du rang FROM.
+  - Training : vitesse par défaut 2.4s/carte (+ preset « Débutant » 2.40s).
+  - MMR : promotion → 10 MMR au palier suivant ; défaite >0 → descend (plancher 0, pas de relégation) ; défaite à 0 → relégation au palier précédent à 100 MMR. Système de promo (gate) retiré du ladder.
+  - i18n : `game.demotion` ajouté (FR/EN/ES/DE), parité 337 clés OK. Build OK.
 - [x] Git + backups GitHub — repo `Moiehzb/BjaKiller`, commit auto à chaque fin de session
 
 - [x] Création du projet React + Vite

@@ -398,6 +398,9 @@ const getCasinoStepConfig = (stepIdx) => {
 };
 
 // ─── RANK SYSTEM ─────────────────────────────────────────────────
+// Source de vérité par rang : id, name, icon, color, decks, mmrPerWin/Loss.
+// NOTE : penetration / secPerCard / mmrToPromo / desc sont OBSOLÈTES — la pénétration
+// et la vitesse sont désormais dérivées du sous-rang (voir getRankConfig / TIER_SPC).
 const RANKS_DEF = [
   { id: 1, name: 'Bronze',   icon: '🥉', color: '#a05a2c', decks: 1, penetration: 75, secPerCard: 0.80, mmrPerWin: 20, mmrPerLoss: -15, mmrToPromo: 100, desc: '1 deck · 0.80s/carte' },
   { id: 2, name: 'Silver',   icon: '🥈', color: '#8a8a9a', decks: 2, penetration: 75, secPerCard: 0.70, mmrPerWin: 20, mmrPerLoss: -15, mmrToPromo: 100, desc: '2 decks · 0.70s/carte' },
@@ -407,10 +410,34 @@ const RANKS_DEF = [
   { id: 6, name: 'Master',   icon: '👑', color: '#9b59b6', decks: 8, penetration: 85, secPerCard: 0.45, mmrPerWin: 20, mmrPerLoss: -15, mmrToPromo: null, desc: '8 decks · 0.45s/carte — Rang final' },
 ];
 
-const getRankTimeLimit = (rank, promoMode = false) => {
-  const pen = promoMode ? Math.min(rank.penetration + 10, 95) : rank.penetration;
-  const totalCards = Math.floor(52 * rank.decks * pen / 100);
-  return Math.round(rank.secPerCard * totalCards);
+// ─── SUB-RANK SYSTEM ─────────────────────────────────────────────
+// Chaque rang (Bronze…Master) a 3 sous-rangs (I, II, III) = 18 paliers.
+// Pénétration par sous-rang : I=60%, II=70%, III=80% (identique pour tous les rangs).
+// Vitesse : courbe géométrique de Bronze I (3.00s/carte) → Master III (0.42s/carte)
+// sur les 18 paliers (ratio ≈ 0.8908). Decks repris de RANKS_DEF.
+const SUB_RANKS = 3;
+const SUBRANK_PEN = { 1: 60, 2: 70, 3: 80 };
+const TIER_SPC = [
+  3.00, 2.67, 2.38,  // Bronze   I/II/III
+  2.12, 1.89, 1.68,  // Silver   I/II/III
+  1.50, 1.34, 1.19,  // Gold     I/II/III
+  1.06, 0.94, 0.84,  // Platinum I/II/III
+  0.75, 0.67, 0.59,  // Diamond  I/II/III
+  0.53, 0.47, 0.42,  // Master   I/II/III
+];
+const MAX_TIER = TIER_SPC.length - 1; // 17 = Master III (palier final absolu)
+const tierIndex = (rankId, subRank) => (rankId - 1) * SUB_RANKS + (subRank - 1);
+const tierToRank = (tier) => ({ rankId: Math.floor(tier / SUB_RANKS) + 1, subRank: (tier % SUB_RANKS) + 1 });
+const ROMAN = ['I', 'II', 'III'];
+const subRankRoman = (subRank) => ROMAN[subRank - 1] || '';
+
+// Config effective d'un sous-rang : { decks, penetration, secPerCard, totalCards, timeLimit }
+const getRankConfig = (rankId, subRank) => {
+  const rank = RANKS_DEF[rankId - 1];
+  const penetration = SUBRANK_PEN[subRank] ?? 60;
+  const secPerCard = TIER_SPC[tierIndex(rankId, subRank)];
+  const totalCards = Math.floor(52 * rank.decks * penetration / 100);
+  return { decks: rank.decks, penetration, secPerCard, totalCards, timeLimit: Math.round(secPerCard * totalCards) };
 };
 
 // ─── PLACEMENT SYSTEM ────────────────────────────────────────────
@@ -418,8 +445,8 @@ const getRankTimeLimit = (rank, promoMode = false) => {
 // Rattrapage (recovery) = same rank config +10% s/carte (easier).
 //
 // Slot types:
-//   'gate'       → promotion config (pen +10%, standard speed)
-//   'recovery'   → ranked config +10% s/carte (slightly easier)
+//   'gate'       → difficulté sous-rang 2 du rang FROM (70% pénétration)
+//   'recovery'   → même config +10% s/carte (un peu plus facile)
 //
 // Flow per slot:
 //   gate win     → next gate (if slots remain)
@@ -428,48 +455,39 @@ const getRankTimeLimit = (rank, promoMode = false) => {
 //   recovery loss→ placement ends, placed at that rank MMR 0
 //
 // Game 5 win (any type) → MMR 100 of resulting rank
-// 5/5 gates passed      → Diamond MMR 100 + The Architect achievement
+// 5/5 gates passed      → Master MMR 100 + The Architect achievement
 
-// Gate configs: promo pen (+10% on rank base pen, max 95%)
+// Les gates ne portent que le mapping rang/label ; la difficulté (decks, pen, spc)
+// est dérivée du sous-rang 2 (70% pénétration) du rang FROM via getRankConfig.
 const PLACEMENT_GATES = [
-  // gate 0: Bronze→Silver  (rank 1 promo)
-  { gateId: 0, label: 'Bronze → Silver',   fromRankId: 1, toRankId: 2,
-    decks: 1, penetration: Math.min(75+10,95), secPerCard: 0.80 },
-  // gate 1: Silver→Gold    (rank 2 promo)
-  { gateId: 1, label: 'Silver → Gold',     fromRankId: 2, toRankId: 3,
-    decks: 2, penetration: Math.min(75+10,95), secPerCard: 0.70 },
-  // gate 2: Gold→Platinum  (rank 3 promo)
-  { gateId: 2, label: 'Gold → Platinum',   fromRankId: 3, toRankId: 4,
-    decks: 4, penetration: Math.min(75+10,95), secPerCard: 0.62 },
-  // gate 3: Platinum→Diamond (rank 4 promo)
-  { gateId: 3, label: 'Platinum → Diamond',fromRankId: 4, toRankId: 5,
-    decks: 6, penetration: Math.min(75+10,95), secPerCard: 0.55 },
-  // gate 4: Diamond→Master  (rank 5 promo)
-  { gateId: 4, label: 'Diamond → Master',  fromRankId: 5, toRankId: 6,
-    decks: 8, penetration: Math.min(80+10,95), secPerCard: 0.50 },
+  { gateId: 0, label: 'Bronze → Silver',   fromRankId: 1, toRankId: 2 },
+  { gateId: 1, label: 'Silver → Gold',     fromRankId: 2, toRankId: 3 },
+  { gateId: 2, label: 'Gold → Platinum',   fromRankId: 3, toRankId: 4 },
+  { gateId: 3, label: 'Platinum → Diamond',fromRankId: 4, toRankId: 5 },
+  { gateId: 4, label: 'Diamond → Master',  fromRankId: 5, toRankId: 6 },
 ];
-
-// Recovery config for a gate: same decks/pen as the FROM rank, +10% s/carte
-const getRecoveryConfig = (gateId) => {
-  const gate = PLACEMENT_GATES[gateId];
-  const rank = RANKS_DEF[gate.fromRankId - 1];
-  const spc = parseFloat((rank.secPerCard * 1.10).toFixed(3));
-  const totalCards = Math.floor(52 * rank.decks * rank.penetration / 100);
-  return {
-    label: rank.name, // recovery suffix is appended (localized) at render via slotLabel()
-    decks: rank.decks,
-    penetration: rank.penetration,
-    secPerCard: spc,
-    timeLimit: Math.round(spc * totalCards),
-    totalCards,
-  };
-};
 
 const getGateConfig = (gateId) => {
   const g = PLACEMENT_GATES[gateId];
-  const totalCards = Math.floor(52 * g.decks * g.penetration / 100);
-  const timeLimit = Math.round(g.secPerCard * totalCards);
-  return { ...g, totalCards, timeLimit };
+  const cfg = getRankConfig(g.fromRankId, 2); // sous-rang 2 = 70% pénétration
+  return { ...g, decks: cfg.decks, penetration: cfg.penetration, secPerCard: cfg.secPerCard,
+    totalCards: cfg.totalCards, timeLimit: cfg.timeLimit };
+};
+
+// Recovery : même difficulté que la gate (sous-rang 2 du rang FROM) mais +10% s/carte
+const getRecoveryConfig = (gateId) => {
+  const g = PLACEMENT_GATES[gateId];
+  const rank = RANKS_DEF[g.fromRankId - 1];
+  const base = getRankConfig(g.fromRankId, 2);
+  const spc = parseFloat((base.secPerCard * 1.10).toFixed(2));
+  return {
+    label: rank.name, // recovery suffix is appended (localized) at render via slotLabel()
+    decks: base.decks,
+    penetration: base.penetration,
+    secPerCard: spc,
+    timeLimit: Math.round(spc * base.totalCards),
+    totalCards: base.totalCards,
+  };
 };
 
 // Build next placement slot given current state
@@ -533,8 +551,9 @@ const placementResult = (history, isLastGameWin, isLastGame) => {
   const allGatesPassed = history.filter(h => h.type === 'gate').length === PLACEMENT_GATES.length
     && history.filter(h => h.type === 'gate').every(h => h.won);
 
+  // On entre toujours dans un rang par son sous-rang I (bas du palier).
   const startMMR = isLastGame ? 100 : 0;
-  return { rankId: placedRankId, mmr: startMMR, perfect: allGatesPassed };
+  return { rankId: placedRankId, subRank: 1, mmr: startMMR, perfect: allGatesPassed };
 };
 
 const PLACEMENT_TOTAL = 5;
@@ -724,7 +743,7 @@ const css = `
 
 // ─── Time presets — expressed in s/carte so they scale with deck count ──
 // Labels live in the locale files (timePicker.presets), aligned by index.
-const SPC_PRESETS = [1.00, 0.82, 0.71, 0.62, 0.55, 0.50, 0.45, 0.40, 0.35];
+const SPC_PRESETS = [2.40, 1.00, 0.82, 0.71, 0.62, 0.55, 0.50, 0.45, 0.40, 0.35];
 
 // value = total seconds, totalCards = cards in this deck config
 const TimePicker = ({ value, onChange, totalCards, t }) => {
@@ -960,9 +979,10 @@ const DEFAULT_SAVE = {
 
   // Ranked
   rankId: 1,            // current rank (1–6)
-  mmr: 0,               // 0–100 within current rank
-  inPromo: false,       // promotion game pending
-  promoLocked: false,   // failed promo, need to reach 100 again
+  subRank: 1,           // sous-rang dans le rang (1=I, 2=II, 3=III)
+  mmr: 0,               // 0–100 within current sub-rank
+  inPromo: false,       // (legacy — système de promo retiré, conservé pour compat)
+  promoLocked: false,   // (legacy)
   totalWins: 0,
   totalLosses: 0,
   perfectStreak: 0,
@@ -1038,7 +1058,7 @@ export default function EliteCounter() {
   // ── game config (for training mode / casino)
   const [trainDecks, setTrainDecks] = useState(1);
   const [trainPen, setTrainPen] = useState(75);
-  const [trainTime, setTrainTime] = useState(30); // total seconds
+  const [trainTime, setTrainTime] = useState(94); // total seconds ≈ 2.4s/carte (1 deck · 75% pén) — accessible débutant
   const [trainShowCount, setTrainShowCount] = useState(false);
 
   // Keep s/carte roughly constant when deck count or penetration changes,
@@ -1100,6 +1120,10 @@ export default function EliteCounter() {
     try {
       const raw = localStorage.getItem('eliteSave');
       const parsed = raw ? { ...DEFAULT_SAVE, ...JSON.parse(raw) } : { ...DEFAULT_SAVE };
+      // Migration sous-rangs : anciens saves sans subRank → I, clamp 1..3, purge promo legacy.
+      if (!parsed.subRank || parsed.subRank < 1 || parsed.subRank > SUB_RANKS) parsed.subRank = 1;
+      parsed.inPromo = false;
+      parsed.promoLocked = false;
       setSave(parsed);
     } catch { setSave({ ...DEFAULT_SAVE }); }
   }, []);
@@ -1137,6 +1161,14 @@ export default function EliteCounter() {
   };
 
   const currentRank = save ? RANKS_DEF[save.rankId - 1] : RANKS_DEF[0];
+  const curSubRank = save?.subRank || 1;
+  // Config effective du sous-rang courant (decks/pen/spc/timeLimit)
+  const curRankCfg = getRankConfig(save?.rankId || 1, curSubRank);
+  // "Bronze I", "Master III", … — nom de rang + chiffre romain du sous-rang
+  const rankLabel = (rankId = save?.rankId || 1, subRank = curSubRank) =>
+    `${RANKS_DEF[rankId - 1]?.name || ''} ${subRankRoman(subRank)}`;
+  // Palier final absolu = Master III (plus de progression possible)
+  const isMaxTier = (save?.rankId === 6) && (curSubRank === SUB_RANKS);
 
   // Placement slot display label — gate labels ("Bronze → Silver") are
   // language-neutral; recovery slots get a localized "(recovery)" suffix.
@@ -1241,18 +1273,13 @@ export default function EliteCounter() {
       placementTierPlayedRef.current = slot; // store full slot object
       setNav('game');
       launchGame(slot.decks, slot.penetration, slot.timeLimit, 'placement');
-    } else if (save.inPromo) {
-      gameModeRef.current = 'promo';
-      rankUsedRef.current = rank;
-      const tl = getRankTimeLimit(rank, true);
-      setNav('game');
-      launchGame(rank.decks, Math.min(rank.penetration + 10, 95), tl, 'promo');
     } else {
+      // Ranked normal — config du sous-rang courant (decks/pen/spc).
       gameModeRef.current = 'ranked';
-      rankUsedRef.current = rank;
-      const tl = getRankTimeLimit(rank, false);
+      const cfg = getRankConfig(save.rankId, save.subRank);
+      rankUsedRef.current = { ...rank, decks: cfg.decks, penetration: cfg.penetration, secPerCard: cfg.secPerCard };
       setNav('game');
-      launchGame(rank.decks, rank.penetration, tl, 'ranked');
+      launchGame(cfg.decks, cfg.penetration, cfg.timeLimit, 'ranked');
     }
   };
 
@@ -1404,6 +1431,7 @@ export default function EliteCounter() {
           placementWins: newWins,
           placementHistory: newHistory,
           rankId: res.rankId,
+          subRank: res.subRank,
           mmr: res.mmr,
           inPromo: false,
           promoLocked: false,
@@ -1424,30 +1452,41 @@ export default function EliteCounter() {
       }
     }
 
-    if (mode === 'promo') {
-      if (won && !abandon) {
-        const nextId = Math.min(6, save.rankId + 1);
-        patchSave({ rankId: nextId, mmr: 0, inPromo: false, promoLocked: false });
-        setMmrDelta(999);
+    // ── Ranked normal (échelle 18 sous-rangs) ──────────────────────
+    // Promotion  : 100 MMR atteint après une victoire → palier+1, on arrive à 10 MMR.
+    // Défaite >0 : MMR descend (plancher 0), pas de relégation.
+    // Défaite à 0: relégation palier−1 → on arrive à 100 MMR (puis ça redescend normalement).
+    // Abandon    : pénalité sèche −25 MMR, ne relègue jamais.
+    const tier = tierIndex(save.rankId, save.subRank);
+
+    if (won && !abandon) {
+      const newMmr = save.mmr + rank.mmrPerWin;
+      if (newMmr >= 100 && tier < MAX_TIER) {
+        const np = tierToRank(tier + 1);
+        patchSave({ rankId: np.rankId, subRank: np.subRank, mmr: 10 });
+        setMmrDelta(999); // flag promotion (affichage)
       } else {
-        const penaltyMmr = Math.max(0, save.mmr - 25);
-        patchSave({ inPromo: false, promoLocked: true, mmr: penaltyMmr });
-        setMmrDelta(-25);
+        // Palier final (Master III) → plafonné à 100, sinon MMR normal.
+        patchSave({ mmr: Math.min(100, newMmr) });
+        setMmrDelta(rank.mmrPerWin);
       }
-      return null;
-    }
-
-    // Normal ranked
-    const delta = won ? rank.mmrPerWin : (abandon ? -25 : rank.mmrPerLoss);
-    const newMmr = Math.max(0, Math.min(100, save.mmr + delta));
-    setMmrDelta(delta);
-
-    if (newMmr >= 100 && rank.mmrToPromo !== null && !save.promoLocked) {
-      patchSave({ mmr: 100, inPromo: true });
-    } else if (newMmr >= 100 && save.promoLocked) {
-      patchSave({ mmr: 100, promoLocked: false, inPromo: true });
+    } else if (abandon) {
+      patchSave({ mmr: Math.max(0, save.mmr - 25) });
+      setMmrDelta(-25);
+    } else if (save.mmr === 0) {
+      // Défaite à 0 → relégation (sauf si déjà Bronze I, plancher absolu).
+      if (tier <= 0) {
+        patchSave({ mmr: 0 });
+        setMmrDelta(0);
+      } else {
+        const np = tierToRank(tier - 1);
+        patchSave({ rankId: np.rankId, subRank: np.subRank, mmr: 100 });
+        setMmrDelta(-998); // flag relégation (affichage)
+      }
     } else {
-      patchSave({ mmr: newMmr, inPromo: false });
+      // Défaite avec MMR > 0 → on descend, plancher 0, pas de relégation.
+      patchSave({ mmr: Math.max(0, save.mmr + rank.mmrPerLoss) });
+      setMmrDelta(rank.mmrPerLoss);
     }
     return null;
   };
@@ -1712,7 +1751,7 @@ export default function EliteCounter() {
   // ──────────────────────────────────────────────────────────────
   if (nav === 'lobby') {
     const rank = currentRank;
-    const isMaster = rank.id === 6;
+    const isMaster = isMaxTier; // bar MMR masquée seulement au palier final absolu (Master III)
     const winRate = save.stats.total > 0 ? Math.round(save.stats.correct / save.stats.total * 100) : null;
 
     return (
@@ -1728,16 +1767,16 @@ export default function EliteCounter() {
               <div style={{ fontSize: 34 }}>{rank.icon}</div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 11, color: G.textMuted, letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 2 }}>
-                  {save.inPromo ? t('lobby.promoGame') : save.promoLocked ? t('lobby.promoLocked') : t('lobby.currentRank')}
+                  {t('lobby.currentRank')}
                 </div>
-                <div style={{ fontFamily: 'Playfair Display, serif', fontSize: 17, fontWeight: 700 }}>{rank.name}</div>
+                <div style={{ fontFamily: 'Playfair Display, serif', fontSize: 17, fontWeight: 700 }}>{rankLabel()}</div>
                 {!isMaster && (
                   <>
                     <div className="mmrtrack">
                       <div className="mmrfill" style={{ width: `${save.mmr}%`, background: `linear-gradient(90deg,${G.goldDim},${mmrColor})` }} />
                     </div>
                     <div style={{ fontSize: 11, color: G.textMuted, marginTop: 3 }}>
-                      {save.inPromo ? t('lobby.winToRankUp') : save.promoLocked ? t('lobby.mmrLocked', { mmr: save.mmr }) : t('lobby.mmr', { mmr: save.mmr })}
+                      {t('lobby.mmr', { mmr: save.mmr })}
                     </div>
                   </>
                 )}
@@ -1793,13 +1832,13 @@ export default function EliteCounter() {
             <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
               <div className="ci">🏆</div>
               <div>
-                <div className="ct">{save.placementDone ? (save.inPromo ? t('lobby.rankedPromo') : t('modeName.ranked')) : t('lobby.rankedPlacement')}</div>
+                <div className="ct">{save.placementDone ? t('modeName.ranked') : t('lobby.rankedPlacement')}</div>
                 <div className="cs">
                   {!save.trainingDone
                     ? t('lobby.rankedLocked')
                     : !save.placementDone
                       ? t('lobby.rankedPlacementSub', { left: PLACEMENT_TOTAL - save.placementGames })
-                      : t('lobby.rankedSub', { rank: rank.name, desc: t('ranks.descShort', { decks: rank.decks, spc: rank.secPerCard }) + (rank.id === 6 ? ' — ' + t('ranks.finalRank') : '') })}
+                      : t('lobby.rankedSub', { rank: rankLabel(), desc: t('ranks.descShort', { decks: curRankCfg.decks, spc: curRankCfg.secPerCard }) + (isMaxTier ? ' — ' + t('ranks.finalRank') : '') })}
                 </div>
               </div>
             </div>
@@ -2246,12 +2285,12 @@ export default function EliteCounter() {
   if (nav === 'mode-ranked') {
     const rank = currentRank;
     const isPlacement = !save.placementDone && !save.placementEnded;
-    const isPromo = save.placementDone && save.inPromo;
+    const isPromo = false; // système de promo retiré — promotion automatique à 100 MMR
     const history = save.placementHistory || [];
     const nextSlot = isPlacement ? nextPlacementSlot(history) : null;
-    const rankedPen = isPromo ? Math.min(rank.penetration + 10, 95) : rank.penetration;
-    const tl = nextSlot ? nextSlot.timeLimit : getRankTimeLimit(rank, isPromo);
-    const totalC = nextSlot ? nextSlot.totalCards : Math.floor(52 * rank.decks * rankedPen / 100);
+    const rankedPen = curRankCfg.penetration;
+    const tl = nextSlot ? nextSlot.timeLimit : curRankCfg.timeLimit;
+    const totalC = nextSlot ? nextSlot.totalCards : curRankCfg.totalCards;
 
     return (
       <div className="r">
@@ -2267,9 +2306,7 @@ export default function EliteCounter() {
           <div style={{ fontSize: 13, color: G.textMuted, marginBottom: 16 }}>
             {isPlacement && nextSlot
               ? t('rankedConfig.placementSub', { n: save.placementGames + 1, total: PLACEMENT_TOTAL, type: nextSlot.type })
-              : isPromo
-              ? t('rankedConfig.promoSub', { from: rank.name, to: RANKS_DEF[Math.min(5, rank.id)].name })
-              : t('rankedConfig.rankedSub', { rank: rank.name, win: rank.mmrPerWin, loss: rank.mmrPerLoss })}
+              : t('rankedConfig.rankedSub', { rank: rankLabel(), win: rank.mmrPerWin, loss: rank.mmrPerLoss })}
           </div>
 
           {isPlacement && nextSlot ? (
@@ -2334,19 +2371,14 @@ export default function EliteCounter() {
             </div>
           ) : (
             <>
-              {isPromo && (
-                <div style={{ background: 'rgba(201,168,76,.06)', border: `1px solid ${G.borderGold}`, borderRadius: 10, padding: '10px 14px', marginBottom: 12, fontSize: 12, color: G.gold, lineHeight: 1.5 }}>
-                  {t('rankedConfig.promoWarn')}
-                </div>
-              )}
               <div className="cfgc">
                 <div className="cfgt">{t('rankedConfig.configuration')}</div>
                 <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
                   <div style={{ fontSize: 36 }}>{rank.icon}</div>
                   <div>
-                    <div style={{ fontFamily: 'Playfair Display, serif', fontSize: 15, fontWeight: 600, marginBottom: 3 }}>{rank.name}</div>
-                    <div style={{ fontSize: 12, color: G.textMuted, marginBottom: 2 }}>{t('rankedConfig.deckPen', { decks: rank.decks, pen: rankedPen })}</div>
-                    <div style={{ fontSize: 12, color: G.textMuted }}>{t('rankedConfig.timeSpcCards', { tl, spc: rank.secPerCard, cards: totalC })}</div>
+                    <div style={{ fontFamily: 'Playfair Display, serif', fontSize: 15, fontWeight: 600, marginBottom: 3 }}>{rankLabel()}</div>
+                    <div style={{ fontSize: 12, color: G.textMuted, marginBottom: 2 }}>{t('rankedConfig.deckPen', { decks: curRankCfg.decks, pen: rankedPen })}</div>
+                    <div style={{ fontSize: 12, color: G.textMuted }}>{t('rankedConfig.timeSpcCards', { tl, spc: curRankCfg.secPerCard, cards: totalC })}</div>
                   </div>
                 </div>
               </div>
@@ -2356,9 +2388,6 @@ export default function EliteCounter() {
                 <div className="mmrtrack">
                   <div className="mmrfill" style={{ width: `${save.mmr}%`, background: `linear-gradient(90deg,${G.goldDim},${mmrColor})` }} />
                 </div>
-                {save.promoLocked && (
-                  <div style={{ fontSize: 11, color: G.red, marginTop: 6 }}>{t('rankedConfig.promoLockedHint')}</div>
-                )}
               </div>
             </>
           )}
@@ -2368,7 +2397,7 @@ export default function EliteCounter() {
               ? nextSlot?.type === 'recovery'
                 ? t('rankedConfig.launchRecovery')
                 : t('rankedConfig.launchGate', { n: save.placementGames + 1, total: PLACEMENT_TOTAL })
-              : isPromo ? t('rankedConfig.launchPromo') : t('rankedConfig.launchRanked')}
+              : t('rankedConfig.launchRanked')}
           </button>
           <div style={{ fontSize: 11, color: G.red, textAlign: 'center', marginTop: 8 }}>{t('rankedConfig.abandonWarn')}</div>
         </div>
@@ -2556,7 +2585,6 @@ export default function EliteCounter() {
 
     // Finished screen
     if (gameState === 'finished') {
-      const isPromo = gameModeRef.current === 'promo';
       const isPlace = gameModeRef.current === 'placement';
       const finalTimeSec = finalTime / 1000;
       const overTime = isRanked && finalTimeSec > tl * 1.05;
@@ -2604,13 +2632,14 @@ export default function EliteCounter() {
                       {t('game.resultStats', { time: finalTimeSec.toFixed(1), tl, decks: (rankUsedRef.current || { decks: trainDecks }).decks })}
                     </div>
 
-                    {/* MMR delta */}
+                    {/* MMR delta — promotion (999) / relégation (-998) / variation normale */}
                     {isRanked && !isPlace && mmrDelta !== 0 && (
                       <div style={{ marginBottom: 12, padding: '8px 16px', background: mmrDelta === 999 ? 'rgba(201,168,76,.12)' : mmrDelta > 0 ? 'rgba(39,174,96,.1)' : 'rgba(192,57,43,.1)', border: `1px solid ${mmrDelta === 999 ? G.borderGold : mmrDelta > 0 ? 'rgba(39,174,96,.3)' : 'rgba(192,57,43,.3)'}`, borderRadius: 8 }}>
                         {mmrDelta === 999
-                          ? <span style={{ color: G.gold, fontFamily: 'Playfair Display, serif', fontSize: 16, fontWeight: 700 }}>{t('game.promotion')}</span>
+                          ? <span style={{ color: G.gold, fontFamily: 'Playfair Display, serif', fontSize: 16, fontWeight: 700 }}>{t('game.promotion')} → {rankLabel()}</span>
+                          : mmrDelta === -998
+                          ? <span style={{ color: G.red, fontFamily: 'Playfair Display, serif', fontSize: 16, fontWeight: 700 }}>{t('game.demotion')} → {rankLabel()}</span>
                           : <span style={{ color: mmrDelta > 0 ? G.green : G.red, fontSize: 15, fontWeight: 700 }}>{t('game.mmrDelta', { delta: mmrDelta })}</span>}
-                        {isPromo && !isCorrect && <div style={{ fontSize: 11, color: G.red, marginTop: 3 }}>{t('game.promoLockedResult')}</div>}
                       </div>
                     )}
 

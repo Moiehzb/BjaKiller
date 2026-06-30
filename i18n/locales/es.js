@@ -259,6 +259,7 @@ const es = {
     wasCount: ({ count }) => `Era ${count}`,
     resultStats: ({ time, tl, decks }) => `${time}s / ${tl}s · ${decks}D`,
     promotion: '🎉 ¡PROMOCIÓN!',
+    demotion: '⬇ DESCENSO',
     mmrDelta: ({ delta }) => `${delta > 0 ? '+' : ''}${delta} MMR`,
     promoLockedResult: 'Promoción bloqueada — vuelve a farmear hasta 100',
     placementDoneTitle: '🎲 ¡Clasificación terminada!',
@@ -289,7 +290,7 @@ const es = {
   },
 
   timePicker: {
-    presets: ['Muy fácil', 'Fácil', 'Moderado', 'Sostenido', 'Difícil', 'Muy difícil', 'Experto', 'Extremo', 'Casino'],
+    presets: ['Principiante', 'Muy fácil', 'Fácil', 'Moderado', 'Sostenido', 'Difícil', 'Muy difícil', 'Experto', 'Extremo', 'Casino'],
     manual: 'Manual',
     hint: 'Toca el tiempo para introducir un valor exacto',
     spcCards: ({ spc, cards }) => `${spc}s / carta · ${cards} cartas`,

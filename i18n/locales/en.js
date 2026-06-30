@@ -259,6 +259,7 @@ const en = {
     wasCount: ({ count }) => `It was ${count}`,
     resultStats: ({ time, tl, decks }) => `${time}s / ${tl}s · ${decks}D`,
     promotion: '🎉 PROMOTION!',
+    demotion: '⬇ DEMOTION',
     mmrDelta: ({ delta }) => `${delta > 0 ? '+' : ''}${delta} MMR`,
     promoLockedResult: 'Promo locked — re-grind back to 100',
     placementDoneTitle: '🎲 Placement complete!',
@@ -289,7 +290,7 @@ const en = {
   },
 
   timePicker: {
-    presets: ['Very easy', 'Easy', 'Moderate', 'Steady', 'Hard', 'Very hard', 'Expert', 'Extreme', 'Casino'],
+    presets: ['Beginner', 'Very easy', 'Easy', 'Moderate', 'Steady', 'Hard', 'Very hard', 'Expert', 'Extreme', 'Casino'],
     manual: 'Manual',
     hint: 'Tap the time to enter a precise value',
     spcCards: ({ spc, cards }) => `${spc}s / card · ${cards} cards`,
