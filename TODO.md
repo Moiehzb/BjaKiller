@@ -22,7 +22,6 @@
 
 ## 🛠️ Features en attente (backlog)
 
-- [ ] Mettre le projet sous Git + backups GitHub — aujourd'hui pas de versioning (ni historique, ni filet de secours). À faire : `git init`, premier commit, créer un repo GitHub (privé), pousser. Ensuite commit + push réguliers après chaque grosse feature pour avoir un backup et un historique.
 - [ ] Brancher l'achat des skins support (4,99 €/skin) sur un vrai paiement — aujourd'hui le clic "4,99 €" débloque directement en localStorage (démo). Voir aussi le paywall en fin de roadmap.
 - [ ] Ajouter des sons dans l'app (changement de carte, bonne/mauvaise réponse, victoire/défaite, achat/équipement de skin, clics UI) — prévoir un toggle son ON/OFF dans les réglages
 - [ ] Transformer l'app en APK Android (build mobile installable)
@@ -34,6 +33,8 @@
 - [ ] App 2 séparée : mode table réaliste style Card Counter Lite
 
 ## ✅ Fait
+
+- [x] Git + backups GitHub — repo `Moiehzb/BjaKiller`, commit auto à chaque fin de session
 
 - [x] Création du projet React + Vite
 - [x] EliteCounter.jsx (~2200 lignes) avec tous les modes
