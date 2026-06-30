@@ -114,13 +114,13 @@ const en = {
 
   shop: {
     title: 'Card skins',
-    coinsAvailable: ({ coins }) => `🪙 ${coins} coins available`,
+    coinsAvailable: ({ coins }) => `${coins} coins available`,
     boutiqueCoins: 'Shop · coins',
     secretName: '???',
     secretDesc: 'Secret skin — hidden condition',
     free: 'Free',
-    priceCoins: ({ price }) => `${price} 🪙`,
-    buyLocked: ({ price }) => `🔒 ${price} 🪙`,
+    priceCoins: ({ price }) => `${price}`,
+    buyLocked: ({ price }) => `🔒 ${price}`,
     warChest: '⚔️ The War Chest',
     warChestDesc:
       'Forged in fire, not begged for. Every skin is a relic you earn — €4.99 each, paid once, yours forever. You arm the app, the app arms you back. No subscription, no mercy. 🪓',
@@ -166,6 +166,8 @@ const en = {
     rankedProgress: 'Ranked progress',
     initialPlacement: 'Initial placement',
     architectSuffix: ' — 5/5 gates cleared',
+    topSkin: 'Most-played skin',
+    topSkinGames: ({ n }) => `${n} ${n > 1 ? 'games' : 'game'}`,
   },
 
   settings: {
@@ -270,7 +272,7 @@ const en = {
     recoveryParen: ' (recovery)',
     placementStats: ({ decks, pen, spc, tl }) => `${decks}D · ${pen}% · ${spc}s/c · ${tl}s`,
     gamesPlayed: ({ played, total }) => `${played}/${total} games played`,
-    coinsEarned: ({ coins }) => `+${coins} 🪙`,
+    coinsEarned: ({ coins }) => `+${coins}`,
     casinoFail: '💥 Failed — back to step 1',
     casinoStepOk: ({ n, next }) => `✓ Step ${n}/5 — next in ${next}s`,
     casinoDone: '🎰 CASINO CHALLENGE COMPLETE!',
@@ -290,7 +292,7 @@ const en = {
   },
 
   timePicker: {
-    presets: ['Beginner', 'Very easy', 'Easy', 'Moderate', 'Steady', 'Hard', 'Very hard', 'Expert', 'Extreme', 'Casino'],
+    presets: ['First steps', 'Warming up', 'Getting there', 'Nice work', 'Solid', 'Fearsome', 'No mercy', 'Warrior', 'Berserker', 'Legend'],
     manual: 'Manual',
     hint: 'Tap the time to enter a precise value',
     spcCards: ({ spc, cards }) => `${spc}s / card · ${cards} cards`,

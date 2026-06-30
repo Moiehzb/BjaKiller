@@ -114,13 +114,13 @@ const es = {
 
   shop: {
     title: 'Skins de cartas',
-    coinsAvailable: ({ coins }) => `🪙 ${coins} monedas disponibles`,
+    coinsAvailable: ({ coins }) => `${coins} monedas disponibles`,
     boutiqueCoins: 'Tienda · monedas',
     secretName: '???',
     secretDesc: 'Skin secreto — condición oculta',
     free: 'Gratis',
-    priceCoins: ({ price }) => `${price} 🪙`,
-    buyLocked: ({ price }) => `🔒 ${price} 🪙`,
+    priceCoins: ({ price }) => `${price}`,
+    buyLocked: ({ price }) => `🔒 ${price}`,
     warChest: '⚔️ El Tesoro de Guerra',
     warChestDesc:
       'Forjados en el fuego, no mendigados. Cada skin es una reliquia ganada — 4,99 € cada uno, pagado una vez, tuyo para siempre. Tú armas la app, la app te arma a ti. Sin suscripción, sin piedad. 🪓',
@@ -166,6 +166,8 @@ const es = {
     rankedProgress: 'Progreso ranked',
     initialPlacement: 'Clasificación inicial',
     architectSuffix: ' — 5/5 gates superadas',
+    topSkin: 'Skin más jugado',
+    topSkinGames: ({ n }) => `${n} ${n > 1 ? 'partidas' : 'partida'}`,
   },
 
   settings: {
@@ -270,7 +272,7 @@ const es = {
     recoveryParen: ' (repesca)',
     placementStats: ({ decks, pen, spc, tl }) => `${decks}D · ${pen}% · ${spc}s/c · ${tl}s`,
     gamesPlayed: ({ played, total }) => `${played}/${total} partidas jugadas`,
-    coinsEarned: ({ coins }) => `+${coins} 🪙`,
+    coinsEarned: ({ coins }) => `+${coins}`,
     casinoFail: '💥 Fallaste — vuelves a la etapa 1',
     casinoStepOk: ({ n, next }) => `✓ Etapa ${n}/5 — siguiente en ${next}s`,
     casinoDone: '🎰 ¡CASINO CHALLENGE COMPLETADO!',
@@ -290,7 +292,7 @@ const es = {
   },
 
   timePicker: {
-    presets: ['Principiante', 'Muy fácil', 'Fácil', 'Moderado', 'Sostenido', 'Difícil', 'Muy difícil', 'Experto', 'Extremo', 'Casino'],
+    presets: ['Primeros pasos', 'Calentando', 'Ya llega', 'Bien hecho', 'Sólido', 'Temible', 'Sin piedad', 'Guerrero', 'Berserker', 'Leyenda'],
     manual: 'Manual',
     hint: 'Toca el tiempo para introducir un valor exacto',
     spcCards: ({ spc, cards }) => `${spc}s / carta · ${cards} cartas`,

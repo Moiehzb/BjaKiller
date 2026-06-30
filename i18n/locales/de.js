@@ -116,13 +116,13 @@ const de = {
 
   shop: {
     title: 'Karten-Skins',
-    coinsAvailable: ({ coins }) => `🪙 ${coins} Münzen verfügbar`,
+    coinsAvailable: ({ coins }) => `${coins} Münzen verfügbar`,
     boutiqueCoins: 'Shop · Münzen',
     secretName: '???',
     secretDesc: 'Geheimer Skin — versteckte Bedingung',
     free: 'Gratis',
-    priceCoins: ({ price }) => `${price} 🪙`,
-    buyLocked: ({ price }) => `🔒 ${price} 🪙`,
+    priceCoins: ({ price }) => `${price}`,
+    buyLocked: ({ price }) => `🔒 ${price}`,
     warChest: '⚔️ Die Kriegskasse',
     warChestDesc:
       'Im Feuer geschmiedet, nicht erbettelt. Jeder Skin ist ein verdientes Relikt — 4,99 € pro Stück, einmal bezahlt, für immer deins. Du rüstest die App, die App rüstet dich. Kein Abo, keine Gnade. 🪓',
@@ -168,6 +168,8 @@ const de = {
     rankedProgress: 'Ranked-Fortschritt',
     initialPlacement: 'Erste Platzierung',
     architectSuffix: ' — 5/5 Gates geschafft',
+    topSkin: 'Meistgespielter Skin',
+    topSkinGames: ({ n }) => `${n} ${n > 1 ? 'Spiele' : 'Spiel'}`,
   },
 
   settings: {
@@ -272,7 +274,7 @@ const de = {
     recoveryParen: ' (Aufholspiel)',
     placementStats: ({ decks, pen, spc, tl }) => `${decks}D · ${pen}% · ${spc}s/K · ${tl}s`,
     gamesPlayed: ({ played, total }) => `${played}/${total} Spiele gespielt`,
-    coinsEarned: ({ coins }) => `+${coins} 🪙`,
+    coinsEarned: ({ coins }) => `+${coins}`,
     casinoFail: '💥 Verfehlt — zurück zu Etappe 1',
     casinoStepOk: ({ n, next }) => `✓ Etappe ${n}/5 — nächste in ${next}s`,
     casinoDone: '🎰 CASINO CHALLENGE ABGESCHLOSSEN!',
@@ -292,7 +294,7 @@ const de = {
   },
 
   timePicker: {
-    presets: ['Anfänger', 'Sehr leicht', 'Leicht', 'Mittel', 'Zügig', 'Schwer', 'Sehr schwer', 'Experte', 'Extrem', 'Casino'],
+    presets: ['Erste Schritte', 'Warmlaufen', 'Wird besser', 'Gut gemacht', 'Solide', 'Furchtbar', 'Keine Gnade', 'Krieger', 'Berserker', 'Legende'],
     manual: 'Manuell',
     hint: 'Tippe auf die Zeit für einen genauen Wert',
     spcCards: ({ spc, cards }) => `${spc}s / Karte · ${cards} Karten`,

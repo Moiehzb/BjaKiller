@@ -325,6 +325,22 @@ const SUPPORT_SKINS = [
 ];
 const SUPPORT_IDS = new Set(SUPPORT_SKINS.map(s => s.id));
 
+// Nom d'un skin par id (CARD_SKINS + SUPPORT_SKINS) — pour les stats.
+const skinNameById = (id) =>
+  (CARD_SKINS.find(s => s.id === id) || SUPPORT_SKINS.find(s => s.id === id) || {}).name || id;
+
+// ─── Icône pièce — SVG inline ────────────────────────────────────
+// L'emoji 🪙 (U+1FA99, 2020) ne s'affiche pas sur Windows 10 (tofu).
+// Ce SVG s'affiche de façon identique partout.
+const Coin = ({ size = 14 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true"
+    style={{ display: 'inline-block', verticalAlign: '-0.14em', flexShrink: 0 }}>
+    <circle cx="12" cy="12" r="10" fill="#e8c96d" stroke="#9c7c2e" strokeWidth="1.5" />
+    <circle cx="12" cy="12" r="6.5" fill="none" stroke="#9c7c2e" strokeWidth="1.2" opacity="0.55" />
+    <ellipse cx="9" cy="8.5" rx="2.4" ry="1.4" fill="#ffffff" opacity="0.45" transform="rotate(-30 9 8.5)" />
+  </svg>
+);
+
 // ─── CHALLENGES — Geometry Dash style: hard, short, retry-friendly ────
 // coins: reward credited on unlock, matched to a specific skin price.
 const CHALLENGES = [
@@ -793,11 +809,9 @@ const TimePicker = ({ value, onChange, totalCards, t }) => {
           </div>
         ) : (
           <div className="tstep">
-            <button className="tsb" onClick={() => onChange(Math.max(5, value - 1))}>−</button>
             <div style={{ flex: 1, textAlign: 'center', cursor: 'pointer' }} onClick={startEdit}>
               <div className="tdsp">{value}<span style={{ fontSize: 13, color: G.goldDim, marginLeft: 2 }}>s</span></div>
             </div>
-            <button className="tsb" onClick={() => onChange(Math.min(600, value + 1))}>+</button>
           </div>
         )}
       </div>
@@ -1003,7 +1017,7 @@ const DEFAULT_SAVE = {
 
   // Stats — recentResults now stores objects, not just booleans
   // { won, decks, penetration, spc, timeSec, mode }
-  stats: { correct: 0, total: 0, bestTime: null, recentResults: [] },
+  stats: { correct: 0, total: 0, bestTime: null, recentResults: [], skinGames: {} },
 
   // Casino Killer
   casinoChallenge: {
@@ -1544,12 +1558,14 @@ export default function EliteCounter() {
       mode: gameModeRef.current,
     };
 
+    const skinUsed = save.activeSkin || 'classic';
     const newStats = {
       ...save.stats,
       total: save.stats.total + 1,
       correct: save.stats.correct + (correct ? 1 : 0),
       bestTime: correct && (!save.stats.bestTime || timeInSec < save.stats.bestTime) ? timeInSec : save.stats.bestTime,
       recentResults: [...(save.stats.recentResults || []).slice(-19), resultEntry],
+      skinGames: { ...(save.stats.skinGames || {}), [skinUsed]: ((save.stats.skinGames || {})[skinUsed] || 0) + 1 },
     };
 
     // ── Challenge detection ──
@@ -1708,7 +1724,7 @@ export default function EliteCounter() {
         {!minimal && (
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
             <div className="pill">{currentRank.icon} {currentRank.name}</div>
-            <div className="pill">🪙 {save.coins}</div>
+            <div className="pill" style={{ display: 'flex', alignItems: 'center', gap: 5 }}><Coin size={13} /> {save.coins}</div>
             {showTutoBtn && (
               <button onClick={() => setShowTutorialReplay(true)}
                 style={{ fontSize: 11, fontWeight: 600, color: G.textMuted, background: 'rgba(255,255,255,.06)', border: `1px solid ${G.border}`, borderRadius: 6, padding: '4px 9px', cursor: 'pointer', letterSpacing: '.03em' }}>
@@ -1983,7 +1999,7 @@ export default function EliteCounter() {
             <div className="mdl" onClick={e => e.stopPropagation()}>
               <div className="mhndl" />
               <div className="mtitle">{t('shop.title')}</div>
-              <div style={{ color: G.textMuted, fontSize: 12, marginBottom: 14 }}>{t('shop.coinsAvailable', { coins: save.coins })}</div>
+              <div style={{ color: G.textMuted, fontSize: 12, marginBottom: 14, display: 'flex', alignItems: 'center', gap: 5 }}><Coin size={13} />{t('shop.coinsAvailable', { coins: save.coins })}</div>
               <div style={{ fontSize: 10, letterSpacing: '.15em', textTransform: 'uppercase', color: G.gold, marginBottom: 8 }}>{t('shop.boutiqueCoins')}</div>
               {CARD_SKINS.map(sk => {
                 const owned = save.unlockedSkins.includes(sk.id);
@@ -1998,7 +2014,7 @@ export default function EliteCounter() {
                     </div>
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 1 }}>{isSecret ? t('shop.secretName') : sk.name}</div>
-                      <div style={{ fontSize: 12, color: G.textMuted }}>{isSecret ? t('shop.secretDesc') : sk.price === 0 ? t('shop.free') : t('shop.priceCoins', { price: sk.price })}</div>
+                      <div style={{ fontSize: 12, color: G.textMuted }}>{isSecret ? t('shop.secretDesc') : sk.price === 0 ? t('shop.free') : <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>{t('shop.priceCoins', { price: sk.price })}<Coin size={11} /></span>}</div>
                     </div>
                     {isSecret ? null : active
                       ? <span style={{ fontSize: 11, color: '#0a0d0a', background: G.gold, borderRadius: 6, padding: '4px 10px', fontWeight: 700, letterSpacing: '.04em' }}>{t('common.equipped')}</span>
@@ -2006,7 +2022,7 @@ export default function EliteCounter() {
                         ? <button style={{ fontSize: 11, color: '#0a0d0a', background: G.green, border: 'none', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', fontWeight: 700 }} onClick={() => patchSave({ activeSkin: sk.id })}>{t('common.equip')}</button>
                         : <button style={{ fontSize: 11, color: canBuy ? '#0a0d0a' : G.textMuted, background: canBuy ? G.gold : 'rgba(255,255,255,.04)', border: `1px solid ${canBuy ? G.gold : G.border}`, borderRadius: 6, padding: '4px 10px', cursor: canBuy ? 'pointer' : 'not-allowed', fontWeight: canBuy ? 700 : 400 }}
                           onClick={() => { if (canBuy) patchSave({ coins: save.coins - sk.price, unlockedSkins: [...save.unlockedSkins, sk.id], activeSkin: sk.id }); }}>
-                          {canBuy ? t('common.buy') : t('shop.buyLocked', { price: sk.price })}</button>}
+                          {canBuy ? t('common.buy') : <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>{t('shop.buyLocked', { price: sk.price })}<Coin size={10} /></span>}</button>}
                   </div>
                 );
               })}
@@ -2071,6 +2087,9 @@ export default function EliteCounter() {
           const recentWR = recent.length > 0 ? Math.round(recentWins / recent.length * 100) : null;
           const history = save.placementHistory || [];
           const selected = selectedHistoryIdx !== null ? recent[selectedHistoryIdx] : null;
+          const skinGames = s.skinGames || {};
+          const topSkinId = Object.keys(skinGames).sort((a, b) => skinGames[b] - skinGames[a])[0] || null;
+          const topSkinCount = topSkinId ? skinGames[topSkinId] : 0;
 
           return (
             <div className="moverlay" onClick={() => { setShowStats(false); setSelectedHistoryIdx(null); }}>
@@ -2115,6 +2134,17 @@ export default function EliteCounter() {
                     </div>
                   )}
                 </div>
+
+                {/* Most-played skin */}
+                {topSkinId && (
+                  <div style={{ background: 'rgba(201,168,76,.06)', border: `1px solid ${G.borderGold}`, borderRadius: 8, padding: '10px 14px', marginBottom: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
+                    <div style={{ fontSize: 13, color: G.gold, display: 'flex', alignItems: 'center', gap: 6 }}>🎨 {t('stats.topSkin')}</div>
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ fontFamily: 'Playfair Display, serif', fontSize: 15, fontWeight: 700, color: G.goldLight }}>{skinNameById(topSkinId)}</div>
+                      <div style={{ fontSize: 11, color: G.textMuted }}>{t('stats.topSkinGames', { n: topSkinCount })}</div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Recent 20 results — clickable bars */}
                 {recent.length > 0 && (
@@ -2676,7 +2706,7 @@ export default function EliteCounter() {
                     })()}
 
                     {isCorrect && earnedCoins > 0 && (
-                      <div style={{ color: G.textMuted, fontSize: 13, marginBottom: 12 }}>{t('game.coinsEarned', { coins: earnedCoins })}</div>
+                      <div style={{ color: G.textMuted, fontSize: 13, marginBottom: 12, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 5 }}>{t('game.coinsEarned', { coins: earnedCoins })}<Coin size={13} /></div>
                     )}
 
                     {/* Casino: show failure state or waiting for auto-advance */}
