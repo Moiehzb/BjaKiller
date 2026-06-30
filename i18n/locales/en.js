@@ -168,6 +168,7 @@ const en = {
     architectSuffix: ' — 5/5 gates cleared',
     topSkin: 'Most-played skin',
     topSkinGames: ({ n }) => `${n} ${n > 1 ? 'games' : 'game'}`,
+    placementInProgress: 'Placement in progress…',
   },
 
   settings: {
@@ -294,7 +295,9 @@ const en = {
   timePicker: {
     presets: ['First steps', 'Warming up', 'Getting there', 'Nice work', 'Solid', 'Fearsome', 'No mercy', 'Warrior', 'Berserker', 'Legend'],
     manual: 'Manual',
-    hint: 'Tap the time to enter a precise value',
+    hint: 'Tap the time to open the keypad',
+    keypadTitle: 'Time in seconds',
+    keypadValidate: 'Confirm',
     spcCards: ({ spc, cards }) => `${spc}s / card · ${cards} cards`,
   },
 

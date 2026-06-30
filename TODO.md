@@ -8,9 +8,6 @@
 ### Tutoriel
 - [ ] **Slide 3 du tuto** : quand le joueur se trompe, la carte doit se stopper et afficher un rappel (correction visuelle + explication) avant de continuer — pas de défilement automatique si erreur
 
-### Interface
-- [ ] **UI sélection de langue** : redesigner l'écran/modal de choix de langue — jugé moche par le testeur
-
 ---
 
 ## 🛠️ Features en attente (backlog)
@@ -27,6 +24,19 @@
 
 ## ✅ Fait
 
+- [x] **Lot de retours UI — session 30/06/2026 (implémenté, à vérifier au retour)**
+  - **Drapeaux SVG** : les emojis-drapeaux (🇫🇷…) s'affichaient « FR/GB/DE/ES » sur Windows. Remplacés par un composant `Flag` SVG (`LanguageSelect.jsx`, exporté) — picker de langue + bouton langue de l'accueil.
+  - **Accueil** : bouton Tuto déplacé juste à gauche du bouton langue (fil d'Ariane). Le bouton langue n'affiche plus le code texte, juste 🌐 + drapeau.
+  - **Réglages** : choix de langue retiré (se fait via l'accueil).
+  - **Training — sélecteur de durée refait** : stepper `−` (gauche) / temps / `+` (droite), ±1s par clic. Clic sur le nombre → **clavier virtuel** (pavé 1-9, 0, C, ⌫, Valider), clampé 5–600s. Composants `KpKey` + clavier dans `TimePicker`. Ancien input natif supprimé.
+  - **Rank dynamique au placement** : le rang affiché (pill accueil + stats) projette le rang provisoire via `placementResult(history)` pendant les games de placement (`displayRank` / `displayRankId`). Stats : « Classement en cours… » tant que le placement n'est pas fini.
+  - i18n : clés `timePicker.keypadTitle/keypadValidate`, `stats.placementInProgress` ajoutées FR/EN/ES/DE. Build OK.
+- [x] **Lot de retours UI précédent — 30/06/2026**
+  - Training : flèches ±1s d'origine retirées (puis sélecteur entièrement refait, voir ci-dessus).
+  - Libellés de durée → encouragement viking (Premiers pas → Légende) FR/EN/ES/DE.
+  - Stat « skin le plus joué » dans les stats (`stats.skinGames`).
+  - **UI sélection de langue redesignée** (sobre + stylée : drapeaux en pastille, survol doré, coche dans cercle or). ✅ remplace l'item backlog.
+  - Pièces (coins) : emoji 🪙 (invisible sur Windows 10) remplacé par un composant SVG `Coin` partout (header, boutique, gains).
 - [x] **Refonte ranked — sous-rangs (I/II/III) + courbe de vitesse** (30/06/2026)
   - 18 paliers : 6 rangs × 3 sous-rangs. Vitesse géométrique de Bronze I (3.00s/carte) → Master III (0.42s/carte), table `TIER_SPC`.
   - Pénétration par sous-rang : I=60%, II=70%, III=80% (identique tous rangs). Bronze I = 1 deck · 60% · 3s.

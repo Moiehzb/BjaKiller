@@ -2,6 +2,54 @@ import React, { useState } from 'react';
 import { Check } from 'lucide-react';
 import { LANGUAGES } from './i18n';
 
+// ─── Drapeaux SVG ────────────────────────────────────────────────
+// Windows ne rend PAS les emojis-drapeaux (🇫🇷 s'affiche « FR »). On dessine
+// donc des drapeaux SVG, rendus à l'identique partout. Ratio 3:2 uniforme.
+export const Flag = ({ code, size = 22 }) => {
+  const common = {
+    width: size, height: Math.round((size * 2) / 3), viewBox: '0 0 60 40',
+    style: { display: 'block', borderRadius: 3, boxShadow: 'inset 0 0 0 1px rgba(0,0,0,.25)', flexShrink: 0 },
+    'aria-hidden': true,
+  };
+  switch (code) {
+    case 'fr':
+      return (
+        <svg {...common}>
+          <rect width="20" height="40" fill="#0055A4" />
+          <rect x="20" width="20" height="40" fill="#fff" />
+          <rect x="40" width="20" height="40" fill="#EF4135" />
+        </svg>
+      );
+    case 'de':
+      return (
+        <svg {...common}>
+          <rect width="60" height="13.34" fill="#000" />
+          <rect y="13.34" width="60" height="13.33" fill="#DD0000" />
+          <rect y="26.67" width="60" height="13.33" fill="#FFCE00" />
+        </svg>
+      );
+    case 'es':
+      return (
+        <svg {...common}>
+          <rect width="60" height="40" fill="#AA151B" />
+          <rect y="10" width="60" height="20" fill="#F1BF00" />
+        </svg>
+      );
+    case 'en':
+      return (
+        <svg {...common}>
+          <rect width="60" height="40" fill="#012169" />
+          <path d="M0 0 L60 40 M60 0 L0 40" stroke="#fff" strokeWidth="8" />
+          <path d="M0 0 L60 40 M60 0 L0 40" stroke="#C8102E" strokeWidth="3.5" />
+          <path d="M30 0 V40 M0 20 H60" stroke="#fff" strokeWidth="11" />
+          <path d="M30 0 V40 M0 20 H60" stroke="#C8102E" strokeWidth="6.5" />
+        </svg>
+      );
+    default:
+      return null;
+  }
+};
+
 // Design tokens — mirror of EliteCounter.jsx so this screen can stand alone
 // (it renders before the main app's <style> is mounted, on first launch).
 const G = {
@@ -38,13 +86,12 @@ const LangRow = ({ lang, active, onClick }) => {
         style={{
           width: 40, height: 40, borderRadius: 10, flexShrink: 0,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 24, lineHeight: 1,
           background: 'rgba(0,0,0,.25)',
           border: `1px solid ${lit ? G.borderGold : G.border}`,
           transition: 'border-color .18s ease',
         }}
       >
-        {lang.flag}
+        <Flag code={lang.code} size={24} />
       </span>
       <span style={{ flex: 1, fontFamily: "'Playfair Display', serif", fontSize: 16, fontWeight: 600, letterSpacing: '.01em' }}>
         {lang.label}

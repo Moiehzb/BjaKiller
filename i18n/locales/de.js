@@ -170,6 +170,7 @@ const de = {
     architectSuffix: ' — 5/5 Gates geschafft',
     topSkin: 'Meistgespielter Skin',
     topSkinGames: ({ n }) => `${n} ${n > 1 ? 'Spiele' : 'Spiel'}`,
+    placementInProgress: 'Platzierung läuft…',
   },
 
   settings: {
@@ -296,7 +297,9 @@ const de = {
   timePicker: {
     presets: ['Erste Schritte', 'Warmlaufen', 'Wird besser', 'Gut gemacht', 'Solide', 'Furchtbar', 'Keine Gnade', 'Krieger', 'Berserker', 'Legende'],
     manual: 'Manuell',
-    hint: 'Tippe auf die Zeit für einen genauen Wert',
+    hint: 'Tippe auf die Zeit, um das Tastenfeld zu öffnen',
+    keypadTitle: 'Zeit in Sekunden',
+    keypadValidate: 'Bestätigen',
     spcCards: ({ spc, cards }) => `${spc}s / Karte · ${cards} Karten`,
   },
 

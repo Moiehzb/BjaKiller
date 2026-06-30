@@ -168,6 +168,7 @@ const fr = {
     architectSuffix: ' — 5/5 gates franchies',
     topSkin: 'Skin le plus joué',
     topSkinGames: ({ n }) => `${n} ${n > 1 ? 'parties' : 'partie'}`,
+    placementInProgress: 'Classement en cours…',
   },
 
   settings: {
@@ -294,7 +295,9 @@ const fr = {
   timePicker: {
     presets: ['Premiers pas', 'Ça s’échauffe', 'Ça vient', 'Beau boulot', 'Solide', 'Redoutable', 'Sans pitié', 'Guerrier', 'Berserker', 'Légende'],
     manual: 'Manuel',
-    hint: 'Tape sur le temps pour saisir une valeur précise',
+    hint: 'Tape sur le temps pour ouvrir le clavier',
+    keypadTitle: 'Temps en secondes',
+    keypadValidate: 'Valider',
     spcCards: ({ spc, cards }) => `${spc}s / carte · ${cards} cartes`,
   },
 

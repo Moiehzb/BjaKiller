@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Play, Pause, X, ChevronRight, ChevronLeft, Eye, EyeOff, AlertTriangle, Globe } from 'lucide-react';
 import TutorialOverlay from './EliteCounterTutorial.jsx';
 import { makeT, DEFAULT_LANG, getLanguage } from './i18n';
-import { LanguageSelectScreen, LanguageModal } from './LanguageSelect.jsx';
+import { LanguageSelectScreen, LanguageModal, Flag } from './LanguageSelect.jsx';
 
 // ─── Constants ────────────────────────────────────────────────────
 const CARD_VALUES = {
@@ -762,9 +762,31 @@ const css = `
 const SPC_PRESETS = [2.40, 1.00, 0.82, 0.71, 0.62, 0.55, 0.50, 0.45, 0.40, 0.35];
 
 // value = total seconds, totalCards = cards in this deck config
+// Touche du clavier virtuel — style autonome (pas de dépendance CSS).
+const KpKey = ({ children, onClick, alt = false }) => {
+  const [h, setH] = useState(false);
+  return (
+    <button
+      onClick={onClick}
+      onMouseEnter={() => setH(true)}
+      onMouseLeave={() => setH(false)}
+      style={{
+        padding: '15px 0', fontSize: 21, fontWeight: 700, cursor: 'pointer',
+        borderRadius: 11, transition: 'all .12s',
+        fontFamily: "'Playfair Display', serif",
+        background: alt ? (h ? 'rgba(255,255,255,.09)' : 'rgba(255,255,255,.04)') : (h ? 'rgba(201,168,76,.2)' : 'rgba(201,168,76,.08)'),
+        border: `1px solid ${alt ? G.border : (h ? G.gold : G.borderGold)}`,
+        color: alt ? G.textMuted : G.goldLight,
+      }}
+    >
+      {children}
+    </button>
+  );
+};
+
 const TimePicker = ({ value, onChange, totalCards, t }) => {
-  const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState('');
+  const [kpOpen, setKpOpen] = useState(false);
+  const [kpVal, setKpVal] = useState('');
   const currentSpc = totalCards > 0 ? value / totalCards : 0;
   const presetLabels = t('timePicker.presets');
 
@@ -774,11 +796,18 @@ const TimePicker = ({ value, onChange, totalCards, t }) => {
     if (totalCards > 0) onChange(Math.max(5, Math.round(spc * totalCards)));
   };
 
-  const startEdit = () => { setDraft(String(value)); setEditing(true); };
-  const commitEdit = () => {
-    const n = parseInt(draft);
+  // Clavier virtuel — saisie manuelle du temps en secondes.
+  const openKp = () => { setKpVal(String(value)); setKpOpen(true); };
+  const kpPress = (d) => setKpVal(v => {
+    const nv = (v === '0' ? '' : v) + d;
+    return nv.length > 3 ? v : nv; // 3 chiffres max (clampé à 600 à la validation)
+  });
+  const kpBack = () => setKpVal(v => v.slice(0, -1));
+  const kpClear = () => setKpVal('');
+  const kpConfirm = () => {
+    const n = parseInt(kpVal || '0', 10);
     if (!isNaN(n) && n > 0) onChange(Math.max(5, Math.min(600, n)));
-    setEditing(false);
+    setKpOpen(false);
   };
 
   return (
@@ -792,33 +821,51 @@ const TimePicker = ({ value, onChange, totalCards, t }) => {
         ))}
       </div>
 
+      {/* Stepper : − à gauche, temps cliquable (→ clavier) au centre, + à droite */}
       <div className="tcust">
-        <div style={{ fontSize: 10, color: G.textMuted, letterSpacing: '.1em', textTransform: 'uppercase', marginRight: 6, whiteSpace: 'nowrap' }}>{t('timePicker.manual')}</div>
-        {editing ? (
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <input
-              type="number"
-              autoFocus
-              value={draft}
-              onChange={e => setDraft(e.target.value)}
-              onBlur={commitEdit}
-              onKeyDown={e => { if (e.key === 'Enter') commitEdit(); if (e.key === 'Escape') setEditing(false); }}
-              style={{ flex: 1, background: 'rgba(0,0,0,.3)', border: `1px solid ${G.gold}`, borderRadius: 6, padding: '6px 10px', color: G.goldLight, fontFamily: 'Playfair Display, serif', fontSize: 22, fontWeight: 700, textAlign: 'center', outline: 'none' }}
-            />
-            <span style={{ fontSize: 13, color: G.goldDim }}>s</span>
-          </div>
-        ) : (
-          <div className="tstep">
-            <div style={{ flex: 1, textAlign: 'center', cursor: 'pointer' }} onClick={startEdit}>
-              <div className="tdsp">{value}<span style={{ fontSize: 13, color: G.goldDim, marginLeft: 2 }}>s</span></div>
-            </div>
-          </div>
-        )}
+        <button className="tsb" onClick={() => onChange(Math.max(5, value - 1))}>−</button>
+        <div style={{ flex: 1, textAlign: 'center', cursor: 'pointer' }} onClick={openKp}>
+          <div className="tdsp">{value}<span style={{ fontSize: 13, color: G.goldDim, marginLeft: 2 }}>s</span></div>
+        </div>
+        <button className="tsb" onClick={() => onChange(Math.min(600, value + 1))}>+</button>
       </div>
-      {!editing && <div style={{ fontSize: 10, color: G.textMuted, textAlign: 'center', marginTop: 3 }}>{t('timePicker.hint')}</div>}
+      <div style={{ fontSize: 10, color: G.textMuted, textAlign: 'center', marginTop: 5 }}>{t('timePicker.hint')}</div>
 
       {totalCards > 0 && (
         <div className="tpc">{t('timePicker.spcCards', { spc: currentSpc.toFixed(2), cards: totalCards })}</div>
+      )}
+
+      {/* Clavier virtuel */}
+      {kpOpen && (
+        <div
+          onClick={() => setKpOpen(false)}
+          style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,.72)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{ background: 'linear-gradient(180deg,#1a261a,#0a0d0a)', border: `1px solid ${G.border}`, borderTop: `1px solid ${G.borderGold}`, borderRadius: 18, padding: '20px 18px 22px', width: '100%', maxWidth: 300 }}
+          >
+            <div style={{ fontSize: 11, color: G.textMuted, letterSpacing: '.12em', textTransform: 'uppercase', textAlign: 'center', marginBottom: 12 }}>{t('timePicker.keypadTitle')}</div>
+            <div style={{ background: 'rgba(0,0,0,.35)', border: `1px solid ${G.borderGold}`, borderRadius: 10, padding: '12px', textAlign: 'center', marginBottom: 14 }}>
+              <span style={{ fontFamily: "'Playfair Display', serif", fontSize: 34, fontWeight: 700, color: G.goldLight }}>{kpVal || '0'}</span>
+              <span style={{ fontSize: 15, color: G.goldDim, marginLeft: 3 }}>s</span>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(d => (
+                <KpKey key={d} onClick={() => kpPress(String(d))}>{d}</KpKey>
+              ))}
+              <KpKey alt onClick={kpClear}>C</KpKey>
+              <KpKey onClick={() => kpPress('0')}>0</KpKey>
+              <KpKey alt onClick={kpBack}>⌫</KpKey>
+            </div>
+            <button
+              onClick={kpConfirm}
+              style={{ width: '100%', marginTop: 12, padding: '13px', background: G.gold, border: 'none', borderRadius: 11, color: '#0a0d0a', fontWeight: 700, fontSize: 14, cursor: 'pointer', letterSpacing: '.03em' }}
+            >
+              {t('timePicker.keypadValidate')}
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
@@ -1175,6 +1222,14 @@ export default function EliteCounter() {
   };
 
   const currentRank = save ? RANKS_DEF[save.rankId - 1] : RANKS_DEF[0];
+  // Rang AFFICHÉ (header accueil + stats) : pendant le placement, save.rankId
+  // reste à Bronze jusqu'à la fin. On projette donc le rang provisoire à partir
+  // de l'historique des gates déjà jouées pour qu'il évolue partie après partie.
+  const placementOngoing = save && !save.placementDone && (save.placementHistory || []).length > 0;
+  const displayRankId = placementOngoing
+    ? placementResult(save.placementHistory || [], false, false).rankId
+    : (save?.rankId || 1);
+  const displayRank = RANKS_DEF[displayRankId - 1] || RANKS_DEF[0];
   const curSubRank = save?.subRank || 1;
   // Config effective du sous-rang courant (decks/pen/spc/timeLimit)
   const curRankCfg = getRankConfig(save?.rankId || 1, curSubRank);
@@ -1723,14 +1778,8 @@ export default function EliteCounter() {
         <div className="logo">ELITE COUNTER</div>
         {!minimal && (
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <div className="pill">{currentRank.icon} {currentRank.name}</div>
+            <div className="pill">{displayRank.icon} {displayRank.name}</div>
             <div className="pill" style={{ display: 'flex', alignItems: 'center', gap: 5 }}><Coin size={13} /> {save.coins}</div>
-            {showTutoBtn && (
-              <button onClick={() => setShowTutorialReplay(true)}
-                style={{ fontSize: 11, fontWeight: 600, color: G.textMuted, background: 'rgba(255,255,255,.06)', border: `1px solid ${G.border}`, borderRadius: 6, padding: '4px 9px', cursor: 'pointer', letterSpacing: '.03em' }}>
-                {t('header.tuto')}
-              </button>
-            )}
           </div>
         )}
       </div>
@@ -1738,7 +1787,6 @@ export default function EliteCounter() {
   );
 
   const renderCrumbs = () => {
-    const langMeta = getLanguage(lang);
     return (
       <div className="crumb">
         {crumbs.map((c, i) => (
@@ -1748,12 +1796,17 @@ export default function EliteCounter() {
           </React.Fragment>
         ))}
         {nav === 'lobby' && (
-          <button onClick={() => setShowLangModal(true)} title={t('header.language')}
-            style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 5, background: 'rgba(255,255,255,.06)', border: `1px solid ${G.border}`, borderRadius: 6, padding: '3px 9px', cursor: 'pointer', color: G.textMuted, fontSize: 11, letterSpacing: '.04em', flexShrink: 0 }}>
-            <Globe size={12} />
-            <span style={{ fontSize: 13 }}>{langMeta.flag}</span>
-            <span style={{ textTransform: 'uppercase', fontWeight: 600 }}>{lang}</span>
-          </button>
+          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+            <button onClick={() => setShowTutorialReplay(true)} title={t('header.tuto')}
+              style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,.06)', border: `1px solid ${G.border}`, borderRadius: 6, padding: '4px 10px', cursor: 'pointer', color: G.textMuted, fontSize: 11, fontWeight: 600, letterSpacing: '.04em' }}>
+              {t('header.tuto')}
+            </button>
+            <button onClick={() => setShowLangModal(true)} title={t('header.language')}
+              style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,.06)', border: `1px solid ${G.border}`, borderRadius: 6, padding: '4px 9px', cursor: 'pointer', color: G.textMuted }}>
+              <Globe size={12} />
+              <Flag code={lang} size={18} />
+            </button>
+          </div>
         )}
       </div>
     );
@@ -2203,10 +2256,12 @@ export default function EliteCounter() {
                 <div style={{ borderTop: `1px solid ${G.border}`, paddingTop: 14, marginBottom: 14 }}>
                   <div style={{ fontSize: 11, color: G.textMuted, letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 10 }}>{t('stats.rankedProgress')}</div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{ fontSize: 32 }}>{currentRank.icon}</div>
+                    <div style={{ fontSize: 32 }}>{displayRank.icon}</div>
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 3 }}>{currentRank.name}</div>
-                      {currentRank.id < 6 && (
+                      <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 3 }}>{displayRank.name}</div>
+                      {placementOngoing ? (
+                        <div style={{ fontSize: 11, color: G.gold, marginTop: 3 }}>{t('stats.placementInProgress')}</div>
+                      ) : displayRank.id < 6 && (
                         <>
                           <div className="mmrtrack">
                             <div className="mmrfill" style={{ width: `${save.mmr}%`, background: `linear-gradient(90deg,${G.goldDim},${mmrColor})` }} />
@@ -2251,10 +2306,6 @@ export default function EliteCounter() {
             <div className="mdl" onClick={e => e.stopPropagation()}>
               <div className="mhndl" />
               <div className="mtitle">{t('settings.title')}</div>
-              <button style={{ width: '100%', padding: 11, marginTop: 6, background: 'rgba(255,255,255,.05)', border: `1px solid ${G.border}`, borderRadius: 8, color: G.text, cursor: 'pointer', fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
-                onClick={() => { setShowSettings(false); setShowLangModal(true); }}>
-                <Globe size={14} /> {t('header.language')} · {getLanguage(lang).flag} {getLanguage(lang).label}
-              </button>
               <div style={{ padding: '14px 0', borderBottom: `1px solid ${G.border}` }}>
                 <button style={{ width: '100%', padding: 11, background: 'rgba(192,57,43,.1)', border: `1px solid rgba(192,57,43,.3)`, borderRadius: 8, color: G.red, cursor: 'pointer', fontSize: 13, fontWeight: 600 }}
                   onClick={() => setShowResetConfirm(true)}>{t('settings.reset')}</button>
