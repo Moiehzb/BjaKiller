@@ -11,5 +11,20 @@
       "PowerShell(npm run *)",
       "PowerShell(git *)"
     ]
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$env:PATH += ';C:\\Program Files\\Git\\cmd'; Set-Location 'D:\\CLAUDE CODE CS CODE'; git add .; $s = git status --porcelain; if ($s) { $ts = Get-Date -Format 'yyyy-MM-dd HH:mm'; git commit -m \"Auto-save $ts\"; git push origin main }",
+            "shell": "powershell",
+            "timeout": 30,
+            "statusMessage": "Sauvegarde GitHub..."
+          }
+        ]
+      }
+    ]
   }
 }
