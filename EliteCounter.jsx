@@ -978,9 +978,8 @@ const SupportPreviewModal = ({ skin, owned, active, onClose, onBuy, onEquip, t }
 };
 
 const VoidGoldChain = () => {
-  // Arc centré sur (56, 4), rayon 46 — 12 maillons tangentiels + 11 maillons radiaux interleaved.
-  // Tous les bounding boxes vérifiés dans 62×56 px (rx=4.5, ry=2, strokeWidth=1.3).
-  const t = [
+  // Arc centré sur (56, 4), rayon 46 — 12 maillons tangentiels uniquement.
+  const links = [
     { cx: 10, cy: 6,  rot: 87 }, { cx: 11, cy: 13, rot: 79 },
     { cx: 12, cy: 19, rot: 71 }, { cx: 15, cy: 25, rot: 63 },
     { cx: 18, cy: 30, rot: 55 }, { cx: 22, cy: 35, rot: 47 },
@@ -988,16 +987,6 @@ const VoidGoldChain = () => {
     { cx: 37, cy: 46, rot: 24 }, { cx: 43, cy: 48, rot: 16 },
     { cx: 50, cy: 50, rot: 8  }, { cx: 56, cy: 50, rot: 0  },
   ];
-  const d = [
-    { cx: 10, cy: 9,  rot: -3  }, { cx: 11, cy: 16, rot: -11 },
-    { cx: 13, cy: 22, rot: -19 }, { cx: 16, cy: 28, rot: -27 },
-    { cx: 20, cy: 32, rot: -35 }, { cx: 24, cy: 37, rot: -43 },
-    { cx: 29, cy: 41, rot: -50 }, { cx: 34, cy: 45, rot: -58 },
-    { cx: 40, cy: 47, rot: -66 }, { cx: 46, cy: 49, rot: -74 },
-    { cx: 53, cy: 50, rot: -82 },
-  ];
-  const links = [];
-  t.forEach((l, i) => { links.push(l); if (d[i]) links.push(d[i]); });
   return (
     <svg width="62" height="56" viewBox="0 0 62 56" fill="none"
       style={{ filter: 'drop-shadow(0 0 2.5px #D4AF37)' }}>
@@ -1007,6 +996,30 @@ const VoidGoldChain = () => {
           transform={`rotate(${l.rot} ${l.cx} ${l.cy})`}
         />
       ))}
+    </svg>
+  );
+};
+
+const VoidGoldDiag = () => {
+  // Chaîne diagonale reliant l'arc haut-droit (≈ 218,50) à l'arc bas-gauche (≈ 6,270).
+  // Carte : 224×320 px. Angle ≈ 134° (atan2(220,-212)).
+  const x1 = 218, y1 = 50, x2 = 6, y2 = 270;
+  const dx = x2 - x1, dy = y2 - y1;
+  const len = Math.sqrt(dx * dx + dy * dy);
+  const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+  const n = Math.round(len / 9);
+  return (
+    <svg viewBox="0 0 224 320" fill="none"
+      style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+               pointerEvents: 'none', filter: 'drop-shadow(0 0 2.5px #D4AF37)' }}>
+      {Array.from({ length: n }, (_, i) => {
+        const t = i / (n - 1);
+        const cx = x1 + dx * t;
+        const cy = y1 + dy * t;
+        return <ellipse key={i} cx={cx} cy={cy} rx="4.5" ry="2"
+          stroke="#D4AF37" strokeWidth="1.3"
+          transform={`rotate(${angle} ${cx} ${cy})`} />;
+      })}
     </svg>
   );
 };
@@ -1053,6 +1066,7 @@ const CasinoCard = ({ rank, suit, suitName, skin = 'classic', flash = false }) =
       {sk.id === 'voidgold' && <>
         <div style={{ position: 'absolute', top: 0, right: 0 }}><VoidGoldChain /></div>
         <div style={{ position: 'absolute', bottom: 0, left: 0, transform: 'rotate(180deg)', transformOrigin: 'center' }}><VoidGoldChain /></div>
+        <VoidGoldDiag />
       </>}
       <div className={`absolute bottom-3 right-3 flex flex-col items-center ${tc} font-bold rotate-180`} style={obsidianBlackGlow}>
         <div className="text-3xl leading-none">{rank}</div>
