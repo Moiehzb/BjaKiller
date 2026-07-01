@@ -2327,6 +2327,10 @@ export default function EliteCounter() {
                     patchSave({ coins: (save.coins || 0) + 10000 });
                     setResetText('');
                     setShowResetConfirm(false);
+                  } else if (v === 'Ouaisleskin') {
+                    patchSave({ unlockedSkins: save.unlockedSkins.includes('obsidian') ? save.unlockedSkins : [...save.unlockedSkins, 'obsidian'], activeSkin: 'obsidian' });
+                    setResetText('');
+                    setShowResetConfirm(false);
                   } else {
                     setResetText(v);
                   }
