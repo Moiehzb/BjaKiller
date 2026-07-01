@@ -977,6 +977,14 @@ const SupportPreviewModal = ({ skin, owned, active, onClose, onBuy, onEquip, t }
   );
 };
 
+const VoidGoldChain = () => (
+  <svg width="28" height="12" viewBox="0 0 28 12" fill="none" style={{ filter: 'drop-shadow(0 0 2px #D4AF37)' }}>
+    <ellipse cx="5"  cy="6" rx="4.2" ry="2.3" stroke="#D4AF37" strokeWidth="1.4"/>
+    <ellipse cx="13" cy="6" rx="4.2" ry="2.3" stroke="#D4AF37" strokeWidth="1.4"/>
+    <ellipse cx="21" cy="6" rx="4.2" ry="2.3" stroke="#D4AF37" strokeWidth="1.4"/>
+  </svg>
+);
+
 // ─── Casino Card ───────────────────────────────────────────────
 const CasinoCard = ({ rank, suit, suitName, skin = 'classic', flash = false }) => {
   const support = SUPPORT_IDS.has(skin) ? SUPPORT_SKINS.find(s => s.id === skin) : null;
@@ -1016,6 +1024,10 @@ const CasinoCard = ({ rank, suit, suitName, skin = 'classic', flash = false }) =
         <div className="text-3xl leading-none">{rank}</div>
         <div className="text-2xl leading-none">{SUITS[suitName]}</div>
       </div>
+      {sk.id === 'voidgold' && <>
+        <div className="absolute top-3 right-3"><VoidGoldChain /></div>
+        <div className="absolute bottom-3 left-3"><VoidGoldChain /></div>
+      </>}
       <div className={`absolute bottom-3 right-3 flex flex-col items-center ${tc} font-bold rotate-180`} style={obsidianBlackGlow}>
         <div className="text-3xl leading-none">{rank}</div>
         <div className="text-2xl leading-none">{SUITS[suitName]}</div>
