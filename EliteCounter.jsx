@@ -988,15 +988,17 @@ const CasinoCard = ({ rank, suit, suitName, skin = 'classic', flash = false }) =
   if (sk.id === 'matrix') tc = 'text-green-400';
   if (sk.id === 'blood') tc = isRed ? 'text-red-400' : 'text-gray-300';
   if (sk.id === 'obsidian') tc = isRed ? 'text-red-500' : 'text-gray-200';
-  if (sk.id === 'voidgold') tc = isRed ? 'text-red-700' : 'text-amber-900';
+  if (sk.id === 'voidgold') tc = 'text-amber-400';
   if (sk.id === 'ice') tc = isRed ? 'text-red-400' : 'text-cyan-300';
   if (sk.id === 'royal') tc = isRed ? 'text-red-600' : 'text-purple-900';
   const faceCards = { 'J': 'JACK', 'Q': 'QUEEN', 'K': 'KING', 'A': 'ACE' };
   const isFace = ['J', 'Q', 'K', 'A'].includes(rank);
   const obsidianBlackGlow = sk.id === 'obsidian' && !isRed
     ? { textShadow: '0 0 8px rgba(255,255,255,0.9), 0 0 16px rgba(200,200,255,0.5)' }
-    : sk.id === 'voidgold' && !isRed
-    ? { textShadow: '0 0 4px rgba(180,120,0,0.3)' }
+    : sk.id === 'obsidian' && isRed
+    ? { textShadow: '0 0 8px rgba(255,60,80,0.9), 0 0 16px rgba(255,0,50,0.5)' }
+    : sk.id === 'voidgold'
+    ? { textShadow: '0 0 8px rgba(255,180,0,0.9), 0 0 16px rgba(255,160,0,0.5)' }
     : sk.id === 'ice' && !isRed
     ? { textShadow: '0 0 10px rgba(80,220,255,0.95), 0 0 20px rgba(0,180,255,0.6)' }
     : {};
@@ -1005,8 +1007,6 @@ const CasinoCard = ({ rank, suit, suitName, skin = 'classic', flash = false }) =
     ? '0 20px 60px rgba(0,0,0,.8), 0 0 0 1px rgba(255,255,255,.08), inset 0 0 30px rgba(255,255,255,.02)'
     : sk.id === 'ice'
     ? '0 20px 60px rgba(0,80,160,.5), 0 0 0 1px rgba(100,220,255,.15), inset 0 0 40px rgba(0,150,255,.08)'
-    : sk.id === 'voidgold'
-    ? '0 20px 60px rgba(180,140,0,.25), 0 0 0 1px rgba(200,160,0,.2)'
     : '0 20px 60px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.05)';
 
   return (
