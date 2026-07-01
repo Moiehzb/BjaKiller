@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Play, Pause, X, ChevronRight, ChevronLeft, Eye, EyeOff, AlertTriangle, Globe } from 'lucide-react';
+import { Play, Pause, X, ChevronRight, ChevronLeft, Eye, EyeOff, AlertTriangle, Globe, Volume2, VolumeX } from 'lucide-react';
 import TutorialOverlay from './EliteCounterTutorial.jsx';
 import { makeT, DEFAULT_LANG, getLanguage } from './i18n';
 import { LanguageSelectScreen, LanguageModal, Flag } from './LanguageSelect.jsx';
+import { initAudio, playCard, playCorrect, playWrong, playChip, playRankUp, playAchievement, playClick, playCountdown, playGo } from './src/sounds.js';
 
 // ─── Constants ────────────────────────────────────────────────────
 const CARD_VALUES = {
@@ -1127,6 +1128,7 @@ const DEFAULT_SAVE = {
   tutorialDone: false,
   trainingDone: false,   // unlocks Ranked after first training card
   rankedDone: false,     // unlocks Casino Killer after first ranked game
+  soundEnabled: true,
 };
 
 export default function EliteCounter() {
@@ -1206,6 +1208,7 @@ export default function EliteCounter() {
     setTimeout(() => {
       setToastLeaving(false);
       setShowAchievement(ach);
+      snd(playAchievement);
       setTimeout(() => {
         setToastLeaving(true);                  // trigger slide-up
         setTimeout(() => {
@@ -1225,6 +1228,7 @@ export default function EliteCounter() {
 
   const timerRef = useRef(null);
   const autoPlayRef = useRef(null);
+  const soundEnabledRef = useRef(true);
 
   // ── Load save ─────────────────────────────────────────────────
   useEffect(() => {
@@ -1243,6 +1247,15 @@ export default function EliteCounter() {
   useEffect(() => {
     if (save) localStorage.setItem('eliteSave', JSON.stringify(save));
   }, [save]);
+
+  // ── Sound helpers ──────────────────────────────────────────────
+  useEffect(() => { soundEnabledRef.current = save?.soundEnabled !== false; }, [save?.soundEnabled]);
+  const snd = (fn) => { if (soundEnabledRef.current) fn(); };
+
+  // Card flip — triggered by currentIndex change during play
+  useEffect(() => {
+    if (gameState === 'playing' && currentIndex > 0) snd(playCard);
+  }, [currentIndex]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const patchSave = (patch) => setSave(prev => ({ ...prev, ...patch }));
 
@@ -1344,6 +1357,7 @@ export default function EliteCounter() {
     if (mode !== 'casino') countWasShownRef.current = initialCountShown;
 
     const startPlaying = () => {
+      snd(playChip);
       setCurrentIndex(1);
       setGameState('playing');
       setStartTime(Date.now());
@@ -1362,13 +1376,17 @@ export default function EliteCounter() {
     } else {
       setGameState('countdown');
       setCountdown(3);
+      snd(() => playCountdown(3));
       let cnt = 3;
       const iv = setInterval(() => {
         cnt--;
         setCountdown(cnt);
         if (cnt === 0) {
           clearInterval(iv);
+          snd(playGo);
           startPlaying();
+        } else {
+          snd(() => playCountdown(cnt));
         }
       }, 1000);
     }
@@ -1584,6 +1602,7 @@ export default function EliteCounter() {
         const np = tierToRank(tier + 1);
         patchSave({ rankId: np.rankId, subRank: np.subRank, mmr: 10 });
         setMmrDelta(999); // flag promotion (affichage)
+        snd(playRankUp);
       } else {
         // Palier final (Master III) → plafonné à 100, sinon MMR normal.
         patchSave({ mmr: Math.min(100, newMmr) });
@@ -1648,6 +1667,10 @@ export default function EliteCounter() {
     const newCurSpcSum = correct ? (save.curStreakSpcSum || 0) + spcUsed : 0;
     const newCurCardsSum = correct ? (save.curStreakCardsSum || 0) + cardsUsed : 0;
     const beatsBest = correct && newStreak > (save.bestStreak || 0);
+
+    // ── Answer sound (streak richness grows with combo) ──────────
+    if (correct) snd(() => playCorrect(newStreak));
+    else snd(playWrong);
     const newBestStreak = beatsBest ? newStreak : (save.bestStreak || 0);
     const newBestStreakAvgSpc = beatsBest ? (newCurSpcSum / newStreak) : save.bestStreakAvgSpc;
     const newBestStreakCards = beatsBest ? newCurCardsSum : save.bestStreakCards;
@@ -1935,7 +1958,7 @@ export default function EliteCounter() {
 
           <div className="sec">{t('lobby.gameModes')}</div>
 
-          <div className="card feat" onClick={() => setNav('mode-training')}>
+          <div className="card feat" onClick={() => { snd(playClick); setNav('mode-training'); }}>
             <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
               <div className="ci">🎯</div>
               <div>
@@ -1946,7 +1969,7 @@ export default function EliteCounter() {
             <ChevronRight className="chev" size={17} />
           </div>
 
-          <div className="card" onClick={save.trainingDone ? () => setNav('mode-ranked') : undefined}
+          <div className="card" onClick={save.trainingDone ? () => { snd(playClick); setNav('mode-ranked'); } : undefined}
             style={!save.trainingDone ? { opacity: 0.45, cursor: 'not-allowed' } : {}}>
             <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
               <div className="ci">🏆</div>
@@ -1964,7 +1987,7 @@ export default function EliteCounter() {
             {save.trainingDone && <ChevronRight className="chev" size={17} />}
           </div>
 
-          <div className="card danger" onClick={save.rankedDone ? () => setNav('mode-casino') : undefined}
+          <div className="card danger" onClick={save.rankedDone ? () => { snd(playClick); setNav('mode-casino'); } : undefined}
             style={!save.rankedDone ? { opacity: 0.45, cursor: 'not-allowed' } : {}}>
             <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
               <div className="ci">🔥</div>
@@ -2364,6 +2387,17 @@ export default function EliteCounter() {
             <div className="mdl" onClick={e => e.stopPropagation()}>
               <div className="mhndl" />
               <div className="mtitle">{t('settings.title')}</div>
+              <div style={{ padding: '14px 0', borderBottom: `1px solid ${G.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: G.text, fontSize: 13 }}>
+                  {save.soundEnabled !== false ? <Volume2 size={15} color={G.gold} /> : <VolumeX size={15} color={G.textMuted} />}
+                  <span>Sons</span>
+                </div>
+                <button
+                  onClick={() => { initAudio(); patchSave({ soundEnabled: save.soundEnabled === false }); }}
+                  style={{ padding: '6px 14px', background: save.soundEnabled !== false ? 'rgba(201,168,76,.15)' : 'rgba(255,255,255,.05)', border: `1px solid ${save.soundEnabled !== false ? G.borderGold : G.border}`, borderRadius: 6, color: save.soundEnabled !== false ? G.gold : G.textMuted, cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>
+                  {save.soundEnabled !== false ? 'ON' : 'OFF'}
+                </button>
+              </div>
               <div style={{ padding: '14px 0', borderBottom: `1px solid ${G.border}` }}>
                 <button style={{ width: '100%', padding: 11, background: 'rgba(192,57,43,.1)', border: `1px solid rgba(192,57,43,.3)`, borderRadius: 8, color: G.red, cursor: 'pointer', fontSize: 13, fontWeight: 600 }}
                   onClick={() => setShowResetConfirm(true)}>{t('settings.reset')}</button>
@@ -2535,7 +2569,7 @@ export default function EliteCounter() {
             </>
           )}
 
-          <button className="lbtn" onClick={startRanked}>
+          <button className="lbtn" onClick={() => { snd(playClick); startRanked(); }}>
             {isPlacement
               ? nextSlot?.type === 'recovery'
                 ? t('rankedConfig.launchRecovery')
@@ -2601,7 +2635,7 @@ export default function EliteCounter() {
             </div>
           </div>
 
-          <button className="lbtn" onClick={startTraining}>{t('trainingConfig.start')}</button>
+          <button className="lbtn" onClick={() => { snd(playClick); startTraining(); }}>{t('trainingConfig.start')}</button>
         </div>
       </div>
     );
@@ -2655,7 +2689,7 @@ export default function EliteCounter() {
             {t('casinoConfig.warn')}
           </div>
 
-          <button className="lbtn red" onClick={startCasinoChallenge}>
+          <button className="lbtn red" onClick={() => { snd(playClick); startCasinoChallenge(); }}>
             {t('casinoConfig.launch')}
           </button>
         </div>
@@ -2843,8 +2877,8 @@ export default function EliteCounter() {
 
                     <div style={{ display: 'flex', gap: 8 }}>
                       <button style={{ flex: 1, padding: '11px 0', background: 'rgba(255,255,255,.04)', border: `1px solid ${G.border}`, borderRadius: 8, color: G.textMuted, cursor: 'pointer', fontSize: 13 }} onClick={goBack}>{t('common.menu')}</button>
-                      {!isCasino && <button className="lbtn" style={{ flex: 2, marginTop: 0, padding: 11 }} onClick={playAgain}>{t('common.replay')}</button>}
-                      {isCasino && !isCorrect && <button className="lbtn red" style={{ flex: 2, marginTop: 0, padding: 11 }} onClick={startCasinoChallenge}>{t('common.restart')}</button>}
+                      {!isCasino && <button className="lbtn" style={{ flex: 2, marginTop: 0, padding: 11 }} onClick={() => { snd(playClick); playAgain(); }}>{t('common.replay')}</button>}
+                      {isCasino && !isCorrect && <button className="lbtn red" style={{ flex: 2, marginTop: 0, padding: 11 }} onClick={() => { snd(playClick); startCasinoChallenge(); }}>{t('common.restart')}</button>}
                     </div>
                   </div>
                 )}
@@ -2878,6 +2912,9 @@ export default function EliteCounter() {
                 {gameState === 'paused' ? <Play size={15} /> : <Pause size={15} />}
               </div>
             )}
+            <div className="ghbtn" onClick={() => patchSave({ soundEnabled: save.soundEnabled === false })} title="Son">
+              {save.soundEnabled !== false ? <Volume2 size={15} /> : <VolumeX size={15} color={G.textMuted} />}
+            </div>
           </div>
 
           {/* Progress */}
