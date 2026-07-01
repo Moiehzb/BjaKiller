@@ -1062,13 +1062,9 @@ const CasinoCard = ({ rank, suit, suitName, skin = 'classic', flash = false }) =
       </div>
       {sk.id === 'voidgold' && <>
         <div style={{ position: 'absolute', top: 0, right: 0 }}><VoidGoldChain /></div>
-        <div style={{ position: 'absolute', top: 0, left: 0, transform: 'scaleX(-1)' }}><VoidGoldChain /></div>
         <div style={{ position: 'absolute', bottom: 0, left: 0, transform: 'rotate(180deg)', transformOrigin: 'center' }}><VoidGoldChain /></div>
-        <div style={{ position: 'absolute', bottom: 0, right: 0, transform: 'scaleY(-1)' }}><VoidGoldChain /></div>
-        <VoidGoldDiag x1={218} y1={50}  x2={6}   y2={270} />
-        <VoidGoldDiag x1={172} y1={6}   x2={52}  y2={314} />
-        <VoidGoldDiag x1={6}   y1={50}  x2={218} y2={270} />
-        <VoidGoldDiag x1={52}  y1={6}   x2={172} y2={314} />
+        <VoidGoldDiag x1={218} y1={50} x2={6}   y2={270} />
+        <VoidGoldDiag x1={172} y1={6}  x2={52}  y2={314} />
       </>}
       <div className={`absolute bottom-3 right-3 flex flex-col items-center ${tc} font-bold rotate-180`} style={obsidianBlackGlow}>
         <div className="text-3xl leading-none">{rank}</div>
@@ -2121,13 +2117,9 @@ export default function EliteCounter() {
                       {!isSecret && sk.id === 'voidgold' && (
                         <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', filter: 'drop-shadow(0 0 1px #D4AF37)' }} viewBox="0 0 38 52" fill="none">
                           <path d="M 29 1 Q 37 1 37 9"  stroke="#D4AF37" strokeWidth="1" strokeDasharray="2 1.5"/>
-                          <path d="M 9  1 Q 1  1 1  9"  stroke="#D4AF37" strokeWidth="1" strokeDasharray="2 1.5"/>
                           <path d="M 9 51 Q 1 51 1 43"  stroke="#D4AF37" strokeWidth="1" strokeDasharray="2 1.5"/>
-                          <path d="M 29 51 Q 37 51 37 43" stroke="#D4AF37" strokeWidth="1" strokeDasharray="2 1.5"/>
                           <line x1="37" y1="9"  x2="1"  y2="43" stroke="#D4AF37" strokeWidth="1" strokeDasharray="2 1.5"/>
                           <line x1="29" y1="1"  x2="9"  y2="51" stroke="#D4AF37" strokeWidth="1" strokeDasharray="2 1.5"/>
-                          <line x1="1"  y1="9"  x2="37" y2="43" stroke="#D4AF37" strokeWidth="1" strokeDasharray="2 1.5"/>
-                          <line x1="9"  y1="1"  x2="29" y2="51" stroke="#D4AF37" strokeWidth="1" strokeDasharray="2 1.5"/>
                         </svg>
                       )}
                     </div>
