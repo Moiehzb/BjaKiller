@@ -1000,10 +1000,7 @@ const VoidGoldChain = () => {
   );
 };
 
-const VoidGoldDiag = () => {
-  // Chaîne diagonale reliant l'arc haut-droit (≈ 218,50) à l'arc bas-gauche (≈ 6,270).
-  // Carte : 224×320 px. Angle ≈ 134° (atan2(220,-212)).
-  const x1 = 218, y1 = 50, x2 = 6, y2 = 270;
+const VoidGoldDiag = ({ x1, y1, x2, y2 }) => {
   const dx = x2 - x1, dy = y2 - y1;
   const len = Math.sqrt(dx * dx + dy * dy);
   const angle = Math.atan2(dy, dx) * 180 / Math.PI;
@@ -1066,7 +1063,8 @@ const CasinoCard = ({ rank, suit, suitName, skin = 'classic', flash = false }) =
       {sk.id === 'voidgold' && <>
         <div style={{ position: 'absolute', top: 0, right: 0 }}><VoidGoldChain /></div>
         <div style={{ position: 'absolute', bottom: 0, left: 0, transform: 'rotate(180deg)', transformOrigin: 'center' }}><VoidGoldChain /></div>
-        <VoidGoldDiag />
+        <VoidGoldDiag x1={218} y1={50} x2={6}   y2={270} />
+        <VoidGoldDiag x1={172} y1={6}  x2={52}  y2={314} />
       </>}
       <div className={`absolute bottom-3 right-3 flex flex-col items-center ${tc} font-bold rotate-180`} style={obsidianBlackGlow}>
         <div className="text-3xl leading-none">{rank}</div>
