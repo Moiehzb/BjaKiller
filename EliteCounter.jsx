@@ -982,10 +982,16 @@ const VoidGoldChain = () => {
   // 6 maillons de θ=177° à θ=90°, chacun tourné tangentiellement (rot = θ − 90°).
   const links = [
     { cx: 8,  cy: 3,  rot: 87 },
-    { cx: 11, cy: 18, rot: 70 },
-    { cx: 19, cy: 32, rot: 52 },
-    { cx: 30, cy: 43, rot: 35 },
-    { cx: 44, cy: 50, rot: 17 },
+    { cx: 9,  cy: 10, rot: 79 },
+    { cx: 11, cy: 17, rot: 71 },
+    { cx: 14, cy: 23, rot: 63 },
+    { cx: 17, cy: 30, rot: 56 },
+    { cx: 22, cy: 35, rot: 48 },
+    { cx: 27, cy: 40, rot: 40 },
+    { cx: 33, cy: 44, rot: 32 },
+    { cx: 39, cy: 48, rot: 24 },
+    { cx: 46, cy: 50, rot: 16 },
+    { cx: 53, cy: 52, rot: 8  },
     { cx: 60, cy: 52, rot: 0  },
   ];
   return (
