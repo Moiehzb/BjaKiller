@@ -2111,9 +2111,17 @@ export default function EliteCounter() {
                 const isSecret = sk.secret && !owned;
                 return (
                   <div key={sk.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 0', borderBottom: `1px solid ${G.border}`, opacity: isSecret ? 0.5 : 1 }}>
-                    <div style={{ width: 38, height: 52, borderRadius: 6, border: `2px solid ${active ? G.gold : isSecret ? G.border : G.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    <div style={{ width: 38, height: 52, borderRadius: 6, border: `2px solid ${active ? G.gold : G.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}
                          className={isSecret ? '' : sk.bg}>
                       {isSecret && <span style={{ fontSize: 18 }}>🔒</span>}
+                      {!isSecret && sk.id === 'voidgold' && (
+                        <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', filter: 'drop-shadow(0 0 1px #D4AF37)' }} viewBox="0 0 38 52" fill="none">
+                          <path d="M 29 1 Q 37 1 37 9"  stroke="#D4AF37" strokeWidth="1" strokeDasharray="2 1.5"/>
+                          <path d="M 9 51 Q 1 51 1 43"  stroke="#D4AF37" strokeWidth="1" strokeDasharray="2 1.5"/>
+                          <line x1="37" y1="9"  x2="1"  y2="43" stroke="#D4AF37" strokeWidth="1" strokeDasharray="2 1.5"/>
+                          <line x1="29" y1="1"  x2="9"  y2="51" stroke="#D4AF37" strokeWidth="1" strokeDasharray="2 1.5"/>
+                        </svg>
+                      )}
                     </div>
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 1 }}>{isSecret ? t('shop.secretName') : sk.name}</div>
