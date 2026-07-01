@@ -376,6 +376,8 @@ const de = {
         'Flüstere den Count bei jeder Karte: „eins… null… minus eins…“ Versuche nicht, jede Karte zu merken — nur die laufende Summe.',
       see6: 'Die 6 Karten ansehen',
       watching: 'Folge dem Count…',
+      nextCard: 'Weiter →',
+      enterCount: 'Meinen Zähler eingeben',
       wrongTry: 'Nicht ganz… noch ein Versuch.',
       correctTitle: ({ count }) => `✓ Genau! Der Count war +${count}.`,
       wrongTitle: ({ count }) => `Der Count war +${count}.`,

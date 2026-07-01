@@ -374,6 +374,8 @@ const en = {
         'Whisper the count on each card: "one… zero… minus one…" Don’t try to memorize each card — just the running total.',
       see6: 'See the 6 cards',
       watching: 'Follow the count…',
+      nextCard: 'Next →',
+      enterCount: 'Enter my count',
       wrongTry: 'Not quite… one more try.',
       correctTitle: ({ count }) => `✓ Exactly! The count was +${count}.`,
       wrongTitle: ({ count }) => `The count was +${count}.`,

@@ -562,60 +562,50 @@ const HiLoQuizStep = ({ onNext, onBack, t }) => {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // STEP 3 — Quiz de comptage : 6 cartes en séquence
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const HiLoRefBar = () => (
+  <div style={{ display: 'flex', gap: 6, marginBottom: 14 }}>
+    {[
+      { range: '2 – 6', val: '+1', color: G.green },
+      { range: '7 – 9', val: '0',  color: G.textMuted },
+      { range: '10 – A', val: '−1', color: G.red },
+    ].map((r) => (
+      <div key={r.range} style={{ flex: 1, background: G.feltLight, border: `1px solid ${G.border}`, borderRadius: 8, padding: '7px 4px', textAlign: 'center' }}>
+        <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 17, fontWeight: 700, color: r.color, lineHeight: 1 }}>{r.val}</div>
+        <div style={{ fontSize: 10, color: G.textMuted, marginTop: 3, letterSpacing: '.04em' }}>{r.range}</div>
+      </div>
+    ))}
+  </div>
+);
+
 const CountQuizStep = ({ onNext, onBack, t }) => {
   // phase: 'intro' → 'watching' → 'input' → 'done'
   const [phase, setPhase]       = useState('intro');
-  const [dealIdx, setDealIdx]   = useState(-1);     // index of last dealt card (-1 = aucune)
-  const [showVals, setShowVals] = useState(false);  // afficher les +1/0/-1 sous chaque carte
+  const [dealIdx, setDealIdx]   = useState(-1);
+  const [showVals, setShowVals] = useState(false);
   const [guess, setGuess]       = useState(0);
-  const [attempts, setAttempts] = useState(0);
-  const [feedback, setFeedback] = useState(null);   // null | 'correct' | 'wrong-try' | 'wrong-final'
-  const dealRef  = useRef(null);
-  const phaseRef = useRef(null);
-  const fbRef    = useRef(null);
-
-  useEffect(() => () => {
-    clearTimeout(dealRef.current);
-    clearTimeout(phaseRef.current);
-    clearTimeout(fbRef.current);
-  }, []);
-
-  // Auto-deal cards one by one
-  useEffect(() => {
-    if (phase !== 'watching' || dealIdx < 0) return;
-
-    if (dealIdx < COUNT_SEQ.length - 1) {
-      dealRef.current = setTimeout(() => setDealIdx((i) => i + 1), 870);
-    } else {
-      // Last card dealt → pause → input (valeurs révélées seulement après une erreur)
-      dealRef.current = setTimeout(() => {
-        phaseRef.current = setTimeout(() => setPhase('input'), 700);
-      }, 750);
-    }
-    return () => clearTimeout(dealRef.current);
-  }, [phase, dealIdx]);
+  const [feedback, setFeedback] = useState(null);   // null | 'correct' | 'wrong'
 
   const startWatching = () => {
     setPhase('watching');
     setDealIdx(0);
   };
 
+  const nextCard = () => {
+    if (dealIdx < COUNT_SEQ.length - 1) {
+      setDealIdx((i) => i + 1);
+    } else {
+      setPhase('input');
+    }
+  };
+
   const validate = () => {
     if (guess === COUNT_ANSWER) {
       setFeedback('correct');
       setPhase('done');
-      // Valeurs restent cachées — l'utilisateur a réussi sans aide
     } else {
-      const next = attempts + 1;
-      setAttempts(next);
-      setShowVals(true); // Révèle les valeurs comme aide après une erreur
-      if (next >= 2) {
-        setFeedback('wrong-final');
-        setPhase('done');
-      } else {
-        setFeedback('wrong-try');
-        fbRef.current = setTimeout(() => setFeedback(null), 1600);
-      }
+      setShowVals(true);
+      setFeedback('wrong');
+      setPhase('done');
     }
   };
 
@@ -677,59 +667,53 @@ const CountQuizStep = ({ onNext, onBack, t }) => {
         })}
       </div>
 
-      {/* Watching hint */}
+      {/* Hi-Lo reference bar — visible à toutes les phases */}
+      <HiLoRefBar />
+
+      {/* Watching : bouton manuel "Suivant" */}
       {phase === 'watching' && (
-        <div className="cnt-watching-hint">{t('tutorial.count.watching')}</div>
+        <button className="tbtn-g" onClick={nextCard}>
+          {dealIdx < COUNT_SEQ.length - 1
+            ? t('tutorial.count.nextCard')
+            : t('tutorial.count.enterCount')
+          }
+        </button>
       )}
 
       {/* Input */}
-      {(phase === 'input' || phase === 'done') && (
+      {phase === 'input' && (
         <>
-          {/* Wrong-try inline feedback */}
-          {feedback === 'wrong-try' && (
-            <div style={{ textAlign: 'center', marginBottom: 10, fontSize: 13, color: G.red, fontWeight: 600 }}>
-              {t('tutorial.count.wrongTry')}
+          <div className="cnt-stepper">
+            <button className="csb" onClick={() => setGuess((g) => Math.max(g - 1, -12))}>−</button>
+            <div className={`cnt-num ${countCls}`}>
+              {guess > 0 ? `+${guess}` : guess}
             </div>
-          )}
+            <button className="csb" onClick={() => setGuess((g) => Math.min(g + 1, 12))}>+</button>
+          </div>
+          <button className="tbtn-g" onClick={validate}>
+            {t('tutorial.count.validate')}
+          </button>
+        </>
+      )}
 
-          {/* Result feedback */}
-          {phase === 'done' && (
-            <div className={`cnt-fb ${feedback === 'correct' ? 'ok' : 'err'}`}>
-              <div className="cnt-fb-title" style={{ color: feedback === 'correct' ? G.green : G.red }}>
-                {feedback === 'correct'
-                  ? t('tutorial.count.correctTitle', { count: COUNT_ANSWER })
-                  : t('tutorial.count.wrongTitle', { count: COUNT_ANSWER })}
-              </div>
-              <div className="cnt-fb-desc">
-                {feedback === 'correct'
-                  ? t('tutorial.count.correctDesc')
-                  : t('tutorial.count.wrongDesc')}
-              </div>
+      {/* Done */}
+      {phase === 'done' && (
+        <>
+          <div className={`cnt-fb ${feedback === 'correct' ? 'ok' : 'err'}`}>
+            <div className="cnt-fb-title" style={{ color: feedback === 'correct' ? G.green : G.red }}>
+              {feedback === 'correct'
+                ? t('tutorial.count.correctTitle', { count: COUNT_ANSWER })
+                : t('tutorial.count.wrongTitle', { count: COUNT_ANSWER })}
             </div>
-          )}
-
-          {/* Stepper */}
-          {phase === 'input' && (
-            <div className="cnt-stepper">
-              <button className="csb" onClick={() => setGuess((g) => Math.max(g - 1, -12))}>−</button>
-              <div className={`cnt-num ${countCls}`}>
-                {guess > 0 ? `+${guess}` : guess}
-              </div>
-              <button className="csb" onClick={() => setGuess((g) => Math.min(g + 1, 12))}>+</button>
+            <div className="cnt-fb-desc">
+              {feedback === 'correct'
+                ? t('tutorial.count.correctDesc')
+                : t('tutorial.count.wrongDesc')}
             </div>
-          )}
-
-          {/* CTA */}
-          {phase === 'input' && (
-            <button className="tbtn-g" onClick={validate}>
-              {t('tutorial.count.validate')}
-            </button>
-          )}
-          {phase === 'done' && (
-            <button className="tbtn-g" onClick={onNext}>
-              {t('tutorial.count.continue')}
-            </button>
-          )}
+          </div>
+          <button className="tbtn-g" onClick={onNext}>
+            {t('tutorial.count.continue')}
+          </button>
         </>
       )}
     </div>

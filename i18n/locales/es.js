@@ -374,6 +374,8 @@ const es = {
         'Susurra el conteo en cada carta: "uno… cero… menos uno…" No intentes memorizar cada carta — solo el total actual.',
       see6: 'Ver las 6 cartas',
       watching: 'Sigue el conteo…',
+      nextCard: 'Siguiente →',
+      enterCount: 'Ingresar mi cuenta',
       wrongTry: 'No del todo… un intento más.',
       correctTitle: ({ count }) => `✓ ¡Exacto! El conteo era +${count}.`,
       wrongTitle: ({ count }) => `El conteo era +${count}.`,

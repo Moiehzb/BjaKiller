@@ -374,6 +374,8 @@ const fr = {
         'Murmure le compte à chaque carte : "un… zéro… moins un…" N’essaie pas de mémoriser chaque carte — juste le total courant.',
       see6: 'Voir les 6 cartes',
       watching: 'Suis le compte…',
+      nextCard: 'Suivant →',
+      enterCount: 'Saisir le compte',
       wrongTry: 'Pas tout à fait… encore un essai.',
       correctTitle: ({ count }) => `✓ Exact ! Le compte était +${count}.`,
       wrongTitle: ({ count }) => `Le compte était +${count}.`,
