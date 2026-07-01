@@ -3,7 +3,7 @@ import { Play, Pause, X, ChevronRight, ChevronLeft, Eye, EyeOff, AlertTriangle, 
 import TutorialOverlay from './EliteCounterTutorial.jsx';
 import { makeT, DEFAULT_LANG, getLanguage } from './i18n';
 import { LanguageSelectScreen, LanguageModal, Flag } from './LanguageSelect.jsx';
-import { initAudio, playCard, playCorrect, playWrong, playChip, playRankUp, playAchievement, playClick, playCountdown, playGo } from './src/sounds.js';
+import { initAudio, playCorrect, playWrong, playChip, playRankUp, playAchievement, playClick, playCountdown, playGo } from './src/sounds.js';
 
 // ─── Constants ────────────────────────────────────────────────────
 const CARD_VALUES = {
@@ -1252,10 +1252,6 @@ export default function EliteCounter() {
   useEffect(() => { soundEnabledRef.current = save?.soundEnabled !== false; }, [save?.soundEnabled]);
   const snd = (fn) => { if (soundEnabledRef.current) fn(); };
 
-  // Card flip — triggered by currentIndex change during play
-  useEffect(() => {
-    if (gameState === 'playing' && currentIndex > 0) snd(playCard);
-  }, [currentIndex]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const patchSave = (patch) => setSave(prev => ({ ...prev, ...patch }));
 
@@ -1870,11 +1866,11 @@ export default function EliteCounter() {
         ))}
         {nav === 'lobby' && (
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-            <button onClick={() => setShowTutorialReplay(true)} title={t('header.tuto')}
+            <button onClick={() => { snd(playClick); setShowTutorialReplay(true); }} title={t('header.tuto')}
               style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,.06)', border: `1px solid ${G.border}`, borderRadius: 6, padding: '4px 10px', cursor: 'pointer', color: G.textMuted, fontSize: 11, fontWeight: 600, letterSpacing: '.04em' }}>
               {t('header.tuto')}
             </button>
-            <button onClick={() => setShowLangModal(true)} title={t('header.language')}
+            <button onClick={() => { snd(playClick); setShowLangModal(true); }} title={t('header.language')}
               style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,.06)', border: `1px solid ${G.border}`, borderRadius: 6, padding: '4px 9px', cursor: 'pointer', color: G.textMuted }}>
               <Globe size={12} />
               <Flag code={lang} size={18} />
@@ -1931,7 +1927,7 @@ export default function EliteCounter() {
             const gamesLeft = PLACEMENT_TOTAL - save.placementGames;
             return (
               <div className="rbadge" style={{ borderColor: 'rgba(91,141,238,.3)', background: 'rgba(91,141,238,.05)', cursor: 'pointer' }}
-                onClick={() => setShowPlacementHistory(true)}>
+                onClick={() => { snd(playClick); setShowPlacementHistory(true); }}>
                 <div style={{ fontSize: 28 }}>🎲</div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 11, color: '#5b8dee', letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 2 }}>{t('lobby.placementTitle')}</div>
@@ -2008,7 +2004,7 @@ export default function EliteCounter() {
               { icon: '📊', label: t('lobby.stats'), sub: save.stats.total > 0 ? t('lobby.statsSub', { total: save.stats.total }) : t('lobby.statsNone'), action: () => setShowStats(true) },
               { icon: '⚙️', label: t('lobby.settings'), sub: t('lobby.settingsSub'), action: () => setShowSettings(true) },
             ].map(item => (
-              <div key={item.label} className="card" style={{ marginBottom: 0, padding: '13px 14px' }} onClick={item.action}>
+              <div key={item.label} className="card" style={{ marginBottom: 0, padding: '13px 14px' }} onClick={() => { snd(playClick); item.action(); }}>
                 <div>
                   <div style={{ fontSize: 18, marginBottom: 4 }}>{item.icon}</div>
                   <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 2 }}>{item.label}</div>
@@ -2153,9 +2149,9 @@ export default function EliteCounter() {
                     {isSecret ? null : active
                       ? <span style={{ fontSize: 11, color: '#0a0d0a', background: G.gold, borderRadius: 6, padding: '4px 10px', fontWeight: 700, letterSpacing: '.04em' }}>{t('common.equipped')}</span>
                       : owned
-                        ? <button style={{ fontSize: 11, color: '#0a0d0a', background: G.green, border: 'none', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', fontWeight: 700 }} onClick={() => patchSave({ activeSkin: sk.id })}>{t('common.equip')}</button>
+                        ? <button style={{ fontSize: 11, color: '#0a0d0a', background: G.green, border: 'none', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', fontWeight: 700 }} onClick={() => { snd(playClick); patchSave({ activeSkin: sk.id }); }}>{t('common.equip')}</button>
                         : <button style={{ fontSize: 11, color: canBuy ? '#0a0d0a' : G.textMuted, background: canBuy ? G.gold : 'rgba(255,255,255,.04)', border: `1px solid ${canBuy ? G.gold : G.border}`, borderRadius: 6, padding: '4px 10px', cursor: canBuy ? 'pointer' : 'not-allowed', fontWeight: canBuy ? 700 : 400 }}
-                          onClick={() => { if (canBuy) patchSave({ coins: save.coins - sk.price, unlockedSkins: [...save.unlockedSkins, sk.id], activeSkin: sk.id }); }}>
+                          onClick={() => { if (canBuy) { snd(playClick); patchSave({ coins: save.coins - sk.price, unlockedSkins: [...save.unlockedSkins, sk.id], activeSkin: sk.id }); } }}>
                           {canBuy ? t('common.buy') : <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>{t('shop.buyLocked', { price: sk.price })}<Coin size={10} /></span>}</button>}
                   </div>
                 );
@@ -2184,13 +2180,13 @@ export default function EliteCounter() {
                       <div style={{ fontSize: 12, color: G.textMuted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{owned ? t('shop.tagline.' + sk.id) : t('shop.price499')}</div>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-                      <button onClick={() => setPreviewSkin(sk)}
+                      <button onClick={() => { snd(playClick); setPreviewSkin(sk); }}
                         style={{ fontSize: 11, color: sk.accent, background: 'transparent', border: `1px solid ${sk.accent}55`, borderRadius: 6, padding: '4px 9px', cursor: 'pointer', fontWeight: 600 }}>{t('shop.preview')}</button>
                       {active
                         ? <span style={{ fontSize: 11, color: '#0a0d0a', background: sk.accent, borderRadius: 6, padding: '4px 10px', fontWeight: 700, letterSpacing: '.04em' }}>{t('common.equipped')}</span>
                         : owned
-                          ? <button style={{ fontSize: 11, color: '#0a0d0a', background: G.green, border: 'none', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', fontWeight: 700 }} onClick={equip}>{t('common.equip')}</button>
-                          : <button style={{ fontSize: 11, color: '#0a0d0a', background: '#e6c84c', border: 'none', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', fontWeight: 700 }} onClick={buy}>{t('shop.price499')}</button>}
+                          ? <button style={{ fontSize: 11, color: '#0a0d0a', background: G.green, border: 'none', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', fontWeight: 700 }} onClick={() => { snd(playClick); equip(); }}>{t('common.equip')}</button>
+                          : <button style={{ fontSize: 11, color: '#0a0d0a', background: '#e6c84c', border: 'none', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', fontWeight: 700 }} onClick={() => { snd(playClick); buy(); }}>{t('shop.price499')}</button>}
                     </div>
                   </div>
                 );
@@ -2400,7 +2396,7 @@ export default function EliteCounter() {
               </div>
               <div style={{ padding: '14px 0', borderBottom: `1px solid ${G.border}` }}>
                 <button style={{ width: '100%', padding: 11, background: 'rgba(192,57,43,.1)', border: `1px solid rgba(192,57,43,.3)`, borderRadius: 8, color: G.red, cursor: 'pointer', fontSize: 13, fontWeight: 600 }}
-                  onClick={() => setShowResetConfirm(true)}>{t('settings.reset')}</button>
+                  onClick={() => { snd(playClick); setShowResetConfirm(true); }}>{t('settings.reset')}</button>
               </div>
             </div>
           </div>
@@ -2429,7 +2425,7 @@ export default function EliteCounter() {
                 }} placeholder={t('settings.resetPlaceholder')} />
               <div style={{ display: 'flex', gap: 8 }}>
                 <button style={{ flex: 1, padding: 11, background: 'rgba(255,255,255,.05)', border: `1px solid ${G.border}`, borderRadius: 8, color: G.textMuted, cursor: 'pointer' }}
-                  onClick={() => { setShowResetConfirm(false); setResetText(''); }}>{t('common.cancel')}</button>
+                  onClick={() => { snd(playClick); setShowResetConfirm(false); setResetText(''); }}>{t('common.cancel')}</button>
                 <button style={{ flex: 1, padding: 11, background: resetText === 'RESET' ? 'rgba(192,57,43,.2)' : 'rgba(255,255,255,.03)', border: `1px solid ${resetText === 'RESET' ? G.red : G.border}`, borderRadius: 8, color: resetText === 'RESET' ? G.red : G.textMuted, cursor: resetText === 'RESET' ? 'pointer' : 'not-allowed', fontWeight: 600 }}
                   onClick={() => { if (resetText === 'RESET') { localStorage.removeItem('eliteSave'); window.location.reload(); } }}>{t('common.confirm')}</button>
               </div>
@@ -2475,7 +2471,7 @@ export default function EliteCounter() {
         {renderHeader(true)}
         {renderCrumbs()}
         <div className="cfg">
-          <button className="back" onClick={goBack} style={{ marginBottom: 14 }}><ChevronLeft size={13} /> {t('common.back')}</button>
+          <button className="back" onClick={() => { snd(playClick); goBack(); }} style={{ marginBottom: 14 }}><ChevronLeft size={13} /> {t('common.back')}</button>
 
           <div style={{ fontFamily: 'Playfair Display, serif', fontSize: 21, fontWeight: 700, marginBottom: 3 }}>
             {isPlacement ? t('rankedConfig.placementTitle') : isPromo ? t('rankedConfig.promoTitle') : t('rankedConfig.rankedTitle')}
@@ -2593,7 +2589,7 @@ export default function EliteCounter() {
         {renderHeader(true)}
         {renderCrumbs()}
         <div className="cfg">
-          <button className="back" onClick={goBack} style={{ marginBottom: 14 }}><ChevronLeft size={13} /> {t('common.back')}</button>
+          <button className="back" onClick={() => { snd(playClick); goBack(); }} style={{ marginBottom: 14 }}><ChevronLeft size={13} /> {t('common.back')}</button>
           <div style={{ fontFamily: 'Playfair Display, serif', fontSize: 21, fontWeight: 700, marginBottom: 3 }}>{t('trainingConfig.title')}</div>
           <div style={{ fontSize: 13, color: G.textMuted, marginBottom: 18 }}>{t('trainingConfig.sub')}</div>
 
@@ -2601,7 +2597,7 @@ export default function EliteCounter() {
             <div className="cfgt">{t('trainingConfig.deckCount')}</div>
             <div className="dgrid">
               {[1, 2, 4, 6, 8].map(d => (
-                <button key={d} className={`dbtn${trainDecks === d ? ' a' : ''}`} onClick={() => setTrainDecks(d)}>
+                <button key={d} className={`dbtn${trainDecks === d ? ' a' : ''}`} onClick={() => { snd(playClick); setTrainDecks(d); }}>
                   <span className="dnum">{d}</span><span className="dlbl">{d > 1 ? t('trainingConfig.decks') : t('trainingConfig.deck')}</span>
                 </button>
               ))}
@@ -2612,7 +2608,7 @@ export default function EliteCounter() {
             <div className="cfgt">{t('trainingConfig.penetration')}</div>
             <div className="pgrid">
               {[50, 60, 70, 75, 80, 85, 90, 95].map(p => (
-                <button key={p} className={`pbtn${trainPen === p ? ' a' : ''}`} onClick={() => setTrainPen(p)}>{p}%</button>
+                <button key={p} className={`pbtn${trainPen === p ? ' a' : ''}`} onClick={() => { snd(playClick); setTrainPen(p); }}>{p}%</button>
               ))}
             </div>
             <div style={{ fontSize: 11, color: G.textMuted, marginTop: 7 }}>{t('trainingConfig.cardsOf', { cards: tc, total: 52 * trainDecks })}</div>
@@ -2631,7 +2627,7 @@ export default function EliteCounter() {
                 <div style={{ fontSize: 11, color: G.textMuted }}>{t('trainingConfig.showCounterSub')}</div>
               </div>
               <button style={{ background: trainShowCount ? 'rgba(201,168,76,.15)' : 'rgba(255,255,255,.05)', border: `1px solid ${trainShowCount ? G.gold : G.border}`, borderRadius: 20, padding: '5px 14px', color: trainShowCount ? G.gold : G.textMuted, cursor: 'pointer', fontSize: 13 }}
-                onClick={() => setTrainShowCount(p => !p)}>{trainShowCount ? t('common.on') : t('common.off')}</button>
+                onClick={() => { snd(playClick); setTrainShowCount(p => !p); }}>{trainShowCount ? t('common.on') : t('common.off')}</button>
             </div>
           </div>
 
@@ -2652,7 +2648,7 @@ export default function EliteCounter() {
         {renderHeader(true)}
         {renderCrumbs()}
         <div className="cfg">
-          <button className="back" onClick={goBack} style={{ marginBottom: 14 }}><ChevronLeft size={13} /> {t('common.back')}</button>
+          <button className="back" onClick={() => { snd(playClick); goBack(); }} style={{ marginBottom: 14 }}><ChevronLeft size={13} /> {t('common.back')}</button>
           <div style={{ fontFamily: 'Playfair Display, serif', fontSize: 21, fontWeight: 700, marginBottom: 4 }}>{t('casinoConfig.title')}</div>
           <div style={{ fontSize: 13, color: G.textMuted, marginBottom: 18 }}>{t('casinoConfig.sub')}</div>
 
@@ -2770,7 +2766,7 @@ export default function EliteCounter() {
         <div className="r"><style>{css}</style>
           <div className="gm" style={{ padding: 0 }}>
             <div style={{ padding: '18px 18px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <button className="back" onClick={goBack}><ChevronLeft size={13} /> {t('common.menu')}</button>
+              <button className="back" onClick={() => { snd(playClick); goBack(); }}><ChevronLeft size={13} /> {t('common.menu')}</button>
               <div style={{ fontSize: 12, color: G.textMuted }}>{finalTimeSec.toFixed(1)}s / {tl}s</div>
             </div>
 
@@ -2790,7 +2786,7 @@ export default function EliteCounter() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'center', maxWidth: 300, margin: '0 auto' }}>
                     <div style={{ fontSize: 11, color: G.textMuted, letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 4 }}>{t('game.countQuestion')}</div>
                     {overTime ? (
-                      <button className="lbtn" onClick={() => { setIsCorrect(false); setShowResult(true); applyMMRChange(false); }}>{t('game.seeResult')}</button>
+                      <button className="lbtn" onClick={() => { snd(playClick); setIsCorrect(false); setShowResult(true); applyMMRChange(false); }}>{t('game.seeResult')}</button>
                     ) : (
                       <>
                         <input type="number" className="ans" value={userAnswer} onChange={e => setUserAnswer(e.target.value)}
@@ -2876,7 +2872,7 @@ export default function EliteCounter() {
                     )}
 
                     <div style={{ display: 'flex', gap: 8 }}>
-                      <button style={{ flex: 1, padding: '11px 0', background: 'rgba(255,255,255,.04)', border: `1px solid ${G.border}`, borderRadius: 8, color: G.textMuted, cursor: 'pointer', fontSize: 13 }} onClick={goBack}>{t('common.menu')}</button>
+                      <button style={{ flex: 1, padding: '11px 0', background: 'rgba(255,255,255,.04)', border: `1px solid ${G.border}`, borderRadius: 8, color: G.textMuted, cursor: 'pointer', fontSize: 13 }} onClick={() => { snd(playClick); goBack(); }}>{t('common.menu')}</button>
                       {!isCasino && <button className="lbtn" style={{ flex: 2, marginTop: 0, padding: 11 }} onClick={() => { snd(playClick); playAgain(); }}>{t('common.replay')}</button>}
                       {isCasino && !isCorrect && <button className="lbtn red" style={{ flex: 2, marginTop: 0, padding: 11 }} onClick={() => { snd(playClick); startCasinoChallenge(); }}>{t('common.restart')}</button>}
                     </div>
@@ -2903,7 +2899,7 @@ export default function EliteCounter() {
               <strong>{currentIndex}</strong>/ {deck.length}
             </div>
             {gameModeRef.current === 'training' && (
-              <div className="ghbtn" onClick={() => setShowCount(p => { const n = !p; if (n) countWasShownRef.current = true; return n; })}>
+              <div className="ghbtn" onClick={() => { snd(playClick); setShowCount(p => { const n = !p; if (n) countWasShownRef.current = true; return n; }); }}>
                 {showCount ? <Eye size={15} /> : <EyeOff size={15} />}
               </div>
             )}
@@ -2961,9 +2957,9 @@ export default function EliteCounter() {
               </div>
               <div style={{ display: 'flex', gap: 10 }}>
                 <button style={{ flex: 1, padding: '12px 0', background: 'rgba(255,255,255,.05)', border: `1px solid ${G.border}`, borderRadius: 9, color: G.text, cursor: 'pointer', fontSize: 13, fontWeight: 600 }}
-                  onClick={() => { setShowAbandon(false); togglePause(); }}>{t('common.continue')}</button>
+                  onClick={() => { snd(playClick); setShowAbandon(false); togglePause(); }}>{t('common.continue')}</button>
                 <button style={{ flex: 1, padding: '12px 0', background: 'rgba(192,57,43,.15)', border: `1px solid rgba(192,57,43,.4)`, borderRadius: 9, color: G.red, cursor: 'pointer', fontSize: 13, fontWeight: 600 }}
-                  onClick={doAbandon}>{t('game.abandon')}</button>
+                  onClick={() => { snd(playClick); doAbandon(); }}>{t('game.abandon')}</button>
               </div>
             </div>
           </div>
