@@ -21,7 +21,7 @@ const CARD_SKINS = [
   { id: 'matrix',   name: 'Matrix Code',     price: 1000, bg: 'bg-gradient-to-br from-green-950 to-black',        border: 'border-green-500' },
   { id: 'neon',     name: 'Neon Cyber',      price: 1400, bg: 'bg-gradient-to-br from-purple-900 to-pink-900',    border: 'border-pink-500' },
   { id: 'blood',    name: 'Blood Diamond',   price: 1900, bg: 'bg-gradient-to-br from-red-950 to-black',          border: 'border-red-600' },
-  { id: 'voidgold', name: 'Void Gold',       price: 2500, bg: 'bg-gradient-to-br from-amber-50 to-yellow-100',    border: 'border-amber-500' },
+  { id: 'voidgold', name: 'Gold Chains',      price: 2500, bg: 'bg-gradient-to-br from-amber-50 to-yellow-100',    border: 'border-amber-500' },
   { id: 'obsidian', name: 'Obsidian Void ◆', price: 0, secret: true, bg: 'bg-gradient-to-br from-gray-950 to-black', border: 'border-gray-700' }
 ];
 
