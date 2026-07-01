@@ -24,6 +24,10 @@
 
 ## ✅ Fait
 
+- [x] **Refonte visuelle skins — session 02/07/2026**
+  - **Obsidian Void** : glow rouge (`rgba(255,60,80)`) ajouté sur les cartes rouges (symétrique au glow blanc/bleu des noires).
+  - **Void Gold → renommé "Gold Chains"** : texte en or (`text-amber-400`) pour toutes les enseignes + glow gold, box-shadow spéciale de la carte supprimée. Chaîne en arc de cercle (12 maillons SVG tangentiels) dans les coins haut-droit et bas-gauche. Deux diagonales de maillons traversent la carte en X. Preview shop mis à jour (arcs + diagonales en tirets dorés).
+
 - [x] **Lot de retours UI — session 30/06/2026 (implémenté, à vérifier au retour)**
   - **Drapeaux SVG** : les emojis-drapeaux (🇫🇷…) s'affichaient « FR/GB/DE/ES » sur Windows. Remplacés par un composant `Flag` SVG (`LanguageSelect.jsx`, exporté) — picker de langue + bouton langue de l'accueil.
   - **Accueil** : bouton Tuto déplacé juste à gauche du bouton langue (fil d'Ariane). Le bouton langue n'affiche plus le code texte, juste 🌐 + drapeau.
