@@ -977,19 +977,29 @@ const SupportPreviewModal = ({ skin, owned, active, onClose, onBuy, onEquip, t }
   );
 };
 
-const VoidGoldChain = () => (
-  <svg width="38" height="38" viewBox="0 0 38 38" fill="none" style={{ filter: 'drop-shadow(0 0 2.5px #D4AF37)' }}>
-    {/* maillons horizontaux le long du bord haut */}
-    <ellipse cx="5"  cy="5" rx="4.5" ry="2.3" stroke="#D4AF37" strokeWidth="1.3"/>
-    <ellipse cx="14" cy="5" rx="4.5" ry="2.3" stroke="#D4AF37" strokeWidth="1.3"/>
-    <ellipse cx="23" cy="5" rx="4.5" ry="2.3" stroke="#D4AF37" strokeWidth="1.3"/>
-    {/* maillons verticaux le long du bord droit */}
-    <ellipse cx="32" cy="5"  rx="2.3" ry="4.5" stroke="#D4AF37" strokeWidth="1.3"/>
-    <ellipse cx="32" cy="14" rx="2.3" ry="4.5" stroke="#D4AF37" strokeWidth="1.3"/>
-    <ellipse cx="32" cy="23" rx="2.3" ry="4.5" stroke="#D4AF37" strokeWidth="1.3"/>
-    <ellipse cx="32" cy="32" rx="2.3" ry="4.5" stroke="#D4AF37" strokeWidth="1.3"/>
-  </svg>
-);
+const VoidGoldChain = () => {
+  // Arc de cercle centré sur le coin top-right du SVG (60, 0), rayon 52.
+  // 6 maillons de θ=177° à θ=90°, chacun tourné tangentiellement (rot = θ − 90°).
+  const links = [
+    { cx: 8,  cy: 3,  rot: 87 },
+    { cx: 11, cy: 18, rot: 70 },
+    { cx: 19, cy: 32, rot: 52 },
+    { cx: 30, cy: 43, rot: 35 },
+    { cx: 44, cy: 50, rot: 17 },
+    { cx: 60, cy: 52, rot: 0  },
+  ];
+  return (
+    <svg width="60" height="56" viewBox="0 0 60 56" fill="none"
+      style={{ filter: 'drop-shadow(0 0 2.5px #D4AF37)', overflow: 'visible' }}>
+      {links.map((l, i) => (
+        <ellipse key={i} cx={l.cx} cy={l.cy} rx="5" ry="2.2"
+          stroke="#D4AF37" strokeWidth="1.3"
+          transform={`rotate(${l.rot} ${l.cx} ${l.cy})`}
+        />
+      ))}
+    </svg>
+  );
+};
 
 // ─── Casino Card ───────────────────────────────────────────────
 const CasinoCard = ({ rank, suit, suitName, skin = 'classic', flash = false }) => {
@@ -1031,8 +1041,8 @@ const CasinoCard = ({ rank, suit, suitName, skin = 'classic', flash = false }) =
         <div className="text-2xl leading-none">{SUITS[suitName]}</div>
       </div>
       {sk.id === 'voidgold' && <>
-        <div className="absolute top-0 right-0"><VoidGoldChain /></div>
-        <div className="absolute bottom-0 left-0" style={{ transform: 'rotate(180deg)' }}><VoidGoldChain /></div>
+        <div style={{ position: 'absolute', top: 0, right: 0 }}><VoidGoldChain /></div>
+        <div style={{ position: 'absolute', bottom: 0, left: 0, transform: 'rotate(180deg)', transformOrigin: 'center' }}><VoidGoldChain /></div>
       </>}
       <div className={`absolute bottom-3 right-3 flex flex-col items-center ${tc} font-bold rotate-180`} style={obsidianBlackGlow}>
         <div className="text-3xl leading-none">{rank}</div>
