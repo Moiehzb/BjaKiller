@@ -978,27 +978,31 @@ const SupportPreviewModal = ({ skin, owned, active, onClose, onBuy, onEquip, t }
 };
 
 const VoidGoldChain = () => {
-  // Arc de cercle centré sur le coin top-right du SVG (60, 0), rayon 52.
-  // 6 maillons de θ=177° à θ=90°, chacun tourné tangentiellement (rot = θ − 90°).
-  const links = [
-    { cx: 8,  cy: 3,  rot: 87 },
-    { cx: 9,  cy: 10, rot: 79 },
-    { cx: 11, cy: 17, rot: 71 },
-    { cx: 14, cy: 23, rot: 63 },
-    { cx: 17, cy: 30, rot: 56 },
-    { cx: 22, cy: 35, rot: 48 },
-    { cx: 27, cy: 40, rot: 40 },
-    { cx: 33, cy: 44, rot: 32 },
-    { cx: 39, cy: 48, rot: 24 },
-    { cx: 46, cy: 50, rot: 16 },
-    { cx: 53, cy: 52, rot: 8  },
-    { cx: 60, cy: 52, rot: 0  },
+  // Arc centré sur (56, 4), rayon 46 — 12 maillons tangentiels + 11 maillons radiaux interleaved.
+  // Tous les bounding boxes vérifiés dans 62×56 px (rx=4.5, ry=2, strokeWidth=1.3).
+  const t = [
+    { cx: 10, cy: 6,  rot: 87 }, { cx: 11, cy: 13, rot: 79 },
+    { cx: 12, cy: 19, rot: 71 }, { cx: 15, cy: 25, rot: 63 },
+    { cx: 18, cy: 30, rot: 55 }, { cx: 22, cy: 35, rot: 47 },
+    { cx: 26, cy: 39, rot: 40 }, { cx: 32, cy: 43, rot: 32 },
+    { cx: 37, cy: 46, rot: 24 }, { cx: 43, cy: 48, rot: 16 },
+    { cx: 50, cy: 50, rot: 8  }, { cx: 56, cy: 50, rot: 0  },
   ];
+  const d = [
+    { cx: 10, cy: 9,  rot: -3  }, { cx: 11, cy: 16, rot: -11 },
+    { cx: 13, cy: 22, rot: -19 }, { cx: 16, cy: 28, rot: -27 },
+    { cx: 20, cy: 32, rot: -35 }, { cx: 24, cy: 37, rot: -43 },
+    { cx: 29, cy: 41, rot: -50 }, { cx: 34, cy: 45, rot: -58 },
+    { cx: 40, cy: 47, rot: -66 }, { cx: 46, cy: 49, rot: -74 },
+    { cx: 53, cy: 50, rot: -82 },
+  ];
+  const links = [];
+  t.forEach((l, i) => { links.push(l); if (d[i]) links.push(d[i]); });
   return (
-    <svg width="60" height="56" viewBox="0 0 60 56" fill="none"
-      style={{ filter: 'drop-shadow(0 0 2.5px #D4AF37)', overflow: 'visible' }}>
+    <svg width="62" height="56" viewBox="0 0 62 56" fill="none"
+      style={{ filter: 'drop-shadow(0 0 2.5px #D4AF37)' }}>
       {links.map((l, i) => (
-        <ellipse key={i} cx={l.cx} cy={l.cy} rx="5" ry="2.2"
+        <ellipse key={i} cx={l.cx} cy={l.cy} rx="4.5" ry="2"
           stroke="#D4AF37" strokeWidth="1.3"
           transform={`rotate(${l.rot} ${l.cx} ${l.cy})`}
         />
