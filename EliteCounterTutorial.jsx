@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronRight, ChevronLeft, Check, Play } from 'lucide-react';
 import { makeT, DEFAULT_LANG } from './i18n';
+import { initAudio, playClick, playCorrect, playWrong, playChip, playGo } from './src/sounds.js';
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // Design tokens — exact mirror of EliteCounter.jsx
@@ -283,10 +284,10 @@ const WelcomeStep = ({ onNext, onSkip, t }) => {
         {t('tutorial.welcome.intro')}
       </p>
 
-      <button className="tbtn-g" style={{ maxWidth: 320 }} onClick={onNext}>
+      <button className="tbtn-g" style={{ maxWidth: 320 }} onClick={() => { initAudio(); playChip(); onNext(); }}>
         {t('tutorial.welcome.start')}
       </button>
-      <button className="tbtn-o" style={{ maxWidth: 320 }} onClick={onSkip}>
+      <button className="tbtn-o" style={{ maxWidth: 320 }} onClick={() => { playClick(); onSkip(); }}>
         {t('tutorial.welcome.skipKnow')}&nbsp;
         <ChevronRight size={13} style={{ display: 'inline', verticalAlign: 'middle' }} />
       </button>
@@ -323,7 +324,7 @@ const HiLoLearnStep = ({ onNext, onBack, t }) => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <button className="tbtn-back" onClick={onBack}>
+      <button className="tbtn-back" onClick={() => { playClick(); onBack(); }}>
         <ChevronLeft size={14} /> {t('common.back')}
       </button>
 
@@ -353,7 +354,7 @@ const HiLoLearnStep = ({ onNext, onBack, t }) => {
       </div>
 
       <div style={{ flex: 1 }} />
-      <button className="tbtn-g" style={{ marginTop: 20 }} onClick={onNext}>
+      <button className="tbtn-g" style={{ marginTop: 20 }} onClick={() => { playClick(); onNext(); }}>
         {t('tutorial.hilo.next')}
       </button>
     </div>
@@ -415,10 +416,11 @@ const HiLoQuizStep = ({ onNext, onBack, t }) => {
     setFlashCls(correct ? 'flash-ok' : 'flash-err');
 
     if (correct) {
-      // Bonne réponse : auto-avance après 960 ms
+      playCorrect(0);
       timerRef.current = setTimeout(advanceNext, 960);
+    } else {
+      playWrong();
     }
-    // Mauvaise réponse : on attend que le joueur clique "Suivant"
   };
 
   const resetQuiz = () => {
@@ -446,7 +448,7 @@ const HiLoQuizStep = ({ onNext, onBack, t }) => {
 
     return (
       <div style={{ display: 'flex', flexDirection: 'column' }}>
-        <button className="tbtn-back" onClick={onBack}>
+        <button className="tbtn-back" onClick={() => { playClick(); onBack(); }}>
           <ChevronLeft size={14} /> {t('common.back')}
         </button>
 
@@ -470,11 +472,11 @@ const HiLoQuizStep = ({ onNext, onBack, t }) => {
         {/* Priorité inversée si erreur(s) : Recommencer devient le CTA principal */}
         {score < QUIZ_CARDS.length ? (
           <>
-            <button className="tbtn-g" onClick={resetQuiz}>{t('tutorial.quiz.restart')}</button>
-            <button className="tbtn-o" onClick={onNext}>{t('tutorial.quiz.continueAnyway')}</button>
+            <button className="tbtn-g" onClick={() => { playClick(); resetQuiz(); }}>{t('tutorial.quiz.restart')}</button>
+            <button className="tbtn-o" onClick={() => { playClick(); onNext(); }}>{t('tutorial.quiz.continueAnyway')}</button>
           </>
         ) : (
-          <button className="tbtn-g" onClick={onNext}>{t('tutorial.quiz.continue')}</button>
+          <button className="tbtn-g" onClick={() => { playClick(); onNext(); }}>{t('tutorial.quiz.continue')}</button>
         )}
 
         {/* Fiche mémo — uniquement si des erreurs ont été faites */}
@@ -509,7 +511,7 @@ const HiLoQuizStep = ({ onNext, onBack, t }) => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <button className="tbtn-back" onClick={onBack}>
+      <button className="tbtn-back" onClick={() => { playClick(); onBack(); }}>
         <ChevronLeft size={14} /> {t('common.back')}
       </button>
 
@@ -579,7 +581,7 @@ const HiLoQuizStep = ({ onNext, onBack, t }) => {
 
       {/* Bouton "Suivant" affiché seulement après une mauvaise réponse */}
       {answered && !answered.correct && (
-        <button className="tbtn-g" style={{ marginTop: 6 }} onClick={advanceNext}>
+        <button className="tbtn-g" style={{ marginTop: 6 }} onClick={() => { playClick(); advanceNext(); }}>
           {t('tutorial.quiz.nextCard')}
         </button>
       )}
@@ -634,13 +636,14 @@ const CountQuizStep = ({ onNext, onBack, t }) => {
 
   const validate = () => {
     if (guess === COUNT_ANSWER) {
+      playCorrect(0);
       setFeedback('correct');
       setPhase('done');
-      // Valeurs restent cachées — l'utilisateur a réussi sans aide
     } else {
+      playWrong();
       const next = attempts + 1;
       setAttempts(next);
-      setShowVals(true); // Révèle les valeurs comme aide après une erreur
+      setShowVals(true);
       if (next >= 2) {
         setFeedback('wrong-final');
         setPhase('done');
@@ -657,7 +660,7 @@ const CountQuizStep = ({ onNext, onBack, t }) => {
   if (phase === 'intro') {
     return (
       <div style={{ display: 'flex', flexDirection: 'column' }}>
-        <button className="tbtn-back" onClick={onBack}>
+        <button className="tbtn-back" onClick={() => { playClick(); onBack(); }}>
           <ChevronLeft size={14} /> {t('common.back')}
         </button>
 
@@ -673,7 +676,7 @@ const CountQuizStep = ({ onNext, onBack, t }) => {
         </div>
 
         <div style={{ flex: 1 }} />
-        <button className="tbtn-g" style={{ marginTop: 24 }} onClick={startWatching}>
+        <button className="tbtn-g" style={{ marginTop: 24 }} onClick={() => { playChip(); startWatching(); }}>
           <Play size={15} style={{ display: 'inline', marginRight: 8, verticalAlign: 'middle' }} />
           {t('tutorial.count.see6')}
         </button>
@@ -684,7 +687,7 @@ const CountQuizStep = ({ onNext, onBack, t }) => {
   // ── Cards row (watching + input + done) ───────────────────────
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <button className="tbtn-back" onClick={onBack}>
+      <button className="tbtn-back" onClick={() => { playClick(); onBack(); }}>
         <ChevronLeft size={14} /> {t('common.back')}
       </button>
 
@@ -743,11 +746,11 @@ const CountQuizStep = ({ onNext, onBack, t }) => {
           {/* Stepper */}
           {phase === 'input' && (
             <div className="cnt-stepper">
-              <button className="csb" onClick={() => setGuess((g) => Math.max(g - 1, -12))}>−</button>
+              <button className="csb" onClick={() => { playClick(); setGuess((g) => Math.max(g - 1, -12)); }}>−</button>
               <div className={`cnt-num ${countCls}`}>
                 {guess > 0 ? `+${guess}` : guess}
               </div>
-              <button className="csb" onClick={() => setGuess((g) => Math.min(g + 1, 12))}>+</button>
+              <button className="csb" onClick={() => { playClick(); setGuess((g) => Math.min(g + 1, 12)); }}>+</button>
             </div>
           )}
 
@@ -758,7 +761,7 @@ const CountQuizStep = ({ onNext, onBack, t }) => {
             </button>
           )}
           {phase === 'done' && (
-            <button className="tbtn-g" onClick={onNext}>
+            <button className="tbtn-g" onClick={() => { playClick(); onNext(); }}>
               {t('tutorial.count.continue')}
             </button>
           )}
@@ -801,7 +804,7 @@ const ModesStep = ({ onNext, onBack, t }) => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <button className="tbtn-back" onClick={onBack}>
+      <button className="tbtn-back" onClick={() => { playClick(); onBack(); }}>
         <ChevronLeft size={14} /> {t('common.back')}
       </button>
 
@@ -829,7 +832,7 @@ const ModesStep = ({ onNext, onBack, t }) => {
       </div>
 
       <div style={{ flex: 1 }} />
-      <button className="tbtn-g" style={{ marginTop: 20 }} onClick={onNext}>
+      <button className="tbtn-g" style={{ marginTop: 20 }} onClick={() => { playClick(); onNext(); }}>
         {t('tutorial.modes.continue')}
       </button>
     </div>
@@ -877,7 +880,7 @@ const ReadyStep = ({ onComplete, t }) => {
         </div>
       </div>
 
-      <button className="tbtn-g" onClick={onComplete}>
+      <button className="tbtn-g" onClick={() => { playGo(); onComplete(); }}>
         {t('tutorial.ready.enterLobby')}
       </button>
     </div>
@@ -928,7 +931,7 @@ const TutorialOverlay = ({ onComplete, onSkip, t: tProp }) => {
         <div className="tov-hdr">
           <ProgressDots step={step} total={TOTAL} />
           {step < TOTAL - 1 && (
-            <button className="tskip" onClick={handleSkip}>
+            <button className="tskip" onClick={() => { playClick(); handleSkip(); }}>
               {t('tutorial.skip')} <ChevronRight size={12} />
             </button>
           )}

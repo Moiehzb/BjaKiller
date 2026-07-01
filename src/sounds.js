@@ -3,8 +3,12 @@
 // Slight random jitter per call prevents listener fatigue.
 
 let _ctx = null;
+let _muted = false;
+
+export const setMuted = (v) => { _muted = v; };
 
 const ac = () => {
+  if (_muted) throw new Error('muted');
   if (!_ctx) _ctx = new (window.AudioContext || window.webkitAudioContext)();
   if (_ctx.state === 'suspended') _ctx.resume();
   return _ctx;

@@ -3,7 +3,7 @@ import { Play, Pause, X, ChevronRight, ChevronLeft, Eye, EyeOff, AlertTriangle, 
 import TutorialOverlay from './EliteCounterTutorial.jsx';
 import { makeT, DEFAULT_LANG, getLanguage } from './i18n';
 import { LanguageSelectScreen, LanguageModal, Flag } from './LanguageSelect.jsx';
-import { initAudio, playCorrect, playWrong, playChip, playRankUp, playAchievement, playClick, playCountdown, playGo } from './src/sounds.js';
+import { initAudio, setMuted, playCorrect, playWrong, playChip, playRankUp, playAchievement, playClick, playCountdown, playGo } from './src/sounds.js';
 
 // ─── Constants ────────────────────────────────────────────────────
 const CARD_VALUES = {
@@ -1249,7 +1249,11 @@ export default function EliteCounter() {
   }, [save]);
 
   // ── Sound helpers ──────────────────────────────────────────────
-  useEffect(() => { soundEnabledRef.current = save?.soundEnabled !== false; }, [save?.soundEnabled]);
+  useEffect(() => {
+    const on = save?.soundEnabled !== false;
+    soundEnabledRef.current = on;
+    setMuted(!on);
+  }, [save?.soundEnabled]);
   const snd = (fn) => { if (soundEnabledRef.current) fn(); };
 
 
