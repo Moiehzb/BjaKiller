@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Play, Pause, X, ChevronRight, ChevronLeft, Eye, EyeOff, AlertTriangle, Globe, Volume2, VolumeX } from 'lucide-react';
 import TutorialOverlay from './EliteCounterTutorial.jsx';
 import { makeT, DEFAULT_LANG, getLanguage } from './i18n';
@@ -1129,6 +1129,12 @@ const DEFAULT_SAVE = {
   trainingDone: false,   // unlocks Ranked after first training card
   rankedDone: false,     // unlocks Casino Killer after first ranked game
   soundEnabled: true,
+
+  // Config Training (persistée entre sessions)
+  trainDecks: 1,
+  trainPen: 75,
+  trainTime: 94,
+  trainShowCount: false,
 };
 
 export default function EliteCounter() {
@@ -1155,7 +1161,6 @@ export default function EliteCounter() {
   const countWasShownRef = useRef(false);
   const [earnedCoins, setEarnedCoins] = useState(0);
   const [mmrDelta, setMmrDelta] = useState(0);
-  const [timeTooSlow, setTimeTooSlow] = useState(false);
 
   const [showTutorialReplay, setShowTutorialReplay] = useState(false);
 
@@ -1168,15 +1173,16 @@ export default function EliteCounter() {
   const casinoCountdownRef = useRef(null); // interval ref for 10s break
   const pendingAchievementsRef = useRef([]); // toasts to show after casino ends
 
-  // ── game config (for training mode / casino)
-  const [trainDecks, setTrainDecks] = useState(1);
-  const [trainPen, setTrainPen] = useState(75);
-  const [trainTime, setTrainTime] = useState(94); // total seconds ≈ 2.4s/carte (1 deck · 75% pén) — accessible débutant
-  const [trainShowCount, setTrainShowCount] = useState(false);
+  // ── game config (for training mode / casino) — persisté dans le save (eliteSave)
+  const _savedTrain = useMemo(() => { try { return JSON.parse(localStorage.getItem('eliteSave')) || {}; } catch { return {}; } }, []);
+  const [trainDecks, setTrainDecks] = useState(_savedTrain.trainDecks ?? 1);
+  const [trainPen, setTrainPen] = useState(_savedTrain.trainPen ?? 75);
+  const [trainTime, setTrainTime] = useState(_savedTrain.trainTime ?? 94); // total seconds ≈ 2.4s/carte (1 deck · 75% pén)
+  const [trainShowCount, setTrainShowCount] = useState(_savedTrain.trainShowCount ?? false);
 
   // Keep s/carte roughly constant when deck count or penetration changes,
   // so switching decks doesn't silently make the game trivial or impossible.
-  const prevTrainCardsRef = useRef(Math.floor(52 * 1 * 75 / 100));
+  const prevTrainCardsRef = useRef(Math.floor(52 * (_savedTrain.trainDecks ?? 1) * (_savedTrain.trainPen ?? 75) / 100));
   useEffect(() => {
     const newTotalCards = Math.floor(52 * trainDecks * trainPen / 100);
     const prevTotalCards = prevTrainCardsRef.current;
@@ -1187,6 +1193,12 @@ export default function EliteCounter() {
     prevTrainCardsRef.current = newTotalCards;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [trainDecks, trainPen]);
+
+  // Persiste la config Training pour qu'elle survive au redémarrage de l'app.
+  useEffect(() => {
+    if (save) patchSave({ trainDecks, trainPen, trainTime, trainShowCount });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [trainDecks, trainPen, trainTime, trainShowCount]);
 
   // ── game mode tracking
   const gameModeRef = useRef('ranked'); // 'ranked'|'placement'|'training'|'promo'|'casino'
@@ -1350,7 +1362,6 @@ export default function EliteCounter() {
     setElapsedTime(0);
     setFinalTime(0);
     setShowAbandon(false);
-    setTimeTooSlow(false);
     timeLimitUsedRef.current = timeSec;
     // Casino tracks countWasShown across the full run — don't reset between steps.
     // For all other modes, initialCountShown lets training pass trainShowCount here directly.
@@ -1636,12 +1647,10 @@ export default function EliteCounter() {
     const timeInSec = finalTime / 1000;
     const tl = timeLimitUsedRef.current;
 
-    const tooSlow = ['ranked', 'promo', 'placement'].includes(gameModeRef.current) && timeInSec > tl * 1.05;
-    const correct = answer === runningCount && !tooSlow;
+    const correct = answer === runningCount;
 
     setIsCorrect(correct);
     setShowResult(true);
-    setTimeTooSlow(tooSlow);
 
     const today = new Date().toDateString();
     const isCasinoMode = gameModeRef.current === 'casino';
@@ -1767,6 +1776,34 @@ export default function EliteCounter() {
       applyMMRChange(correct);
     }
   };
+
+  // ── Pavé de réponse (écran de jeu) — gère les counts négatifs ──
+  const ansPress = (d) => {
+    snd(playClick);
+    setUserAnswer(v => {
+      const neg = v.startsWith('-');
+      const digits = neg ? v.slice(1) : v;
+      if (digits.replace(/^0+/, '').length >= 3) return v; // 3 chiffres significatifs max
+      const nd = (digits === '0' ? '' : digits) + d;
+      return (neg ? '-' : '') + nd;
+    });
+  };
+  const ansToggleSign = () => { snd(playClick); setUserAnswer(v => v.startsWith('-') ? v.slice(1) : '-' + v); };
+  const ansBack = () => { snd(playClick); setUserAnswer(v => v.slice(0, -1)); };
+
+  // Clavier physique pour le pavé de réponse (confort desktop / dev).
+  useEffect(() => {
+    if (nav !== 'game' || gameState !== 'finished' || showResult) return;
+    const onKey = (e) => {
+      if (e.key >= '0' && e.key <= '9') ansPress(e.key);
+      else if (e.key === '-') ansToggleSign();
+      else if (e.key === 'Backspace') ansBack();
+      else if (e.key === 'Enter' && userAnswer !== '' && userAnswer !== '-') checkAnswer();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nav, gameState, showResult, userAnswer]);
 
   // ── Play again ─────────────────────────────────────────────────
   const playAgain = () => {
@@ -1894,7 +1931,6 @@ export default function EliteCounter() {
   if (nav === 'lobby') {
     const rank = currentRank;
     const isMaster = isMaxTier; // bar MMR masquée seulement au palier final absolu (Master III)
-    const winRate = save.stats.total > 0 ? Math.round(save.stats.correct / save.stats.total * 100) : null;
 
     return (
       <div className="r">
@@ -2764,7 +2800,6 @@ export default function EliteCounter() {
     if (gameState === 'finished') {
       const isPlace = gameModeRef.current === 'placement';
       const finalTimeSec = finalTime / 1000;
-      const overTime = isRanked && finalTimeSec > tl * 1.05;
 
       return (
         <div className="r"><style>{css}</style>
@@ -2782,28 +2817,27 @@ export default function EliteCounter() {
               )}
 
               <div style={{ position: 'absolute', textAlign: 'center', width: '100%', padding: '0 24px' }}>
-                {overTime && !showResult && (
-                  <div style={{ color: G.red, fontFamily: 'Playfair Display, serif', fontSize: 20, fontWeight: 700, marginBottom: 10 }}>{t('game.overTime')}</div>
-                )}
-
                 {!showResult ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'center', maxWidth: 300, margin: '0 auto' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'center', width: '100%', maxWidth: 280, margin: '0 auto' }}>
                     <div style={{ fontSize: 11, color: G.textMuted, letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 4 }}>{t('game.countQuestion')}</div>
-                    {overTime ? (
-                      <button className="lbtn" onClick={() => { snd(playClick); setIsCorrect(false); setShowResult(true); applyMMRChange(false); }}>{t('game.seeResult')}</button>
-                    ) : (
-                      <>
-                        <input type="number" className="ans" value={userAnswer} onChange={e => setUserAnswer(e.target.value)}
-                          onKeyDown={e => e.key === 'Enter' && userAnswer !== '' && checkAnswer()} placeholder="?" autoFocus />
-                        <button className="lbtn" onClick={checkAnswer} disabled={userAnswer === ''}>{t('common.validate')}</button>
-                      </>
-                    )}
+                    <div className="ans" style={{ userSelect: 'none' }}>
+                      {userAnswer === '' || userAnswer === '-' ? <span style={{ color: G.goldDim }}>?</span> : userAnswer}
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, width: '100%' }}>
+                      {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(d => (
+                        <KpKey key={d} onClick={() => ansPress(String(d))}>{d}</KpKey>
+                      ))}
+                      <KpKey alt onClick={ansToggleSign}>±</KpKey>
+                      <KpKey onClick={() => ansPress('0')}>0</KpKey>
+                      <KpKey alt onClick={ansBack}>⌫</KpKey>
+                    </div>
+                    <button className="lbtn" style={{ width: '100%' }} onClick={checkAnswer} disabled={userAnswer === '' || userAnswer === '-'}>{t('common.validate')}</button>
                   </div>
                 ) : (
                   <div style={{ textAlign: 'center', maxWidth: 300, margin: '0 auto' }}>
                     <div className={isCorrect ? 'rc' : 'rw'}>{isCorrect ? '✓' : '✗'}</div>
                     <div style={{ fontFamily: 'Playfair Display, serif', fontSize: 22, marginTop: 8, marginBottom: 4 }}>
-                      {isCorrect ? t('game.perfect') : timeTooSlow ? t('game.tooSlow') : t('game.wasCount', { count: runningCount })}
+                      {isCorrect ? t('game.perfect') : t('game.wasCount', { count: runningCount })}
                     </div>
                     <div style={{ fontSize: 12, color: G.textMuted, marginBottom: 14 }}>
                       {t('game.resultStats', { time: finalTimeSec.toFixed(1), tl, decks: (rankUsedRef.current || { decks: trainDecks }).decks })}

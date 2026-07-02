@@ -8,6 +8,9 @@
 ### Musique 8-bit
 - [ ] **Musiques 8-bit** : créer les tracks pour l'app — style Zelda OoT Gerudo Valley pour l'accueil/menus, style Kirby Title Screen pour le gameplay. Approche : composer une mélodie via Beepbox.co, étoffer avec Suno.ai ou Gemini. Prévoir : lobby loop, game loop, jingle victoire, jingle défaite.
 
+### UX
+- [ ] **Après le tuto → ouvrir directement le mode Training** : à la sortie du tutoriel, envoyer le joueur droit dans Training (ou au minimum un CTA "Commence ici" bien visible) au lieu de le lâcher devant le lobby (mur d'options).
+
 ---
 
 ## 🛠️ Features en attente (backlog)
@@ -15,6 +18,9 @@
 - [ ] Brancher l'achat des skins support (4,99 €/skin) sur un vrai paiement — aujourd'hui le clic "4,99 €" débloque directement en localStorage (démo). Voir aussi le paywall en fin de roadmap.
 - [ ] Ajouter des sons dans l'app (changement de carte, bonne/mauvaise réponse, victoire/défaite, achat/équipement de skin, clics UI) — prévoir un toggle son ON/OFF dans les réglages
 - [ ] Transformer l'app en APK Android (build mobile installable)
+- [ ] **Défi quotidien** : un deck du jour identique pour tous (même seed), un score à battre, comparable jour après jour.
+- [ ] **Vibration (haptique)** sur bonne/mauvaise réponse — gratuit et satisfaisant sur mobile (à lier au toggle son/retour).
+- [ ] **Stats plus fines** : précision par nombre de decks (ex. « nul à 8 decks »), courbe de précision dans le temps.
 
 ## 🔮 Fin de roadmap — ne jamais mentionner quand on demande quoi faire
 
@@ -23,6 +29,10 @@
 - [ ] App 2 séparée : mode table réaliste style Card Counter Lite
 
 ## ✅ Fait
+
+- [x] **Config Training persistée** : decks / pénétration / durée / compteur visible sauvegardés dans `eliteSave`, restaurés au lancement (fini le reset à 1 deck · 75% · 94s). (02/07/2026)
+- [x] **Suppression du code mort temporel** : `tooSlow` / `overTime` / `timeTooSlow` retirés (jamais déclenchables — les cartes défilent en auto, on ne peut perdre qu'en comptant mal), + `winRate` inutilisé du lobby, + 3 clés i18n orphelines (`game.overTime/seeResult/tooSlow`) dans FR/EN/ES/DE. (02/07/2026)
+- [x] **Pavé de saisie maison pour la réponse** : l'`<input type=number>` natif (le clavier OS masquait la carte sur mobile) remplacé par un pavé `KpKey` cohérent avec le TimePicker (chiffres, ±, ⌫) + support clavier physique pour le dev. (02/07/2026)
 
 - [x] **Slide 3 du tuto — correction visuelle** : la carte se stoppe en cas d'erreur et affiche un rappel avant de continuer (02/07/2026)
 
