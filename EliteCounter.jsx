@@ -2020,7 +2020,7 @@ export default function EliteCounter() {
         <div className="logo">ELITE COUNTER</div>
         {!minimal && (
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <div className="pill">{displayRank.icon} {displayRank.name}</div>
+            <div className="pill" style={{ cursor: 'pointer' }} onClick={() => { snd(playClick); setShowRankLadder(true); }}>{displayRank.icon} {displayRank.name}</div>
             <div className="pill" style={{ display: 'flex', alignItems: 'center', gap: 5 }}><Coin size={13} /> {save.coins}</div>
           </div>
         )}

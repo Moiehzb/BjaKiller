@@ -131,7 +131,7 @@ const de = {
     penetration: 'Penetration',
     speed: 'Tempo/Karte',
     rankPerk: 'Mehr Decks, weniger Zeit pro Karte.',
-    masterPerk: '👑 Höchster Rang · schaltet den Casino-Modus frei',
+    masterPerk: '👑 Höchster Rang · die Spitze der Elite',
     footer: 'Gewinne Ranglisten-Spiele, um aufzusteigen.',
   },
 

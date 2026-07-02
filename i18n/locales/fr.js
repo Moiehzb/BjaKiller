@@ -34,12 +34,12 @@ const fr = {
   header: { tuto: 'Tuto', language: 'Langue' },
 
   crumbs: {
-    home: 'Accueil', ranked: 'Ranked', training: 'Training',
+    home: 'Accueil', ranked: 'Ranked', training: 'Entraînement',
     casino: 'Casino Killer', game: 'Partie',
   },
 
   modeName: {
-    training: 'Training', ranked: 'Ranked', promo: 'Promotion',
+    training: 'Entraînement', ranked: 'Ranked', promo: 'Promotion',
     placement: 'Classement', casino: 'Casino Killer', daily: 'Défi du jour',
   },
 
@@ -80,7 +80,7 @@ const fr = {
     rankedSub: ({ rank, desc }) => `${rank} · ${desc} · Abandon = −25 MMR`,
     casinoSub: '5 étapes hardcore · 0 droit à l’erreur',
     casinoLocked: '🔒 Joue une partie Ranked pour débloquer',
-    achievements: 'Achievements',
+    achievements: 'Succès',
     achievementsSub: ({ unlocked, total }) => `${unlocked}/${total} débloqués`,
     skins: 'Skins',
     skinsSub: ({ owned, total }) => `${owned}/${total} possédés`,
@@ -99,7 +99,7 @@ const fr = {
   },
 
   achievementsModal: {
-    title: 'Achievements',
+    title: 'Succès',
     sub: ({ unlocked, total }) =>
       `${unlocked}/${total} débloqués · Défis permanents, pas de limite de temps`,
     secretNameLocked: '???',
@@ -129,7 +129,7 @@ const fr = {
     penetration: 'Pénétration',
     speed: 'Vitesse/carte',
     rankPerk: 'Plus de decks, moins de temps par carte.',
-    masterPerk: '👑 Rang final · débloque le mode Casino',
+    masterPerk: '👑 Rang final · le sommet de l’élite',
     footer: 'Gagne des parties Classées pour gravir les paliers.',
   },
 
@@ -249,7 +249,7 @@ const fr = {
   },
 
   trainingConfig: {
-    title: 'Training',
+    title: 'Entraînement',
     sub: 'Config libre · Pas d’impact MMR · Coins gagnés normalement',
     deckCount: 'Nombre de decks',
     deck: 'deck',
@@ -422,8 +422,8 @@ const fr = {
       label: 'Tes modes de jeu',
       h1l1: '3 modes,',
       h1l2: 'une progression claire.',
-      p: 'Commence en Training pour bâtir tes réflexes. Une fois à l’aise, attaque la calibration pour accéder au Ranked.',
-      trainingName: 'Training',
+      p: 'Commence en Entraînement pour bâtir tes réflexes. Une fois à l’aise, attaque la calibration pour accéder au Ranked.',
+      trainingName: 'Entraînement',
       trainingSub: 'Mode libre — commence ici',
       trainingDesc:
         'Configure tout à ta guise : decks (1 à 8), pénétration (50–95 %), vitesse. Pause disponible. Compteur optionnel. Idéal pour construire tes réflexes.',

@@ -34,12 +34,12 @@ const es = {
   header: { tuto: 'Tutorial', language: 'Idioma' },
 
   crumbs: {
-    home: 'Inicio', ranked: 'Ranked', training: 'Training',
+    home: 'Inicio', ranked: 'Ranked', training: 'Entrenamiento',
     casino: 'Casino Killer', game: 'Partida',
   },
 
   modeName: {
-    training: 'Training', ranked: 'Ranked', promo: 'Promoción',
+    training: 'Entrenamiento', ranked: 'Ranked', promo: 'Promoción',
     placement: 'Clasificación', casino: 'Casino Killer', daily: 'Reto diario',
   },
 
@@ -129,7 +129,7 @@ const es = {
     penetration: 'Penetración',
     speed: 'Velocidad/carta',
     rankPerk: 'Más mazos, menos tiempo por carta.',
-    masterPerk: '👑 Rango final · desbloquea el modo Casino',
+    masterPerk: '👑 Rango final · la cima de la élite',
     footer: 'Gana partidas clasificatorias para subir de nivel.',
   },
 
@@ -249,7 +249,7 @@ const es = {
   },
 
   trainingConfig: {
-    title: 'Training',
+    title: 'Entrenamiento',
     sub: 'Config libre · Sin impacto en MMR · Monedas normales',
     deckCount: 'Número de mazos',
     deck: 'mazo',
@@ -422,8 +422,8 @@ const es = {
       label: 'Tus modos de juego',
       h1l1: '3 modos,',
       h1l2: 'una progresión clara.',
-      p: 'Empieza en Training para forjar tus reflejos. Cuando estés cómodo, ataca la calibración para acceder a Ranked.',
-      trainingName: 'Training',
+      p: 'Empieza en Entrenamiento para forjar tus reflejos. Cuando estés cómodo, ataca la calibración para acceder a Ranked.',
+      trainingName: 'Entrenamiento',
       trainingSub: 'Modo libre — empieza aquí',
       trainingDesc:
         'Configura todo a tu gusto: mazos (1 a 8), penetración (50–95 %), velocidad. Pausa disponible. Contador opcional. Ideal para construir tus reflejos.',

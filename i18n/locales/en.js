@@ -129,7 +129,7 @@ const en = {
     penetration: 'Penetration',
     speed: 'Speed/card',
     rankPerk: 'More decks, less time per card.',
-    masterPerk: '👑 Final rank · unlocks Casino mode',
+    masterPerk: '👑 Final rank · the peak of the elite',
     footer: 'Win Ranked games to climb the tiers.',
   },
 
