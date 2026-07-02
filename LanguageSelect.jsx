@@ -45,6 +45,103 @@ export const Flag = ({ code, size = 22 }) => {
           <path d="M30 0 V40 M0 20 H60" stroke="#C8102E" strokeWidth="6.5" />
         </svg>
       );
+    case 'pt':
+      return (
+        <svg {...common}>
+          <rect width="60" height="40" fill="#FF0000" />
+          <rect width="24" height="40" fill="#006600" />
+          <circle cx="24" cy="20" r="7" fill="#FFD700" stroke="#006600" strokeWidth="1" />
+          <circle cx="24" cy="20" r="5" fill="#fff" />
+          <path d="M19,17 Q24,22 29,17" stroke="#003399" strokeWidth="1.2" fill="none" />
+          <path d="M19,20 Q24,25 29,20" stroke="#003399" strokeWidth="1.2" fill="none" />
+        </svg>
+      );
+    case 'ja':
+      return (
+        <svg {...common}>
+          <rect width="60" height="40" fill="#fff" />
+          <circle cx="30" cy="20" r="12" fill="#BC002D" />
+        </svg>
+      );
+    case 'zh':
+      return (
+        <svg {...common}>
+          <rect width="60" height="40" fill="#DE2910" />
+          {/* Grand astre */}
+          <polygon points="11,14 12.35,18.14 16.71,18.15 13.19,20.71 14.53,24.85 11,22.3 7.47,24.85 8.81,20.71 5.29,18.15 9.65,18.14" fill="#FFDE00" />
+          {/* Quatre petits astres */}
+          <polygon points="21,8.5 21.56,10.23 23.38,10.23 21.9,11.29 22.47,13.02 21,11.95 19.53,13.02 20.1,11.29 18.62,10.23 20.44,10.23" fill="#FFDE00" />
+          <polygon points="25,13 25.56,14.73 27.38,14.73 25.9,15.79 26.47,17.52 25,16.45 23.53,17.52 24.1,15.79 22.62,14.73 24.44,14.73" fill="#FFDE00" />
+          <polygon points="25,20 25.56,21.73 27.38,21.73 25.9,22.79 26.47,24.52 25,23.45 23.53,24.52 24.1,22.79 22.62,21.73 24.44,21.73" fill="#FFDE00" />
+          <polygon points="21,25 21.56,26.73 23.38,26.73 21.9,27.79 22.47,29.52 21,28.45 19.53,29.52 20.1,27.79 18.62,26.73 20.44,26.73" fill="#FFDE00" />
+        </svg>
+      );
+    case 'ko':
+      return (
+        <svg {...common}>
+          <rect width="60" height="40" fill="#fff" />
+          {/* Taegeuk */}
+          <circle cx="30" cy="20" r="9" fill="#CD2E3A" />
+          <path d="M30,11 A9,9 0 0,1 30,29 A4.5,4.5 0 0,0 30,20 A4.5,4.5 0 0,1 30,11Z" fill="#003478" />
+          <circle cx="30" cy="15.5" r="4.5" fill="#CD2E3A" />
+          <circle cx="30" cy="24.5" r="4.5" fill="#003478" />
+          {/* Trigrammes */}
+          <g fill="#000">
+            <rect x="6" y="7" width="10" height="2" /><rect x="6" y="10.5" width="10" height="2" /><rect x="6" y="14" width="10" height="2" />
+            <rect x="44" y="7" width="4" height="2" /><rect x="50" y="7" width="4" height="2" />
+            <rect x="44" y="10.5" width="4" height="2" /><rect x="50" y="10.5" width="4" height="2" />
+            <rect x="44" y="14" width="4" height="2" /><rect x="50" y="14" width="4" height="2" />
+            <rect x="6" y="24" width="4" height="2" /><rect x="12" y="24" width="4" height="2" />
+            <rect x="6" y="27.5" width="10" height="2" />
+            <rect x="6" y="31" width="4" height="2" /><rect x="12" y="31" width="4" height="2" />
+            <rect x="44" y="24" width="10" height="2" />
+            <rect x="44" y="27.5" width="4" height="2" /><rect x="50" y="27.5" width="4" height="2" />
+            <rect x="44" y="31" width="10" height="2" />
+          </g>
+        </svg>
+      );
+    case 'hi':
+      return (
+        <svg {...common}>
+          <rect width="60" height="40" fill="#FF9933" />
+          <rect y="13.33" width="60" height="13.34" fill="#fff" />
+          <rect y="26.67" width="60" height="13.33" fill="#138808" />
+          {/* Chakra d'Ashoka simplifié */}
+          <circle cx="30" cy="20" r="5.5" fill="none" stroke="#000080" strokeWidth="1" />
+          <circle cx="30" cy="20" r="1" fill="#000080" />
+          <g stroke="#000080" strokeWidth="0.6">
+            <line x1="30" y1="14.5" x2="30" y2="25.5" />
+            <line x1="24.5" y1="20" x2="35.5" y2="20" />
+            <line x1="26.11" y1="16.11" x2="33.89" y2="23.89" />
+            <line x1="33.89" y1="16.11" x2="26.11" y2="23.89" />
+            <line x1="27.07" y1="14.8" x2="32.93" y2="25.2" />
+            <line x1="32.93" y1="14.8" x2="27.07" y2="25.2" />
+            <line x1="24.8" y1="17.07" x2="35.2" y2="22.93" />
+            <line x1="35.2" y1="17.07" x2="24.8" y2="22.93" />
+          </g>
+        </svg>
+      );
+    case 'mn':
+      return (
+        <svg {...common}>
+          <rect width="60" height="40" fill="#C4272F" />
+          <rect x="20" width="20" height="40" fill="#015197" />
+          {/* Soyombo simplifié : flamme + soleil + lune */}
+          <ellipse cx="10" cy="12" rx="3" ry="2" fill="#F5C400" />
+          <circle cx="10" cy="18" r="3" fill="#F5C400" />
+          <path d="M7,22 Q10,28 13,22" fill="#F5C400" />
+        </svg>
+      );
+    case 'sq':
+      return (
+        <svg {...common}>
+          <rect width="60" height="40" fill="#E41E20" />
+          {/* Aigle bicéphale albanais simplifié */}
+          <path d="M30,7 L27,10 L23,8 L25,12 L21,13 L25,15 L24,19 L30,17 L36,19 L35,15 L39,13 L35,12 L37,8 L33,10 Z" fill="#000" />
+          <path d="M24,19 L21,22 L25,22 L23,27 L30,25 L37,27 L35,22 L39,22 L36,19 L30,21 Z" fill="#000" />
+          <path d="M23,27 L21,31 L25,29 L25,33 L28,31 L30,35 L32,31 L35,33 L35,29 L39,31 L37,27 Z" fill="#000" />
+        </svg>
+      );
     default:
       return null;
   }

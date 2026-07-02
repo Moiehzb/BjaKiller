@@ -8,10 +8,17 @@
 //   flag   — emoji flag for quick visual scanning
 //   dir    — 'ltr' | 'rtl' (future-proofing for Arabic, Hebrew, …)
 export const LANGUAGES = [
-  { code: 'fr', label: 'Français', flag: '🇫🇷', dir: 'ltr' },
-  { code: 'en', label: 'English',  flag: '🇬🇧', dir: 'ltr' },
-  { code: 'es', label: 'Español',  flag: '🇪🇸', dir: 'ltr' },
-  { code: 'de', label: 'Deutsch',  flag: '🇩🇪', dir: 'ltr' },
+  { code: 'fr', label: 'Français',  flag: '🇫🇷', dir: 'ltr' },
+  { code: 'en', label: 'English',   flag: '🇬🇧', dir: 'ltr' },
+  { code: 'es', label: 'Español',   flag: '🇪🇸', dir: 'ltr' },
+  { code: 'de', label: 'Deutsch',   flag: '🇩🇪', dir: 'ltr' },
+  { code: 'pt', label: 'Português', flag: '🇵🇹', dir: 'ltr' },
+  { code: 'ja', label: '日本語',    flag: '🇯🇵', dir: 'ltr' },
+  { code: 'zh', label: '中文',      flag: '🇨🇳', dir: 'ltr' },
+  { code: 'ko', label: '한국어',    flag: '🇰🇷', dir: 'ltr' },
+  { code: 'hi', label: 'हिन्दी',   flag: '🇮🇳', dir: 'ltr' },
+  { code: 'mn', label: 'Монгол',   flag: '🇲🇳', dir: 'ltr' },
+  { code: 'sq', label: 'Shqip',    flag: '🇦🇱', dir: 'ltr' },
 ];
 
 // Language used before the user picks one, and as the rendering default.

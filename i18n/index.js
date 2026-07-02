@@ -13,9 +13,16 @@ import fr from './locales/fr';
 import en from './locales/en';
 import es from './locales/es';
 import de from './locales/de';
+import pt from './locales/pt';
+import ja from './locales/ja';
+import zh from './locales/zh';
+import ko from './locales/ko';
+import hi from './locales/hi';
+import mn from './locales/mn';
+import sq from './locales/sq';
 
 // Registry of loaded dictionaries — extend alongside ./languages.js.
-const DICTS = { fr, en, es, de };
+const DICTS = { fr, en, es, de, pt, ja, zh, ko, hi, mn, sq };
 
 // Walk a dotted path ("a.b.c") through a nested dictionary.
 function lookup(dict, key) {
