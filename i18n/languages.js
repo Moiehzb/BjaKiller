@@ -9,7 +9,7 @@
 //   dir    — 'ltr' | 'rtl' (future-proofing for Arabic, Hebrew, …)
 // Sorted by ISO 639-1 code (alphabetical)
 export const LANGUAGES = [
-  { code: 'ar', label: 'العربية',   flag: '🇸🇦', dir: 'rtl' },
+  { code: 'ar', label: 'العربية',   flag: '🇸🇦', dir: 'ltr' },
   { code: 'de', label: 'Deutsch',   flag: '🇩🇪', dir: 'ltr' },
   { code: 'en', label: 'English',   flag: '🇬🇧', dir: 'ltr' },
   { code: 'es', label: 'Español',   flag: '🇪🇸', dir: 'ltr' },

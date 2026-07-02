@@ -202,7 +202,7 @@ const ru = {
     currentStreak: 'Текущая серия',
     bestStreak: 'Лучшая серия',
     avgSpc: ({ spc }) => `${spc}с/карта в среднем`,
-    totalCards: ({ c }) => `${c} ${cards(c)} всего`,
+    totalCards: ({ cards: c }) => `${c} ${cards(c)} всего`,
     recentTitle: 'Последние 20 игр · нажмите на полосу для деталей',
     oldest: 'Самое старое',
     newest: 'Самое новое',
