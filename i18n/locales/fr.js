@@ -204,6 +204,8 @@ const fr = {
 
   settings: {
     title: 'Paramètres',
+    devRankTitle: 'Dev · définir le rang',
+    devRankHint: 'Choisis un rang directement, sans passer par les parties de classement.',
     reset: 'Réinitialiser la progression',
     resetTitle: '⚠️ Réinitialiser',
     resetWarnPre: 'Irréversible. Tape ',

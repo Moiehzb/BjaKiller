@@ -204,6 +204,8 @@ const en = {
 
   settings: {
     title: 'Settings',
+    devRankTitle: 'Dev · set rank',
+    devRankHint: 'Pick a rank directly, skipping the placement games.',
     reset: 'Reset progress',
     resetTitle: '⚠️ Reset',
     resetWarnPre: 'Irreversible. Type ',

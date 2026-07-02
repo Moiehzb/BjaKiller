@@ -206,6 +206,8 @@ const de = {
 
   settings: {
     title: 'Einstellungen',
+    devRankTitle: 'Dev · Rang festlegen',
+    devRankHint: 'Wähle einen Rang direkt, ohne die Platzierungsspiele.',
     reset: 'Fortschritt zurücksetzen',
     resetTitle: '⚠️ Zurücksetzen',
     resetWarnPre: 'Unwiderruflich. Tippe ',

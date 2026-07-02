@@ -204,6 +204,8 @@ const es = {
 
   settings: {
     title: 'Ajustes',
+    devRankTitle: 'Dev · fijar rango',
+    devRankHint: 'Elige un rango directamente, sin jugar las partidas de clasificación.',
     reset: 'Reiniciar progreso',
     resetTitle: '⚠️ Reiniciar',
     resetWarnPre: 'Irreversible. Escribe ',

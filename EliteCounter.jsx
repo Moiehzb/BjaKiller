@@ -2758,6 +2758,37 @@ export default function EliteCounter() {
                   {save.soundEnabled !== false ? 'ON' : 'OFF'}
                 </button>
               </div>
+              {/* Dev · définir le rang sans passer par le placement */}
+              <div style={{ padding: '14px 0', borderBottom: `1px solid ${G.border}` }}>
+                <div style={{ fontSize: 11, color: G.textMuted, letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 4 }}>{t('settings.devRankTitle')}</div>
+                <div style={{ fontSize: 11, color: G.textMuted, marginBottom: 10 }}>{t('settings.devRankHint')}</div>
+                {/* Sous-rang I / II / III */}
+                <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
+                  {ROMAN.map((r, i) => {
+                    const sr = i + 1;
+                    const active = save.subRank === sr;
+                    return (
+                      <button key={r} onClick={() => { snd(playClick); patchSave({ subRank: sr, placementDone: true, placementEnded: false, trainingDone: true, inPromo: false, promoLocked: false }); }}
+                        style={{ flex: 1, padding: '7px 0', background: active ? 'rgba(201,168,76,.15)' : 'rgba(255,255,255,.03)', border: `1px solid ${active ? G.borderGold : G.border}`, borderRadius: 6, color: active ? G.gold : G.textMuted, cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>
+                        {r}
+                      </button>
+                    );
+                  })}
+                </div>
+                {/* Rangs Bronze → Master */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
+                  {RANKS_DEF.map(rk => {
+                    const active = save.rankId === rk.id;
+                    return (
+                      <button key={rk.id} onClick={() => { snd(playClick); patchSave({ rankId: rk.id, subRank: save.subRank || 1, mmr: 0, placementDone: true, placementEnded: false, trainingDone: true, inPromo: false, promoLocked: false }); }}
+                        style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, padding: '9px 4px', background: active ? `${rk.color}22` : 'rgba(255,255,255,.03)', border: `1px solid ${active ? rk.color : G.border}`, borderRadius: 7, cursor: 'pointer' }}>
+                        <span style={{ fontSize: 20 }}>{rk.icon}</span>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: active ? rk.color : G.textMuted }}>{rk.name}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
               <div style={{ padding: '14px 0', borderBottom: `1px solid ${G.border}` }}>
                 <button style={{ width: '100%', padding: 11, background: 'rgba(192,57,43,.1)', border: `1px solid rgba(192,57,43,.3)`, borderRadius: 8, color: G.red, cursor: 'pointer', fontSize: 13, fontWeight: 600 }}
                   onClick={() => { snd(playClick); setShowResetConfirm(true); }}>{t('settings.reset')}</button>
