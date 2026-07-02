@@ -57,6 +57,16 @@ export const playCorrect = (streak = 0) => {
   } catch {}
 };
 
+// Classic menu confirmation — two short ascending pips
+export const playMenuOk = () => {
+  try {
+    const ctx = ac();
+    const t = ctx.currentTime;
+    osc(ctx, 330, 'sine', 0.14, t,        0.065);
+    osc(ctx, 440, 'sine', 0.14, t + 0.08, 0.065);
+  } catch {}
+};
+
 // Wrong answer — low hollow thud, warm and muted
 export const playWrong = () => {
   try {

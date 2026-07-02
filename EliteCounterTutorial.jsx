@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronRight, ChevronLeft, Check, Play, BookOpen, DoorOpen, Flame, Lock } from 'lucide-react';
 import { makeT, DEFAULT_LANG } from './i18n';
-import { initAudio, playClick, playCorrect, playWrong, playChip, playGo, playCardFlip } from './src/sounds.js';
+import { initAudio, playClick, playCorrect, playMenuOk, playWrong, playChip, playGo, playCardFlip } from './src/sounds.js';
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // Design tokens — exact mirror of EliteCounter.jsx
@@ -420,7 +420,7 @@ const HiLoQuizStep = ({ onNext, onBack, t }) => {
     setFlashCls(correct ? 'flash-ok' : 'flash-err');
 
     if (correct) {
-      playCorrect(0);
+      playMenuOk();
       timerRef.current = setTimeout(advanceNext, 960);
     } else {
       playWrong();
