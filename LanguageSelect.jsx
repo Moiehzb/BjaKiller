@@ -45,6 +45,34 @@ export const Flag = ({ code, size = 22 }) => {
           <path d="M30 0 V40 M0 20 H60" stroke="#C8102E" strokeWidth="6.5" />
         </svg>
       );
+    case 'ar':
+      return (
+        <svg {...common}>
+          {/* Égypte — tricolore horizontal */}
+          <rect width="60" height="40" fill="#CE1126" />
+          <rect y="13.33" width="60" height="13.34" fill="#fff" />
+          <rect y="26.67" width="60" height="13.33" fill="#000" />
+          {/* Aigle d'or simplifié */}
+          <path d="M26,18 L26,22 L28,22 L28,20 L32,20 L32,22 L34,22 L34,18 Z" fill="#C09300" />
+          <rect x="28" y="17" width="4" height="1.5" fill="#C09300" />
+        </svg>
+      );
+    case 'it':
+      return (
+        <svg {...common}>
+          <rect width="20" height="40" fill="#009246" />
+          <rect x="20" width="20" height="40" fill="#fff" />
+          <rect x="40" width="20" height="40" fill="#CE2B37" />
+        </svg>
+      );
+    case 'ru':
+      return (
+        <svg {...common}>
+          <rect width="60" height="40" fill="#fff" />
+          <rect y="13.33" width="60" height="13.34" fill="#0039A6" />
+          <rect y="26.67" width="60" height="13.33" fill="#D52B1E" />
+        </svg>
+      );
     case 'pt':
       return (
         <svg {...common}>

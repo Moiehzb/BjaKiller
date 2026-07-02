@@ -9,20 +9,24 @@
 //   • a function (vars) => string                → for plurals / rich logic
 //   • an array / object                          → returned as-is (e.g. preset lists)
 import { LANGUAGES, DEFAULT_LANG, FALLBACK_LANG, getLanguage } from './languages';
-import fr from './locales/fr';
+// Sorted by ISO 639-1 code (alphabetical) — mirror of languages.js
+import ar from './locales/ar';
+import de from './locales/de';
 import en from './locales/en';
 import es from './locales/es';
-import de from './locales/de';
-import pt from './locales/pt';
-import ja from './locales/ja';
-import zh from './locales/zh';
-import ko from './locales/ko';
+import fr from './locales/fr';
 import hi from './locales/hi';
+import it from './locales/it';
+import ja from './locales/ja';
+import ko from './locales/ko';
 import mn from './locales/mn';
+import pt from './locales/pt';
+import ru from './locales/ru';
 import sq from './locales/sq';
+import zh from './locales/zh';
 
 // Registry of loaded dictionaries — extend alongside ./languages.js.
-const DICTS = { fr, en, es, de, pt, ja, zh, ko, hi, mn, sq };
+const DICTS = { ar, de, en, es, fr, hi, it, ja, ko, mn, pt, ru, sq, zh };
 
 // Walk a dotted path ("a.b.c") through a nested dictionary.
 function lookup(dict, key) {
