@@ -5,8 +5,8 @@
 
 ## 🎯 Feedback utilisateur — à implémenter
 
-### Tutoriel
-- [ ] **Slide 3 du tuto** : quand le joueur se trompe, la carte doit se stopper et afficher un rappel (correction visuelle + explication) avant de continuer — pas de défilement automatique si erreur
+### Musique 8-bit
+- [ ] **Musiques 8-bit** : créer les tracks pour l'app — style Zelda OoT Gerudo Valley pour l'accueil/menus, style Kirby Title Screen pour le gameplay. Approche : composer une mélodie via Beepbox.co, étoffer avec Suno.ai ou Gemini. Prévoir : lobby loop, game loop, jingle victoire, jingle défaite.
 
 ---
 
@@ -23,6 +23,8 @@
 - [ ] App 2 séparée : mode table réaliste style Card Counter Lite
 
 ## ✅ Fait
+
+- [x] **Slide 3 du tuto — correction visuelle** : la carte se stoppe en cas d'erreur et affiche un rappel avant de continuer (02/07/2026)
 
 - [x] **Refonte visuelle skins — session 02/07/2026**
   - **Obsidian Void** : glow rouge (`rgba(255,60,80)`) ajouté sur les cartes rouges (symétrique au glow blanc/bleu des noires).
