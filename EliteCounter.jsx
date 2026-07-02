@@ -430,19 +430,50 @@ const dayKey = (d = new Date()) => `${d.getFullYear()}-${d.getMonth() + 1}-${d.g
 // Graine numérique du jour (AAAAMMJJ) — pilote deck + config.
 const daySeed = (d = new Date()) => d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
 
-const DAILY_DECK_CHOICES = [1, 2, 4, 6];
-const DAILY_PEN_CHOICES = [70, 80, 90];
-// Config du défi du jour, dérivée de la graine (fixe pour un jour donné).
-const getDailyConfig = (seed = daySeed()) => {
+// Réglages du défi. Jour normal : rapide (~≤ 2 min), un poil plus simple que la
+// ranked du joueur. Jour spécial : rare, 8 decks mais temps/carte très généreux,
+// réservé aux hauts rangs (sinon 8 decks = injouable / interminable).
+const DAILY_MAX_SECONDS = 150;       // plafond de durée d'un jour normal
+const DAILY_SPECIAL_CHANCE = 0.07;   // ~1 jour sur 14
+const DAILY_EASE = 1.15;             // temps/carte un peu plus lent que la ranked = plus simple
+const DAILY_SPECIAL_SLOW = 1.5;      // jour spécial : bien plus lent que la ranked
+const DAILY_SPECIAL_PEN = 50;        // pénétration réduite pour garder les 8 decks jouables
+
+// Config du défi du jour : dérivée de la date ET du rang courant du joueur.
+// Volontairement différente des games ranked (moins de decks, un peu plus lente
+// par carte) et bien plus courte en temps global.
+const getDailyConfig = (seed, rankId = 1, subRank = 1) => {
+  const ranked = getRankConfig(rankId, subRank);
   const rng = mulberry32(seed);
-  const decks = DAILY_DECK_CHOICES[Math.floor(rng() * DAILY_DECK_CHOICES.length)];
-  const penetration = DAILY_PEN_CHOICES[Math.floor(rng() * DAILY_PEN_CHOICES.length)];
-  const secPerCard = parseFloat((0.75 + rng() * 0.35).toFixed(2)); // 0.75–1.10 s/carte, jamais injouable
-  const totalCards = Math.floor(52 * decks * penetration / 100);
-  return { seed, decks, penetration, secPerCard, totalCards, timeLimit: Math.round(secPerCard * totalCards) };
+  const specialRoll = rng();   // graine seule → même "jour spécial" pour tout le monde
+  const deckRoll = rng();
+  const penRoll = rng();
+  const special = rankId >= 5 && specialRoll < DAILY_SPECIAL_CHANCE;
+
+  if (special) {
+    const decks = 8;
+    const secPerCard = parseFloat((ranked.secPerCard * DAILY_SPECIAL_SLOW).toFixed(2));
+    const totalCards = Math.floor(52 * decks * DAILY_SPECIAL_PEN / 100);
+    return { seed, special: true, decks, penetration: DAILY_SPECIAL_PEN, secPerCard, totalCards, timeLimit: Math.round(secPerCard * totalCards) };
+  }
+
+  const penetration = [65, 70, 75][Math.floor(penRoll * 3)];
+  const secPerCard = parseFloat((ranked.secPerCard * DAILY_EASE).toFixed(2));
+  let decks = deckRoll < 0.6 ? 1 : 2;   // majoritairement 1 deck
+  let totalCards = Math.floor(52 * decks * penetration / 100);
+  let timeLimit = Math.round(secPerCard * totalCards);
+  // Garde-fou "2 min" : si 2 decks dépasse le plafond (rangs lents), on repasse à 1.
+  if (timeLimit > DAILY_MAX_SECONDS && decks === 2) {
+    decks = 1;
+    totalCards = Math.floor(52 * decks * penetration / 100);
+    timeLimit = Math.round(secPerCard * totalCards);
+  }
+  return { seed, special: false, decks, penetration, secPerCard, totalCards, timeLimit };
 };
-// Score journalier : 1000 si compte exact, −120 par unité d'écart, plancher 0.
-const dailyScore = (error) => Math.max(0, 1000 - Math.abs(error) * 120);
+
+// Score du jour : 1000 au compte exact, −501 par unité d'écart (peut être négatif).
+// Score négatif = défi manqué → la série (streak) est perdue.
+const dailyScore = (error) => 1000 - Math.abs(error) * 501;
 
 // ─── RANK SYSTEM ─────────────────────────────────────────────────
 // Source de vérité par rang : id, name, icon, color, decks, mmrPerWin/Loss.
@@ -1490,7 +1521,7 @@ export default function EliteCounter() {
   const startDaily = () => {
     if (!save || save.daily?.lastKey === dayKey()) return; // déjà joué aujourd'hui
     const seed = daySeed();
-    const cfg = getDailyConfig(seed);
+    const cfg = getDailyConfig(seed, save.rankId, save.subRank);
     // Deck seedé indépendamment de la config (graine dérivée) → déterministe.
     const deck = buildDeck(cfg.decks, cfg.penetration, mulberry32(seed ^ 0x9e3779b9));
     dailyRef.current = cfg;
@@ -1501,14 +1532,15 @@ export default function EliteCounter() {
     launchGame(cfg.decks, cfg.penetration, cfg.timeLimit, 'daily', false, false, deck);
   };
 
-  const finishDaily = (correct, trueCount, answer) => {
+  const finishDaily = (trueCount, answer) => {
     const key = dayKey();
     const error = answer - trueCount;
     const score = dailyScore(error);
+    const won = score >= 0; // score négatif (écart ≥ 2) = défi manqué → streak perdue
     const d = save.daily || DEFAULT_SAVE.daily;
-    const newStreak = correct ? (d.streak || 0) + 1 : 0;
-    const coinBonus = correct ? 30 + Math.min(newStreak, 10) * 10 : 0; // habitude récompensée, plafonnée
-    const result = { key, won: correct, score, error, trueCount, answer, decks: dailyRef.current?.decks };
+    const newStreak = won ? (d.streak || 0) + 1 : 0;
+    const coinBonus = won ? 30 + Math.min(newStreak, 10) * 10 : 0; // habitude récompensée, plafonnée
+    const result = { key, won, score, error, trueCount, answer, decks: dailyRef.current?.decks, special: !!dailyRef.current?.special };
     // patch fonctionnel : cumule les coins par-dessus le patch principal de checkAnswer.
     patchSave(prev => ({
       coins: (prev.coins || 0) + coinBonus,
@@ -1520,8 +1552,8 @@ export default function EliteCounter() {
         bestStreak: Math.max(d.bestStreak || 0, newStreak),
         bestScore: Math.max(d.bestScore || 0, score),
         totalPlayed: (d.totalPlayed || 0) + 1,
-        totalWon: (d.totalWon || 0) + (correct ? 1 : 0),
-        history: [...(d.history || []).slice(-13), { key, won: correct, score }],
+        totalWon: (d.totalWon || 0) + (won ? 1 : 0),
+        history: [...(d.history || []).slice(-13), { key, won, score }],
       },
     }));
     if (coinBonus > 0) setEarnedCoins(c => c + coinBonus);
@@ -1870,7 +1902,7 @@ export default function EliteCounter() {
     if (gameModeRef.current === 'casino') {
       advanceCasinoStep(correct);
     } else if (gameModeRef.current === 'daily') {
-      finishDaily(correct, runningCount, answer);
+      finishDaily(runningCount, answer);
     } else {
       applyMMRChange(correct);
     }
@@ -2093,24 +2125,30 @@ export default function EliteCounter() {
 
           <div className="sec">{t('lobby.gameModes')}</div>
 
-          {/* Défi du jour — deck identique pour tous, 1 tentative/jour */}
+          {/* Défi du jour — difficulté calée sur le rang, 1 tentative/jour */}
           {(() => {
             const dDone = save.daily?.lastKey === dayKey();
             const dStreak = save.daily?.streak || 0;
             const dRes = save.daily?.lastResult;
+            const dCfg = getDailyConfig(daySeed(), save.rankId, save.subRank);
+            const isSpecial = !dDone && dCfg.special;
             return (
               <div className="card" onClick={() => { snd(playClick); if (dDone) setShowStats(true); else startDaily(); }}
                 style={dDone
                   ? { borderColor: G.border, background: 'rgba(255,255,255,.02)' }
-                  : { borderColor: G.borderGold, background: 'rgba(201,168,76,.07)', boxShadow: '0 0 18px rgba(201,168,76,.15)' }}>
+                  : isSpecial
+                    ? { borderColor: G.gold, background: 'rgba(201,168,76,.12)', boxShadow: '0 0 22px rgba(201,168,76,.28)' }
+                    : { borderColor: G.borderGold, background: 'rgba(201,168,76,.07)', boxShadow: '0 0 18px rgba(201,168,76,.15)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
-                  <div className="ci">🗓️</div>
+                  <div className="ci">{isSpecial ? '⭐' : '🗓️'}</div>
                   <div>
-                    <div className="ct" style={{ color: dDone ? G.text : G.goldLight }}>{t('lobby.dailyTitle')}</div>
+                    <div className="ct" style={{ color: dDone ? G.text : G.goldLight }}>
+                      {isSpecial ? t('lobby.dailySpecialTitle') : t('lobby.dailyTitle')}
+                    </div>
                     <div className="cs">
                       {dDone
                         ? (dRes?.won ? t('lobby.dailyDoneWin', { score: dRes.score }) : t('lobby.dailyDoneLoss')) + ' · ' + t('lobby.dailyComeBack')
-                        : t('lobby.dailyReadySub')}
+                        : t('lobby.dailyReadySub', { decks: dCfg.decks, secs: dCfg.timeLimit })}
                     </div>
                   </div>
                 </div>
@@ -3118,18 +3156,22 @@ export default function EliteCounter() {
                     )}
 
                     {/* Défi du jour : score + streak + reviens demain */}
-                    {isDaily && showResult && save.daily?.lastResult && (
-                      <div style={{ marginBottom: 12, background: 'rgba(201,168,76,.08)', border: `1px solid ${G.borderGold}`, borderRadius: 8, padding: '12px 14px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
-                          <span style={{ fontSize: 12, color: G.textMuted }}>{t('game.dailyScore')}</span>
-                          <span style={{ fontFamily: 'Playfair Display, serif', fontSize: 22, fontWeight: 700, color: G.goldLight }}>{save.daily.lastResult.score}</span>
+                    {isDaily && showResult && save.daily?.lastResult && (() => {
+                      const lr = save.daily.lastResult;
+                      return (
+                        <div style={{ marginBottom: 12, background: 'rgba(201,168,76,.08)', border: `1px solid ${G.borderGold}`, borderRadius: 8, padding: '12px 14px' }}>
+                          {lr.special && <div style={{ fontSize: 11, color: G.gold, textAlign: 'center', marginBottom: 6, letterSpacing: '.06em' }}>⭐ {t('game.dailySpecial')}</div>}
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
+                            <span style={{ fontSize: 12, color: G.textMuted }}>{t('game.dailyScore')}</span>
+                            <span style={{ fontFamily: 'Playfair Display, serif', fontSize: 22, fontWeight: 700, color: lr.score >= 0 ? G.goldLight : G.red }}>{lr.score}</span>
+                          </div>
+                          <div style={{ fontSize: 12, color: lr.won ? G.green : G.red, textAlign: 'center', marginBottom: 4 }}>
+                            {lr.won ? t('game.dailyStreakKept', { n: save.daily.streak }) : t('game.dailyStreakLost')}
+                          </div>
+                          <div style={{ fontSize: 11, color: G.textMuted, textAlign: 'center' }}>{t('game.dailyComeBack')}</div>
                         </div>
-                        <div style={{ fontSize: 12, color: isCorrect ? G.green : G.red, textAlign: 'center', marginBottom: 4 }}>
-                          {isCorrect ? t('game.dailyStreakKept', { n: save.daily.streak }) : t('game.dailyStreakLost')}
-                        </div>
-                        <div style={{ fontSize: 11, color: G.textMuted, textAlign: 'center' }}>{t('game.dailyComeBack')}</div>
-                      </div>
-                    )}
+                      );
+                    })()}
 
                     {/* Casino: show failure state or waiting for auto-advance */}
                     {isCasino && showResult && (
