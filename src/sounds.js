@@ -56,13 +56,25 @@ export const playCorrect = (streak = 0) => {
   } catch {}
 };
 
-// Wrong answer — descending soft tones
+// Wrong answer — low hollow thud, warm and muted
 export const playWrong = () => {
   try {
     const ctx = ac();
     const t = ctx.currentTime;
-    osc(ctx, rnd(240, 0.05), 'sine', 0.13, t,        0.22);
-    osc(ctx, rnd(170, 0.05), 'sine', 0.09, t + 0.10, 0.20);
+    osc(ctx, rnd(140, 0.06), 'sine', 0.14, t,        0.28, 90);
+    osc(ctx, rnd(95,  0.06), 'sine', 0.08, t + 0.08, 0.22, 60);
+  } catch {}
+};
+
+// Card flip — soft parchment slide, no transient
+export const playCardFlip = () => {
+  try {
+    const ctx = ac();
+    const t = ctx.currentTime;
+    // Gentle low swish: quick sine sweep down
+    osc(ctx, rnd(320, 0.08), 'sine', 0.06, t,        0.045, 180);
+    // Subtle thud on landing
+    osc(ctx, rnd(90,  0.08), 'sine', 0.09, t + 0.03, 0.07,  55);
   } catch {}
 };
 

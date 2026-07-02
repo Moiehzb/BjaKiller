@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronRight, ChevronLeft, Check, Play, BookOpen, DoorOpen, Flame, Lock } from 'lucide-react';
 import { makeT, DEFAULT_LANG } from './i18n';
-import { initAudio, playClick, playCorrect, playWrong, playChip, playGo } from './src/sounds.js';
+import { initAudio, playClick, playCorrect, playWrong, playChip, playGo, playCardFlip } from './src/sounds.js';
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // Design tokens — exact mirror of EliteCounter.jsx
@@ -403,6 +403,7 @@ const HiLoQuizStep = ({ onNext, onBack, t }) => {
     setFlashCls('');
     setAnswered(null);
     if (idx < QUIZ_CARDS.length - 1) {
+      playCardFlip();
       setIdx((i) => i + 1);
     } else {
       setShowResult(true);
@@ -620,6 +621,7 @@ const CountQuizStep = ({ onNext, onBack, t }) => {
   // Auto-deal cards one by one
   useEffect(() => {
     if (phase !== 'watching' || dealIdx < 0) return;
+    playCardFlip();
 
     if (dealIdx < COUNT_SEQ.length - 1) {
       dealRef.current = setTimeout(() => setDealIdx((i) => i + 1), 870);

@@ -3215,6 +3215,29 @@ export default function EliteCounter() {
               <div style={{ fontSize: 12, color: G.textSecondary }}>{finalTimeSec.toFixed(1)}s / {tl}s</div>
             </div>
 
+            {/* Input phase — no ghost card, keyboard in natural flow */}
+            {!showResult && (
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 24px 32px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'center', width: '100%', maxWidth: 280 }}>
+                  <div style={{ fontSize: 11, color: G.textSecondary, letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 4 }}>{t('game.countQuestion')}</div>
+                  <div className="ans" style={{ userSelect: 'none' }}>
+                    {userAnswer === '' || userAnswer === '-' ? <span style={{ color: G.goldDark }}>?</span> : userAnswer}
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, width: '100%' }}>
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(d => (
+                      <KpKey key={d} onClick={() => ansPress(String(d))}>{d}</KpKey>
+                    ))}
+                    <KpKey alt onClick={ansToggleSign}>−</KpKey>
+                    <KpKey onClick={() => ansPress('0')}>0</KpKey>
+                    <KpKey alt onClick={ansBack}>⌫</KpKey>
+                  </div>
+                  <button className="lbtn" style={{ width: '100%' }} onClick={checkAnswer} disabled={userAnswer === '' || userAnswer === '-'}>{t('common.validate')}</button>
+                </div>
+              </div>
+            )}
+
+            {/* Result phase — ghost card background + absolute content overlay */}
+            {showResult && (
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '16px', gap: 20 }}>
               {currentCard && (
                 <div style={{ opacity: .12, pointerEvents: 'none' }}>
@@ -3223,23 +3246,6 @@ export default function EliteCounter() {
               )}
 
               <div style={{ position: 'absolute', textAlign: 'center', width: '100%', padding: '0 24px' }}>
-                {!showResult ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'center', width: '100%', maxWidth: 280, margin: '0 auto' }}>
-                    <div style={{ fontSize: 11, color: G.textSecondary, letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 4 }}>{t('game.countQuestion')}</div>
-                    <div className="ans" style={{ userSelect: 'none' }}>
-                      {userAnswer === '' || userAnswer === '-' ? <span style={{ color: G.goldDark }}>?</span> : userAnswer}
-                    </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, width: '100%' }}>
-                      {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(d => (
-                        <KpKey key={d} onClick={() => ansPress(String(d))}>{d}</KpKey>
-                      ))}
-                      <KpKey alt onClick={ansToggleSign}>±</KpKey>
-                      <KpKey onClick={() => ansPress('0')}>0</KpKey>
-                      <KpKey alt onClick={ansBack}>⌫</KpKey>
-                    </div>
-                    <button className="lbtn" style={{ width: '100%' }} onClick={checkAnswer} disabled={userAnswer === '' || userAnswer === '-'}>{t('common.validate')}</button>
-                  </div>
-                ) : (
                   <div style={{ textAlign: 'center', maxWidth: 300, margin: '0 auto' }}>
                     <div className={isCorrect ? 'rc' : 'rw'}>{isCorrect ? '✓' : '✗'}</div>
                     <div style={{ fontFamily: 'Cinzel, serif', fontSize: 22, marginTop: 8, marginBottom: 4 }}>
@@ -3339,9 +3345,9 @@ export default function EliteCounter() {
                       {isCasino && !isCorrect && <button className="lbtn red" style={{ flex: 2, marginTop: 0, padding: 11 }} onClick={() => { snd(playClick); startCasinoChallenge(); }}>{t('common.restart')}</button>}
                     </div>
                   </div>
-                )}
               </div>
             </div>
+          )}
           </div>
         </div>
       );
