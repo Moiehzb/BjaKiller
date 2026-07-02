@@ -42,7 +42,7 @@ const de = {
 
   modeName: {
     training: 'Training', ranked: 'Ranked', promo: 'Aufstieg',
-    placement: 'Platzierung', casino: 'Casino Killer',
+    placement: 'Platzierung', casino: 'Casino Killer', daily: 'Tägliche Challenge',
   },
 
   ranks: {
@@ -89,6 +89,11 @@ const de = {
     stats: 'Stats',
     statsSub: ({ total }) => `${total} Spiele gespielt`,
     statsNone: 'Keine Spiele',
+    dailyTitle: 'Tägliche Challenge',
+    dailyReadySub: 'Deck des Tages · für alle gleich',
+    dailyDoneWin: ({ score }) => `✓ Geschafft · ${score} Pkt`,
+    dailyDoneLoss: '✗ Verpasst',
+    dailyComeBack: 'Komm morgen wieder',
     settings: 'Einstellungen',
     settingsSub: 'Reset · Optionen',
     currentStreak: ({ streak }) => `Aktuelle Serie: ${streak}`,
@@ -171,6 +176,16 @@ const de = {
     topSkin: 'Meistgespielter Skin',
     topSkinGames: ({ n }) => `${n} ${n > 1 ? 'Spiele' : 'Spiel'}`,
     placementInProgress: 'Platzierung läuft…',
+    dailyTitle: 'Tägliche Challenge',
+    dailyStreak: 'Aktuelle Serie',
+    dailyBestStreak: 'Beste Serie',
+    dailyBestScore: 'Bester Score',
+    dailyRecap: ({ won, played, wr }) => `${won}/${played} geschafft · ${wr}% Trefferquote`,
+    dailyNever: 'Noch nicht gespielt — komm täglich für ein neues Deck.',
+    byDeckTitle: 'Genauigkeit nach Decks',
+    deckLabel: ({ n }) => `${n} Deck${n > 1 ? 's' : ''}`,
+    cardsCounted: 'Gezählte Karten',
+    byModeTitle: 'Spiele nach Modus',
   },
 
   settings: {
@@ -276,6 +291,10 @@ const de = {
     casinoFail: '💥 Verfehlt — zurück zu Etappe 1',
     casinoStepOk: ({ n, next }) => `✓ Etappe ${n}/5 — nächste in ${next}s`,
     casinoDone: '🎰 CASINO CHALLENGE ABGESCHLOSSEN!',
+    dailyScore: 'Tagesscore',
+    dailyStreakKept: ({ n }) => `🔥 ${n}-Tage-Serie!`,
+    dailyStreakLost: 'Serie zurückgesetzt',
+    dailyComeBack: 'Komm morgen für ein neues Deck wieder',
     infoCasino: ({ n }) => `🔥 CASINO — Etappe ${n}/5`,
     infoPromo: '⚡ AUFSTIEG',
     infoPlacement: ({ n, total }) => `🎲 PLATZIERUNG ${n}/${total}`,

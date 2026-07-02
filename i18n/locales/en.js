@@ -40,7 +40,7 @@ const en = {
 
   modeName: {
     training: 'Training', ranked: 'Ranked', promo: 'Promotion',
-    placement: 'Placement', casino: 'Casino Killer',
+    placement: 'Placement', casino: 'Casino Killer', daily: 'Daily Challenge',
   },
 
   ranks: {
@@ -87,6 +87,11 @@ const en = {
     stats: 'Stats',
     statsSub: ({ total }) => `${total} games played`,
     statsNone: 'No games yet',
+    dailyTitle: 'Daily Challenge',
+    dailyReadySub: 'Deck of the day · same deck for everyone',
+    dailyDoneWin: ({ score }) => `✓ Solved · ${score} pts`,
+    dailyDoneLoss: '✗ Missed',
+    dailyComeBack: 'Come back tomorrow',
     settings: 'Settings',
     settingsSub: 'Reset · Options',
     currentStreak: ({ streak }) => `Current streak: ${streak}`,
@@ -169,6 +174,16 @@ const en = {
     topSkin: 'Most-played skin',
     topSkinGames: ({ n }) => `${n} ${n > 1 ? 'games' : 'game'}`,
     placementInProgress: 'Placement in progress…',
+    dailyTitle: 'Daily Challenge',
+    dailyStreak: 'Current streak',
+    dailyBestStreak: 'Best streak',
+    dailyBestScore: 'Best score',
+    dailyRecap: ({ won, played, wr }) => `${won}/${played} solved · ${wr}% win rate`,
+    dailyNever: 'Not played yet — come back daily for a new deck.',
+    byDeckTitle: 'Accuracy by decks',
+    deckLabel: ({ n }) => `${n} deck${n > 1 ? 's' : ''}`,
+    cardsCounted: 'Cards counted',
+    byModeTitle: 'Games by mode',
   },
 
   settings: {
@@ -274,6 +289,10 @@ const en = {
     casinoFail: '💥 Failed — back to step 1',
     casinoStepOk: ({ n, next }) => `✓ Step ${n}/5 — next in ${next}s`,
     casinoDone: '🎰 CASINO CHALLENGE COMPLETE!',
+    dailyScore: 'Daily score',
+    dailyStreakKept: ({ n }) => `🔥 ${n}-day streak!`,
+    dailyStreakLost: 'Streak reset',
+    dailyComeBack: 'Come back tomorrow for a new deck',
     infoCasino: ({ n }) => `🔥 CASINO — Step ${n}/5`,
     infoPromo: '⚡ PROMO',
     infoPlacement: ({ n, total }) => `🎲 PLACEMENT ${n}/${total}`,

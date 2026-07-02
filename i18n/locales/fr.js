@@ -40,7 +40,7 @@ const fr = {
 
   modeName: {
     training: 'Training', ranked: 'Ranked', promo: 'Promotion',
-    placement: 'Classement', casino: 'Casino Killer',
+    placement: 'Classement', casino: 'Casino Killer', daily: 'Défi du jour',
   },
 
   ranks: {
@@ -87,6 +87,11 @@ const fr = {
     stats: 'Stats',
     statsSub: ({ total }) => `${total} parties jouées`,
     statsNone: 'Aucune partie',
+    dailyTitle: 'Défi du jour',
+    dailyReadySub: 'Deck du jour · même deck pour tous',
+    dailyDoneWin: ({ score }) => `✓ Réussi · ${score} pts`,
+    dailyDoneLoss: '✗ Manqué',
+    dailyComeBack: 'Reviens demain',
     settings: 'Paramètres',
     settingsSub: 'Reset · Options',
     currentStreak: ({ streak }) => `Streak actuel : ${streak}`,
@@ -169,6 +174,16 @@ const fr = {
     topSkin: 'Skin le plus joué',
     topSkinGames: ({ n }) => `${n} ${n > 1 ? 'parties' : 'partie'}`,
     placementInProgress: 'Classement en cours…',
+    dailyTitle: 'Défi du jour',
+    dailyStreak: 'Série actuelle',
+    dailyBestStreak: 'Meilleure série',
+    dailyBestScore: 'Meilleur score',
+    dailyRecap: ({ won, played, wr }) => `${won}/${played} réussis · ${wr}% de réussite`,
+    dailyNever: 'Pas encore joué — reviens chaque jour pour un nouveau deck.',
+    byDeckTitle: 'Précision par decks',
+    deckLabel: ({ n }) => `${n} deck${n > 1 ? 's' : ''}`,
+    cardsCounted: 'Cartes comptées',
+    byModeTitle: 'Parties par mode',
   },
 
   settings: {
@@ -274,6 +289,10 @@ const fr = {
     casinoFail: '💥 Raté — tu repars à l’étape 1',
     casinoStepOk: ({ n, next }) => `✓ Étape ${n}/5 — prochaine dans ${next}s`,
     casinoDone: '🎰 CASINO CHALLENGE TERMINÉ !',
+    dailyScore: 'Score du jour',
+    dailyStreakKept: ({ n }) => `🔥 Série de ${n} jour${n > 1 ? 's' : ''} !`,
+    dailyStreakLost: 'Série remise à zéro',
+    dailyComeBack: 'Reviens demain pour un nouveau deck',
     infoCasino: ({ n }) => `🔥 CASINO — Étape ${n}/5`,
     infoPromo: '⚡ PROMO',
     infoPlacement: ({ n, total }) => `🎲 CLASSEMENT ${n}/${total}`,

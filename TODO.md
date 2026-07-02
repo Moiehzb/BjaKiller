@@ -18,9 +18,7 @@
 - [ ] Brancher l'achat des skins support (4,99 €/skin) sur un vrai paiement — aujourd'hui le clic "4,99 €" débloque directement en localStorage (démo). Voir aussi le paywall en fin de roadmap.
 - [ ] Ajouter des sons dans l'app (changement de carte, bonne/mauvaise réponse, victoire/défaite, achat/équipement de skin, clics UI) — prévoir un toggle son ON/OFF dans les réglages
 - [ ] Transformer l'app en APK Android (build mobile installable)
-- [ ] **Défi quotidien** : un deck du jour identique pour tous (même seed), un score à battre, comparable jour après jour.
 - [ ] **Vibration (haptique)** sur bonne/mauvaise réponse — gratuit et satisfaisant sur mobile (à lier au toggle son/retour).
-- [ ] **Stats plus fines** : précision par nombre de decks (ex. « nul à 8 decks »), courbe de précision dans le temps.
 
 ## 🔮 Fin de roadmap — ne jamais mentionner quand on demande quoi faire
 
@@ -29,6 +27,11 @@
 - [ ] App 2 séparée : mode table réaliste style Card Counter Lite
 
 ## ✅ Fait
+
+- [x] **Défi du jour + stats améliorées — session 02/07/2026**
+  - **Défi du jour** (façon Wordle) : deck + config déterministes depuis la date (`mulberry32` seedé sur `AAAAMMJJ`) → **même deck pour tous** chaque jour, différent chaque jour. 1 tentative/jour (verrouillé ensuite), **compteur toujours caché**. Score du jour (1000 = compte exact, −120/écart), **streak de jours consécutifs réussis** + meilleure série + meilleur score + historique 14 jours. Coins bonus (30 + 10×streak, plafonné). N'affecte **pas** le MMR ranked. Carte dédiée en tête du lobby (glow doré si dispo, sinon résultat du jour + « reviens demain »). Bloc résultat sur l'écran de fin.
+  - **Stats améliorées** : **précision par nombre de decks** (barres 1/2/4/6/8 — le « nul à 8 decks »), **cartes comptées à vie**, **répartition des parties par mode**, + bloc **défi du jour** (série/record/historique) dans le modal Stats. Nouveaux agrégats persistés dans `stats` (`deckStats`, `modeStats`, `cardsCounted`).
+  - i18n : 20 clés × 4 langues (FR/EN/ES/DE), parité 360 clés OK. Build OK.
 
 - [x] **Config Training persistée** : decks / pénétration / durée / compteur visible sauvegardés dans `eliteSave`, restaurés au lancement (fini le reset à 1 deck · 75% · 94s). (02/07/2026)
 - [x] **Suppression du code mort temporel** : `tooSlow` / `overTime` / `timeTooSlow` retirés (jamais déclenchables — les cartes défilent en auto, on ne peut perdre qu'en comptant mal), + `winRate` inutilisé du lobby, + 3 clés i18n orphelines (`game.overTime/seeResult/tooSlow`) dans FR/EN/ES/DE. (02/07/2026)

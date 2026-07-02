@@ -414,6 +414,36 @@ const getCasinoStepConfig = (stepIdx) => {
   return { ...s, totalCards, timeLimit };
 };
 
+// ─── DÉFI DU JOUR ────────────────────────────────────────────────
+// Deck + config déterministes à partir de la date : identiques pour tout
+// le monde le même jour, différents chaque jour. 1 tentative/jour, compteur
+// toujours caché. Le "score du jour" (1000 = compte exact) se compare jour
+// après jour, avec un streak de jours consécutifs réussis (façon Wordle).
+const mulberry32 = (seed) => () => {
+  let t = (seed += 0x6d2b79f5);
+  t = Math.imul(t ^ (t >>> 15), t | 1);
+  t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+};
+// Clé de date locale "AAAA-M-J" — sert au verrouillage journalier.
+const dayKey = (d = new Date()) => `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+// Graine numérique du jour (AAAAMMJJ) — pilote deck + config.
+const daySeed = (d = new Date()) => d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+
+const DAILY_DECK_CHOICES = [1, 2, 4, 6];
+const DAILY_PEN_CHOICES = [70, 80, 90];
+// Config du défi du jour, dérivée de la graine (fixe pour un jour donné).
+const getDailyConfig = (seed = daySeed()) => {
+  const rng = mulberry32(seed);
+  const decks = DAILY_DECK_CHOICES[Math.floor(rng() * DAILY_DECK_CHOICES.length)];
+  const penetration = DAILY_PEN_CHOICES[Math.floor(rng() * DAILY_PEN_CHOICES.length)];
+  const secPerCard = parseFloat((0.75 + rng() * 0.35).toFixed(2)); // 0.75–1.10 s/carte, jamais injouable
+  const totalCards = Math.floor(52 * decks * penetration / 100);
+  return { seed, decks, penetration, secPerCard, totalCards, timeLimit: Math.round(secPerCard * totalCards) };
+};
+// Score journalier : 1000 si compte exact, −120 par unité d'écart, plancher 0.
+const dailyScore = (error) => Math.max(0, 1000 - Math.abs(error) * 120);
+
 // ─── RANK SYSTEM ─────────────────────────────────────────────────
 // Source de vérité par rang : id, name, icon, color, decks, mmrPerWin/Loss.
 // NOTE : penetration / secPerCard / mmrToPromo / desc sont OBSOLÈTES — la pénétration
@@ -1116,7 +1146,15 @@ const DEFAULT_SAVE = {
 
   // Stats — recentResults now stores objects, not just booleans
   // { won, decks, penetration, spc, timeSec, mode }
-  stats: { correct: 0, total: 0, bestTime: null, recentResults: [], skinGames: {} },
+  // deckStats: { [decks]: { correct, total } } — précision par nombre de decks
+  // modeStats: { [mode]: count } — répartition des parties par mode
+  // cardsCounted: total de cartes vues à vie (toutes parties confondues)
+  stats: { correct: 0, total: 0, bestTime: null, recentResults: [], skinGames: {}, deckStats: {}, modeStats: {}, cardsCounted: 0 },
+
+  // Défi du jour — deck identique pour tous chaque jour, 1 tentative/jour.
+  // lastResult: { key, won, score, error, trueCount, answer, decks }
+  // history: [{ key, won, score }] (14 derniers jours)
+  daily: { lastKey: '', lastResult: null, streak: 0, bestStreak: 0, bestScore: 0, totalPlayed: 0, totalWon: 0, history: [] },
 
   // Casino Killer
   casinoChallenge: {
@@ -1207,6 +1245,7 @@ export default function EliteCounter() {
   const timeLimitUsedRef = useRef(null);
   const placementTierPlayedRef = useRef(null);
   const casinoStepConfigRef = useRef(null); // config of the current casino step (decks, pen, spc)
+  const dailyRef = useRef(null); // config du défi du jour en cours (seed, decks, pen, spc)
 
   // ── abandon confirm dialog
   const [showAbandon, setShowAbandon] = useState(false);
@@ -1270,7 +1309,9 @@ export default function EliteCounter() {
   const snd = (fn) => { if (soundEnabledRef.current) fn(); };
 
 
-  const patchSave = (patch) => setSave(prev => ({ ...prev, ...patch }));
+  // patch peut être un objet, ou une fonction (prev) => patch quand le nouveau
+  // patch doit lire l'état déjà modifié dans le même tick (ex. cumuler des coins).
+  const patchSave = (patch) => setSave(prev => ({ ...prev, ...(typeof patch === 'function' ? patch(prev) : patch) }));
 
   // ── i18n ──────────────────────────────────────────────────────
   const lang = save?.lang || DEFAULT_LANG;
@@ -1284,14 +1325,16 @@ export default function EliteCounter() {
   }, [lang]);
 
   // ── Helpers ───────────────────────────────────────────────────
-  const buildDeck = (decks, pen) => {
+  // rng optionnel : passer un générateur seedé (mulberry32) rend le mélange
+  // déterministe — utilisé par le défi du jour. Par défaut : Math.random.
+  const buildDeck = (decks, pen, rng = Math.random) => {
     const cards = [];
     for (let d = 0; d < decks; d++)
       for (const s of Object.keys(SUITS))
         for (const r of RANKS)
           cards.push({ rank: r, suit: SUITS[s], suitName: s, value: CARD_VALUES[r] });
     for (let i = cards.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
+      const j = Math.floor(rng() * (i + 1));
       [cards[i], cards[j]] = [cards[j], cards[i]];
     }
     return cards.slice(0, Math.floor(cards.length * pen / 100));
@@ -1353,8 +1396,8 @@ export default function EliteCounter() {
   }, [currentIndex, gameState, deck.length, startTime]);
 
   // ── Core: launch any game ──────────────────────────────────────
-  const launchGame = (decks, pen, timeSec, mode, skipCountdown = false, initialCountShown = false) => {
-    const newDeck = buildDeck(decks, pen);
+  const launchGame = (decks, pen, timeSec, mode, skipCountdown = false, initialCountShown = false, presetDeck = null) => {
+    const newDeck = presetDeck || buildDeck(decks, pen);
     setDeck(newDeck);
     setCurrentIndex(0);
     setRunningCount(0);
@@ -1441,6 +1484,47 @@ export default function EliteCounter() {
     // Pass trainShowCount as initialCountShown so launchGame sets the ref correctly
     // (setting it before launchGame would just get overwritten)
     launchGame(trainDecks, trainPen, trainTime, 'training', false, trainShowCount);
+  };
+
+  // ── Défi du jour ────────────────────────────────────────────────
+  const startDaily = () => {
+    if (!save || save.daily?.lastKey === dayKey()) return; // déjà joué aujourd'hui
+    const seed = daySeed();
+    const cfg = getDailyConfig(seed);
+    // Deck seedé indépendamment de la config (graine dérivée) → déterministe.
+    const deck = buildDeck(cfg.decks, cfg.penetration, mulberry32(seed ^ 0x9e3779b9));
+    dailyRef.current = cfg;
+    gameModeRef.current = 'daily';
+    rankUsedRef.current = null;
+    setShowCount(false); // compteur toujours caché sur le défi
+    setNav('game');
+    launchGame(cfg.decks, cfg.penetration, cfg.timeLimit, 'daily', false, false, deck);
+  };
+
+  const finishDaily = (correct, trueCount, answer) => {
+    const key = dayKey();
+    const error = answer - trueCount;
+    const score = dailyScore(error);
+    const d = save.daily || DEFAULT_SAVE.daily;
+    const newStreak = correct ? (d.streak || 0) + 1 : 0;
+    const coinBonus = correct ? 30 + Math.min(newStreak, 10) * 10 : 0; // habitude récompensée, plafonnée
+    const result = { key, won: correct, score, error, trueCount, answer, decks: dailyRef.current?.decks };
+    // patch fonctionnel : cumule les coins par-dessus le patch principal de checkAnswer.
+    patchSave(prev => ({
+      coins: (prev.coins || 0) + coinBonus,
+      daily: {
+        ...d,
+        lastKey: key,
+        lastResult: result,
+        streak: newStreak,
+        bestStreak: Math.max(d.bestStreak || 0, newStreak),
+        bestScore: Math.max(d.bestScore || 0, score),
+        totalPlayed: (d.totalPlayed || 0) + 1,
+        totalWon: (d.totalWon || 0) + (correct ? 1 : 0),
+        history: [...(d.history || []).slice(-13), { key, won: correct, score }],
+      },
+    }));
+    if (coinBonus > 0) setEarnedCoins(c => c + coinBonus);
   };
 
   // ── Casino Killer ───────────────────────────────────────────
@@ -1655,9 +1739,12 @@ export default function EliteCounter() {
 
     const today = new Date().toDateString();
     const isCasinoMode = gameModeRef.current === 'casino';
+    const isDailyMode = gameModeRef.current === 'daily';
     const decksUsed = isCasinoMode ? (casinoStepConfigRef.current?.decks ?? 1)
+      : isDailyMode ? (dailyRef.current?.decks ?? 1)
       : rankUsedRef.current ? rankUsedRef.current.decks : trainDecks;
     const penUsed = isCasinoMode ? (casinoStepConfigRef.current?.penetration ?? 90)
+      : isDailyMode ? (dailyRef.current?.penetration ?? 75)
       : rankUsedRef.current ? rankUsedRef.current.penetration : trainPen;
     const cardsUsed = deck.length;
     const spcUsed = cardsUsed > 0 ? timeInSec / cardsUsed : 0;
@@ -1697,6 +1784,12 @@ export default function EliteCounter() {
     };
 
     const skinUsed = save.activeSkin || 'classic';
+    // Agrégats à vie : précision par nb de decks, répartition par mode, cartes vues.
+    const prevDeckStats = save.stats.deckStats || {};
+    const dk = String(decksUsed);
+    const prevDeckEntry = prevDeckStats[dk] || { correct: 0, total: 0 };
+    const prevModeStats = save.stats.modeStats || {};
+    const mk = gameModeRef.current;
     const newStats = {
       ...save.stats,
       total: save.stats.total + 1,
@@ -1704,6 +1797,9 @@ export default function EliteCounter() {
       bestTime: correct && (!save.stats.bestTime || timeInSec < save.stats.bestTime) ? timeInSec : save.stats.bestTime,
       recentResults: [...(save.stats.recentResults || []).slice(-19), resultEntry],
       skinGames: { ...(save.stats.skinGames || {}), [skinUsed]: ((save.stats.skinGames || {})[skinUsed] || 0) + 1 },
+      deckStats: { ...prevDeckStats, [dk]: { correct: prevDeckEntry.correct + (correct ? 1 : 0), total: prevDeckEntry.total + 1 } },
+      modeStats: { ...prevModeStats, [mk]: (prevModeStats[mk] || 0) + 1 },
+      cardsCounted: (save.stats.cardsCounted || 0) + cardsUsed,
     };
 
     // ── Challenge detection ──
@@ -1773,6 +1869,8 @@ export default function EliteCounter() {
 
     if (gameModeRef.current === 'casino') {
       advanceCasinoStep(correct);
+    } else if (gameModeRef.current === 'daily') {
+      finishDaily(correct, runningCount, answer);
     } else {
       applyMMRChange(correct);
     }
@@ -1879,7 +1977,7 @@ export default function EliteCounter() {
     'mode-ranked': [t('crumbs.home'), t('crumbs.ranked')],
     'mode-training': [t('crumbs.home'), t('crumbs.training')],
     'mode-casino': [t('crumbs.home'), t('crumbs.casino')],
-    game: [t('crumbs.home'), gameModeRef.current === 'training' ? t('crumbs.training') : gameModeRef.current === 'casino' ? t('crumbs.casino') : t('crumbs.ranked'), t('crumbs.game')],
+    game: [t('crumbs.home'), gameModeRef.current === 'training' ? t('crumbs.training') : gameModeRef.current === 'casino' ? t('crumbs.casino') : gameModeRef.current === 'daily' ? t('modeName.daily') : t('crumbs.ranked'), t('crumbs.game')],
   };
   const crumbs = crumbMap[nav] || [t('crumbs.home')];
 
@@ -1994,6 +2092,37 @@ export default function EliteCounter() {
           })()}
 
           <div className="sec">{t('lobby.gameModes')}</div>
+
+          {/* Défi du jour — deck identique pour tous, 1 tentative/jour */}
+          {(() => {
+            const dDone = save.daily?.lastKey === dayKey();
+            const dStreak = save.daily?.streak || 0;
+            const dRes = save.daily?.lastResult;
+            return (
+              <div className="card" onClick={() => { snd(playClick); if (dDone) setShowStats(true); else startDaily(); }}
+                style={dDone
+                  ? { borderColor: G.border, background: 'rgba(255,255,255,.02)' }
+                  : { borderColor: G.borderGold, background: 'rgba(201,168,76,.07)', boxShadow: '0 0 18px rgba(201,168,76,.15)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+                  <div className="ci">🗓️</div>
+                  <div>
+                    <div className="ct" style={{ color: dDone ? G.text : G.goldLight }}>{t('lobby.dailyTitle')}</div>
+                    <div className="cs">
+                      {dDone
+                        ? (dRes?.won ? t('lobby.dailyDoneWin', { score: dRes.score }) : t('lobby.dailyDoneLoss')) + ' · ' + t('lobby.dailyComeBack')
+                        : t('lobby.dailyReadySub')}
+                    </div>
+                  </div>
+                </div>
+                {dStreak > 0 && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginRight: 6, fontSize: 13, fontWeight: 700, color: G.gold }}>
+                    🔥 {dStreak}
+                  </div>
+                )}
+                {!dDone && <ChevronRight className="chev" size={17} />}
+              </div>
+            );
+          })()}
 
           <div className="card feat" onClick={() => { snd(playClick); setNav('mode-training'); }}>
             <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
@@ -2262,6 +2391,22 @@ export default function EliteCounter() {
           const topSkinId = Object.keys(skinGames).sort((a, b) => skinGames[b] - skinGames[a])[0] || null;
           const topSkinCount = topSkinId ? skinGames[topSkinId] : 0;
 
+          // Précision par nombre de decks (trié 1 → 8).
+          const deckStats = s.deckStats || {};
+          const deckRows = Object.keys(deckStats)
+            .map(k => ({ decks: parseInt(k, 10), ...deckStats[k] }))
+            .filter(r => r.total > 0)
+            .sort((a, b) => a.decks - b.decks);
+          const modeStats = s.modeStats || {};
+          const cardsCounted = s.cardsCounted || 0;
+          const modeLabel = (m) => t('modeName.' + (m === 'placement' ? 'placement' : m === 'promo' ? 'promo' : m === 'ranked' ? 'ranked' : m === 'casino' ? 'casino' : m === 'daily' ? 'daily' : 'training'));
+
+          // Défi du jour
+          const d = save.daily || {};
+          const dailyPlayed = d.totalPlayed || 0;
+          const dailyWR = dailyPlayed > 0 ? Math.round((d.totalWon || 0) / dailyPlayed * 100) : null;
+          const dailyHist = d.history || [];
+
           return (
             <div className="moverlay" onClick={() => { setShowStats(false); setSelectedHistoryIdx(null); }}>
               <div className="mdl" onClick={e => e.stopPropagation()}>
@@ -2303,6 +2448,41 @@ export default function EliteCounter() {
                       <span>{save.bestStreakAvgSpc != null ? t('stats.avgSpc', { spc: save.bestStreakAvgSpc.toFixed(2) }) : '—'}</span>
                       <span>{t('stats.totalCards', { cards: save.bestStreakCards || 0 })}</span>
                     </div>
+                  )}
+                </div>
+
+                {/* Défi du jour */}
+                <div style={{ background: 'rgba(201,168,76,.06)', border: `1px solid ${G.borderGold}`, borderRadius: 8, padding: '12px 14px', marginBottom: 14 }}>
+                  <div style={{ fontSize: 13, color: G.gold, marginBottom: dailyPlayed > 0 ? 10 : 0, display: 'flex', alignItems: 'center', gap: 6 }}>🗓️ {t('stats.dailyTitle')}</div>
+                  {dailyPlayed > 0 ? (
+                    <>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 10 }}>
+                        {[
+                          { label: t('stats.dailyStreak'), val: `🔥 ${d.streak || 0}`, color: G.goldLight },
+                          { label: t('stats.dailyBestStreak'), val: `⭐ ${d.bestStreak || 0}`, color: '#5b8dee' },
+                          { label: t('stats.dailyBestScore'), val: d.bestScore || 0, color: G.gold },
+                        ].map(m => (
+                          <div key={m.label} style={{ textAlign: 'center' }}>
+                            <div style={{ fontFamily: 'Playfair Display, serif', fontSize: 17, fontWeight: 700, color: m.color }}>{m.val}</div>
+                            <div style={{ fontSize: 10, color: G.textMuted, marginTop: 2 }}>{m.label}</div>
+                          </div>
+                        ))}
+                      </div>
+                      <div style={{ fontSize: 11, color: G.textMuted, marginBottom: dailyHist.length > 0 ? 8 : 0 }}>
+                        {t('stats.dailyRecap', { won: d.totalWon || 0, played: dailyPlayed, wr: dailyWR })}
+                      </div>
+                      {dailyHist.length > 0 && (
+                        <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                          {dailyHist.map((h, i) => (
+                            <div key={i} title={h.key} style={{ width: 14, height: 14, borderRadius: '50%', flexShrink: 0, background: h.won ? 'rgba(39,174,96,.2)' : 'rgba(192,57,43,.2)', border: `1.5px solid ${h.won ? G.green : G.red}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8, color: h.won ? G.green : G.red }}>
+                              {h.won ? '✓' : '✗'}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div style={{ fontSize: 12, color: G.textMuted }}>{t('stats.dailyNever')}</div>
                   )}
                 </div>
 
@@ -2350,7 +2530,7 @@ export default function EliteCounter() {
                     {selected && typeof selected === 'object' && (
                       <div style={{ marginTop: 10, background: 'rgba(0,0,0,.3)', border: `1px solid ${selected.won ? 'rgba(39,174,96,.3)' : 'rgba(192,57,43,.3)'}`, borderRadius: 8, padding: '10px 12px' }}>
                         <div style={{ fontSize: 12, fontWeight: 700, color: selected.won ? G.green : G.red, marginBottom: 6 }}>
-                          {selected.won ? t('stats.detailWin') : t('stats.detailLoss')} · {selected.mode === 'training' ? t('modeName.training') : selected.mode === 'ranked' ? t('modeName.ranked') : selected.mode === 'promo' ? t('modeName.promo') : t('modeName.placement')}
+                          {selected.won ? t('stats.detailWin') : t('stats.detailLoss')} · {modeLabel(selected.mode)}
                         </div>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 6 }}>
                           {[
@@ -2369,6 +2549,51 @@ export default function EliteCounter() {
                     )}
                   </div>
                 )}
+
+                {/* Précision par nombre de decks */}
+                {deckRows.length > 0 && (
+                  <div style={{ marginBottom: 14 }}>
+                    <div style={{ fontSize: 11, color: G.textMuted, letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 8 }}>{t('stats.byDeckTitle')}</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      {deckRows.map(r => {
+                        const acc = Math.round(r.correct / r.total * 100);
+                        const barColor = acc >= 70 ? G.green : acc >= 45 ? '#e8a03a' : G.red;
+                        return (
+                          <div key={r.decks} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <div style={{ width: 58, fontSize: 11, color: G.textMuted, flexShrink: 0 }}>{t('stats.deckLabel', { n: r.decks })}</div>
+                            <div style={{ flex: 1, height: 14, background: 'rgba(255,255,255,.05)', borderRadius: 7, overflow: 'hidden' }}>
+                              <div style={{ width: `${acc}%`, height: '100%', background: barColor, borderRadius: 7, transition: 'width .3s' }} />
+                            </div>
+                            <div style={{ width: 66, textAlign: 'right', fontSize: 11, color: G.text, flexShrink: 0 }}>
+                              <span style={{ fontWeight: 700, color: barColor }}>{acc}%</span> <span style={{ color: G.textMuted }}>({r.total})</span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Cartes comptées à vie + répartition par mode */}
+                <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
+                  <div style={{ flex: 1, background: 'rgba(0,0,0,.2)', border: `1px solid ${G.border}`, borderRadius: 8, padding: '10px 12px' }}>
+                    <div style={{ fontFamily: 'Playfair Display, serif', fontSize: 18, fontWeight: 700, color: G.goldLight }}>{cardsCounted.toLocaleString()}</div>
+                    <div style={{ fontSize: 10, color: G.textMuted, marginTop: 2 }}>{t('stats.cardsCounted')}</div>
+                  </div>
+                  {Object.keys(modeStats).length > 0 && (
+                    <div style={{ flex: 1.4, background: 'rgba(0,0,0,.2)', border: `1px solid ${G.border}`, borderRadius: 8, padding: '10px 12px' }}>
+                      <div style={{ fontSize: 10, color: G.textMuted, letterSpacing: '.06em', textTransform: 'uppercase', marginBottom: 6 }}>{t('stats.byModeTitle')}</div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                        {Object.keys(modeStats).sort((a, b) => modeStats[b] - modeStats[a]).map(m => (
+                          <div key={m} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11 }}>
+                            <span style={{ color: G.textMuted }}>{modeLabel(m)}</span>
+                            <span style={{ color: G.text, fontWeight: 600 }}>{modeStats[m]}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
 
                 {/* Rang + MMR */}
                 <div style={{ borderTop: `1px solid ${G.border}`, paddingTop: 14, marginBottom: 14 }}>
@@ -2745,6 +2970,7 @@ export default function EliteCounter() {
     const progress = deck.length > 0 ? (currentIndex / deck.length) * 100 : 0;
     const isRanked = ['ranked', 'placement', 'promo'].includes(gameModeRef.current);
     const isCasino = gameModeRef.current === 'casino';
+    const isDaily = gameModeRef.current === 'daily';
 
     const timePct = timeInSec / tl;
     const timerColor = timePct > 0.9 ? G.red : timePct > 0.7 ? '#e8a03a' : G.goldLight;
@@ -2787,7 +3013,7 @@ export default function EliteCounter() {
                 </div>
               )}
               <div style={{ fontSize: 12, color: G.textMuted, letterSpacing: '.1em', textTransform: 'uppercase' }}>
-                {isCasino ? t('game.countdownCasino', { n: casinoStep + 1 }) : gameModeRef.current === 'promo' ? t('game.countdownPromo') : gameModeRef.current === 'placement' ? t('game.countdownPlacement', { n: save.placementGames + 1, total: PLACEMENT_TOTAL }) : gameModeRef.current === 'training' ? t('game.countdownTraining') : t('game.countdownRanked')}
+                {isCasino ? t('game.countdownCasino', { n: casinoStep + 1 }) : gameModeRef.current === 'daily' ? t('modeName.daily') : gameModeRef.current === 'promo' ? t('game.countdownPromo') : gameModeRef.current === 'placement' ? t('game.countdownPlacement', { n: save.placementGames + 1, total: PLACEMENT_TOTAL }) : gameModeRef.current === 'training' ? t('game.countdownTraining') : t('game.countdownRanked')}
               </div>
               <div className="cdnum" key={countdown}>{countdown > 0 ? countdown : t('game.go')}</div>
               <div style={{ fontSize: 12, color: G.textMuted }}>{t('game.cardsTime', { cards: deck.length, tl })}</div>
@@ -2841,7 +3067,7 @@ export default function EliteCounter() {
                       {isCorrect ? t('game.perfect') : t('game.wasCount', { count: runningCount })}
                     </div>
                     <div style={{ fontSize: 12, color: G.textMuted, marginBottom: 14 }}>
-                      {t('game.resultStats', { time: finalTimeSec.toFixed(1), tl, decks: (rankUsedRef.current || { decks: trainDecks }).decks })}
+                      {t('game.resultStats', { time: finalTimeSec.toFixed(1), tl, decks: isDaily ? (dailyRef.current?.decks ?? 1) : (rankUsedRef.current || { decks: trainDecks }).decks })}
                     </div>
 
                     {/* MMR delta — promotion (999) / relégation (-998) / variation normale */}
@@ -2891,6 +3117,20 @@ export default function EliteCounter() {
                       <div style={{ color: G.textMuted, fontSize: 13, marginBottom: 12, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 5 }}>{t('game.coinsEarned', { coins: earnedCoins })}<Coin size={13} /></div>
                     )}
 
+                    {/* Défi du jour : score + streak + reviens demain */}
+                    {isDaily && showResult && save.daily?.lastResult && (
+                      <div style={{ marginBottom: 12, background: 'rgba(201,168,76,.08)', border: `1px solid ${G.borderGold}`, borderRadius: 8, padding: '12px 14px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
+                          <span style={{ fontSize: 12, color: G.textMuted }}>{t('game.dailyScore')}</span>
+                          <span style={{ fontFamily: 'Playfair Display, serif', fontSize: 22, fontWeight: 700, color: G.goldLight }}>{save.daily.lastResult.score}</span>
+                        </div>
+                        <div style={{ fontSize: 12, color: isCorrect ? G.green : G.red, textAlign: 'center', marginBottom: 4 }}>
+                          {isCorrect ? t('game.dailyStreakKept', { n: save.daily.streak }) : t('game.dailyStreakLost')}
+                        </div>
+                        <div style={{ fontSize: 11, color: G.textMuted, textAlign: 'center' }}>{t('game.dailyComeBack')}</div>
+                      </div>
+                    )}
+
                     {/* Casino: show failure state or waiting for auto-advance */}
                     {isCasino && showResult && (
                       <div style={{ marginBottom: 12 }}>
@@ -2912,7 +3152,7 @@ export default function EliteCounter() {
 
                     <div style={{ display: 'flex', gap: 8 }}>
                       <button style={{ flex: 1, padding: '11px 0', background: 'rgba(255,255,255,.04)', border: `1px solid ${G.border}`, borderRadius: 8, color: G.textMuted, cursor: 'pointer', fontSize: 13 }} onClick={() => { snd(playClick); goBack(); }}>{t('common.menu')}</button>
-                      {!isCasino && <button className="lbtn" style={{ flex: 2, marginTop: 0, padding: 11 }} onClick={() => { snd(playClick); playAgain(); }}>{t('common.replay')}</button>}
+                      {!isCasino && !isDaily && <button className="lbtn" style={{ flex: 2, marginTop: 0, padding: 11 }} onClick={() => { snd(playClick); playAgain(); }}>{t('common.replay')}</button>}
                       {isCasino && !isCorrect && <button className="lbtn red" style={{ flex: 2, marginTop: 0, padding: 11 }} onClick={() => { snd(playClick); startCasinoChallenge(); }}>{t('common.restart')}</button>}
                     </div>
                   </div>
@@ -2958,11 +3198,11 @@ export default function EliteCounter() {
           </div>
 
           {/* Ranked info bar */}
-          {(isRanked || isCasino) && (
+          {(isRanked || isCasino || isDaily) && (
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 18px', background: 'rgba(0,0,0,.2)', fontSize: 11, color: G.textMuted }}>
               {isCasino
                 ? <><span>{t('game.infoCasino', { n: casinoStep + 1 })}</span><span style={{ display: 'flex', gap: 4 }}>{CASINO_STEPS.map((_, i) => <span key={i} style={{ width: 8, height: 8, borderRadius: '50%', background: i < casinoStep ? G.green : i === casinoStep ? G.gold : 'rgba(255,255,255,.15)', display: 'inline-block' }} />)}</span></>
-                : <><span>{gameModeRef.current === 'promo' ? t('game.infoPromo') : gameModeRef.current === 'placement' ? t('game.infoPlacement', { n: save.placementGames + 1, total: PLACEMENT_TOTAL }) : t('game.infoRank', { rank: currentRank.name })}</span><span style={{ color: timePct > 0.85 ? G.red : G.textMuted }}>{t('game.limit', { tl })}</span></>
+                : <><span>{isDaily ? `🗓️ ${t('modeName.daily')}` : gameModeRef.current === 'promo' ? t('game.infoPromo') : gameModeRef.current === 'placement' ? t('game.infoPlacement', { n: save.placementGames + 1, total: PLACEMENT_TOTAL }) : t('game.infoRank', { rank: currentRank.name })}</span><span style={{ color: timePct > 0.85 ? G.red : G.textMuted }}>{t('game.limit', { tl })}</span></>
               }
             </div>
           )}

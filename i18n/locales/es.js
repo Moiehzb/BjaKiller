@@ -40,7 +40,7 @@ const es = {
 
   modeName: {
     training: 'Training', ranked: 'Ranked', promo: 'Promoción',
-    placement: 'Clasificación', casino: 'Casino Killer',
+    placement: 'Clasificación', casino: 'Casino Killer', daily: 'Reto diario',
   },
 
   ranks: {
@@ -87,6 +87,11 @@ const es = {
     stats: 'Stats',
     statsSub: ({ total }) => `${total} partidas jugadas`,
     statsNone: 'Sin partidas',
+    dailyTitle: 'Reto diario',
+    dailyReadySub: 'Mazo del día · mismo mazo para todos',
+    dailyDoneWin: ({ score }) => `✓ Superado · ${score} pts`,
+    dailyDoneLoss: '✗ Fallado',
+    dailyComeBack: 'Vuelve mañana',
     settings: 'Ajustes',
     settingsSub: 'Reset · Opciones',
     currentStreak: ({ streak }) => `Racha actual: ${streak}`,
@@ -169,6 +174,16 @@ const es = {
     topSkin: 'Skin más jugado',
     topSkinGames: ({ n }) => `${n} ${n > 1 ? 'partidas' : 'partida'}`,
     placementInProgress: 'Clasificación en curso…',
+    dailyTitle: 'Reto diario',
+    dailyStreak: 'Racha actual',
+    dailyBestStreak: 'Mejor racha',
+    dailyBestScore: 'Mejor puntuación',
+    dailyRecap: ({ won, played, wr }) => `${won}/${played} superados · ${wr}% de acierto`,
+    dailyNever: 'Aún sin jugar — vuelve cada día por un nuevo mazo.',
+    byDeckTitle: 'Precisión por mazos',
+    deckLabel: ({ n }) => `${n} mazo${n > 1 ? 's' : ''}`,
+    cardsCounted: 'Cartas contadas',
+    byModeTitle: 'Partidas por modo',
   },
 
   settings: {
@@ -274,6 +289,10 @@ const es = {
     casinoFail: '💥 Fallaste — vuelves a la etapa 1',
     casinoStepOk: ({ n, next }) => `✓ Etapa ${n}/5 — siguiente en ${next}s`,
     casinoDone: '🎰 ¡CASINO CHALLENGE COMPLETADO!',
+    dailyScore: 'Puntuación del día',
+    dailyStreakKept: ({ n }) => `🔥 ¡Racha de ${n} día${n > 1 ? 's' : ''}!`,
+    dailyStreakLost: 'Racha reiniciada',
+    dailyComeBack: 'Vuelve mañana para un nuevo mazo',
     infoCasino: ({ n }) => `🔥 CASINO — Etapa ${n}/5`,
     infoPromo: '⚡ PROMO',
     infoPlacement: ({ n, total }) => `🎲 CLASIFICACIÓN ${n}/${total}`,
