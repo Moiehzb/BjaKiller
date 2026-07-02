@@ -1308,6 +1308,7 @@ export default function EliteCounter() {
   const [selectedHistoryIdx, setSelectedHistoryIdx] = useState(null); // for clickable recent-games bars
   const [resetText, setResetText] = useState('');
   const [showPlacementHistory, setShowPlacementHistory] = useState(false);
+  const [showRankLadder, setShowRankLadder] = useState(false);
 
   const timerRef = useRef(null);
   const autoPlayRef = useRef(null);
@@ -2072,7 +2073,7 @@ export default function EliteCounter() {
         <div className="lobby">
           {/* Rank badge + MMR */}
           {save.placementDone ? (
-            <div className="rbadge">
+            <div className="rbadge" style={{ cursor: 'pointer' }} onClick={() => { snd(playClick); setShowRankLadder(true); }}>
               <div style={{ fontSize: 34 }}>{rank.icon}</div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 11, color: G.textMuted, letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 2 }}>
@@ -2091,6 +2092,7 @@ export default function EliteCounter() {
                 )}
                 {isMaster && <div style={{ fontSize: 11, color: G.gold, marginTop: 2 }}>{t('lobby.maxRank')}</div>}
               </div>
+              <ChevronRight className="chev" size={17} />
             </div>
           ) : (() => {
             const history = save.placementHistory || [];
@@ -2320,6 +2322,64 @@ export default function EliteCounter() {
                   </div>
                 );
               })()}
+            </div>
+          </div>
+        )}
+
+        {showRankLadder && (
+          <div className="moverlay" onClick={() => setShowRankLadder(false)}>
+            <div className="mdl" onClick={e => e.stopPropagation()}>
+              <div className="mhndl" />
+              <div className="mtitle">{t('rankLadder.title')}</div>
+              <div style={{ color: G.textMuted, fontSize: 12, marginBottom: 16 }}>
+                {t('rankLadder.sub', { count: RANKS_DEF.length, tiers: RANKS_DEF.length * SUB_RANKS })}
+              </div>
+
+              {RANKS_DEF.map(rk => {
+                const isCurrent = save.rankId === rk.id;
+                const isReached = save.rankId > rk.id;
+                const isMasterRank = rk.id === RANKS_DEF.length;
+                // fastest = sub-rank III, slowest = sub-rank I
+                const spcFast = TIER_SPC[tierIndex(rk.id, SUB_RANKS)];
+                const spcSlow = TIER_SPC[tierIndex(rk.id, 1)];
+                const status = isCurrent ? t('rankLadder.you') : isReached ? t('rankLadder.reached') : t('rankLadder.locked');
+                const statusColor = isCurrent ? rk.color : isReached ? G.green : G.textMuted;
+                return (
+                  <div key={rk.id} style={{
+                    display: 'flex', gap: 12, alignItems: 'flex-start', padding: '13px 14px', marginBottom: 9,
+                    borderRadius: 10,
+                    background: isCurrent ? `${rk.color}18` : 'rgba(255,255,255,.02)',
+                    border: `1px solid ${isCurrent ? rk.color : G.border}`,
+                    opacity: isReached || isCurrent ? 1 : 0.62,
+                  }}>
+                    <div style={{ fontSize: 30, lineHeight: 1, filter: isReached || isCurrent ? 'none' : 'grayscale(1)' }}>{rk.icon}</div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                        <div style={{ fontFamily: 'Playfair Display, serif', fontSize: 16, fontWeight: 700, color: rk.color }}>{rk.name}</div>
+                        <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: statusColor, border: `1px solid ${statusColor}`, borderRadius: 20, padding: '1px 7px' }}>{status}</div>
+                      </div>
+                      <div style={{ fontSize: 11, color: G.textMuted, marginBottom: 8 }}>{t('rankLadder.tiers')}</div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
+                        {[
+                          { label: t('rankLadder.decksLabel'), val: rk.decks },
+                          { label: t('rankLadder.penetration'), val: `${SUBRANK_PEN[1]}–${SUBRANK_PEN[SUB_RANKS]}%` },
+                          { label: t('rankLadder.speed'), val: `${spcFast}–${spcSlow}s` },
+                        ].map(s => (
+                          <div key={s.label} style={{ background: 'rgba(0,0,0,.22)', borderRadius: 6, padding: '7px 4px', textAlign: 'center' }}>
+                            <div style={{ fontSize: 13, fontWeight: 700, color: rk.color }}>{s.val}</div>
+                            <div style={{ fontSize: 9.5, color: G.textMuted, marginTop: 2 }}>{s.label}</div>
+                          </div>
+                        ))}
+                      </div>
+                      <div style={{ fontSize: 11, color: isMasterRank ? G.gold : G.textMuted, marginTop: 8 }}>
+                        {isMasterRank ? t('rankLadder.masterPerk') : t('rankLadder.rankPerk')}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+
+              <div style={{ fontSize: 11, color: G.textMuted, marginTop: 4, textAlign: 'center' }}>{t('rankLadder.footer')}</div>
             </div>
           </div>
         )}

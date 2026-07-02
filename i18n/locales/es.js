@@ -118,6 +118,21 @@ const es = {
     limit: 'Límite',
   },
 
+  rankLadder: {
+    title: 'Los rangos',
+    sub: ({ count, tiers }) => `${count} rangos · ${tiers} niveles en total`,
+    you: 'Tú',
+    reached: 'Alcanzado',
+    locked: 'Bloqueado',
+    tiers: '3 niveles: I · II · III',
+    decksLabel: 'Mazos',
+    penetration: 'Penetración',
+    speed: 'Velocidad/carta',
+    rankPerk: 'Más mazos, menos tiempo por carta.',
+    masterPerk: '👑 Rango final · desbloquea el modo Casino',
+    footer: 'Gana partidas clasificatorias para subir de nivel.',
+  },
+
   shop: {
     title: 'Skins de cartas',
     coinsAvailable: ({ coins }) => `${coins} monedas disponibles`,

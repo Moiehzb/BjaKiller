@@ -118,6 +118,21 @@ const en = {
     limit: 'Limit',
   },
 
+  rankLadder: {
+    title: 'The ranks',
+    sub: ({ count, tiers }) => `${count} ranks · ${tiers} tiers total`,
+    you: 'You',
+    reached: 'Reached',
+    locked: 'Locked',
+    tiers: '3 tiers: I · II · III',
+    decksLabel: 'Decks',
+    penetration: 'Penetration',
+    speed: 'Speed/card',
+    rankPerk: 'More decks, less time per card.',
+    masterPerk: '👑 Final rank · unlocks Casino mode',
+    footer: 'Win Ranked games to climb the tiers.',
+  },
+
   shop: {
     title: 'Card skins',
     coinsAvailable: ({ coins }) => `${coins} coins available`,

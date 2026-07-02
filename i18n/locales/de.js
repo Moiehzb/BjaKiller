@@ -120,6 +120,21 @@ const de = {
     limit: 'Limit',
   },
 
+  rankLadder: {
+    title: 'Die Ränge',
+    sub: ({ count, tiers }) => `${count} Ränge · ${tiers} Stufen insgesamt`,
+    you: 'Du',
+    reached: 'Erreicht',
+    locked: 'Gesperrt',
+    tiers: '3 Stufen: I · II · III',
+    decksLabel: 'Decks',
+    penetration: 'Penetration',
+    speed: 'Tempo/Karte',
+    rankPerk: 'Mehr Decks, weniger Zeit pro Karte.',
+    masterPerk: '👑 Höchster Rang · schaltet den Casino-Modus frei',
+    footer: 'Gewinne Ranglisten-Spiele, um aufzusteigen.',
+  },
+
   shop: {
     title: 'Karten-Skins',
     coinsAvailable: ({ coins }) => `${coins} Münzen verfügbar`,

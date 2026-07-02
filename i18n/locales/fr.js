@@ -118,6 +118,21 @@ const fr = {
     limit: 'Limite',
   },
 
+  rankLadder: {
+    title: 'Les rangs',
+    sub: ({ count, tiers }) => `${count} rangs · ${tiers} paliers au total`,
+    you: 'Toi',
+    reached: 'Atteint',
+    locked: 'Verrouillé',
+    tiers: '3 paliers : I · II · III',
+    decksLabel: 'Decks',
+    penetration: 'Pénétration',
+    speed: 'Vitesse/carte',
+    rankPerk: 'Plus de decks, moins de temps par carte.',
+    masterPerk: '👑 Rang final · débloque le mode Casino',
+    footer: 'Gagne des parties Classées pour gravir les paliers.',
+  },
+
   shop: {
     title: 'Skins de cartes',
     coinsAvailable: ({ coins }) => `${coins} coins disponibles`,
