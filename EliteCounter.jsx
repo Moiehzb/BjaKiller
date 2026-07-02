@@ -785,7 +785,7 @@ const KpKey = ({ children, onClick, alt = false }) => {
   );
 };
 
-const TimePicker = ({ value, onChange, totalCards, t }) => {
+const TimePicker = ({ value, onChange, totalCards, t, snd = (fn) => fn() }) => {
   const [kpOpen, setKpOpen] = useState(false);
   const [kpVal, setKpVal] = useState('');
   const currentSpc = totalCards > 0 ? value / totalCards : 0;
@@ -794,18 +794,19 @@ const TimePicker = ({ value, onChange, totalCards, t }) => {
   const activePresetIdx = SPC_PRESETS.findIndex(p => Math.abs(p - currentSpc) < 0.015);
 
   const applySpc = (spc) => {
-    if (totalCards > 0) onChange(Math.max(5, Math.round(spc * totalCards)));
+    if (totalCards > 0) { snd(playClick); onChange(Math.max(5, Math.round(spc * totalCards))); }
   };
 
   // Clavier virtuel — saisie manuelle du temps en secondes.
-  const openKp = () => { setKpVal(String(value)); setKpOpen(true); };
-  const kpPress = (d) => setKpVal(v => {
+  const openKp = () => { snd(playClick); setKpVal(String(value)); setKpOpen(true); };
+  const kpPress = (d) => { snd(playClick); setKpVal(v => {
     const nv = (v === '0' ? '' : v) + d;
     return nv.length > 3 ? v : nv; // 3 chiffres max (clampé à 600 à la validation)
-  });
-  const kpBack = () => setKpVal(v => v.slice(0, -1));
-  const kpClear = () => setKpVal('');
+  }); };
+  const kpBack = () => { snd(playClick); setKpVal(v => v.slice(0, -1)); };
+  const kpClear = () => { snd(playClick); setKpVal(''); };
   const kpConfirm = () => {
+    snd(playClick);
     const n = parseInt(kpVal || '0', 10);
     if (!isNaN(n) && n > 0) onChange(Math.max(5, Math.min(600, n)));
     setKpOpen(false);
@@ -824,11 +825,11 @@ const TimePicker = ({ value, onChange, totalCards, t }) => {
 
       {/* Stepper : − à gauche, temps cliquable (→ clavier) au centre, + à droite */}
       <div className="tcust">
-        <button className="tsb" onClick={() => onChange(Math.max(5, value - 1))}>−</button>
+        <button className="tsb" onClick={() => { snd(playClick); onChange(Math.max(5, value - 1)); }}>−</button>
         <div style={{ flex: 1, textAlign: 'center', cursor: 'pointer' }} onClick={openKp}>
           <div className="tdsp">{value}<span style={{ fontSize: 13, color: G.goldDim, marginLeft: 2 }}>s</span></div>
         </div>
-        <button className="tsb" onClick={() => onChange(Math.min(600, value + 1))}>+</button>
+        <button className="tsb" onClick={() => { snd(playClick); onChange(Math.min(600, value + 1)); }}>+</button>
       </div>
       <div style={{ fontSize: 10, color: G.textMuted, textAlign: 'center', marginTop: 5 }}>{t('timePicker.hint')}</div>
 
@@ -2656,7 +2657,7 @@ export default function EliteCounter() {
 
           <div className="cfgc">
             <div className="cfgt">{t('trainingConfig.duration')}</div>
-            <TimePicker value={trainTime} onChange={setTrainTime} totalCards={tc} t={t} />
+            <TimePicker value={trainTime} onChange={setTrainTime} totalCards={tc} t={t} snd={snd} />
           </div>
 
           <div className="cfgc">
