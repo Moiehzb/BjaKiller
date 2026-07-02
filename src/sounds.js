@@ -1,5 +1,6 @@
 // ─── Elite Counter Sound Engine ───────────────────────────────
 // Web Audio API only — zero deps, zero external files.
+// No frequency above ~500 Hz — nothing should sound shrill.
 // Slight random jitter per call prevents listener fatigue.
 
 let _ctx = null;
@@ -42,17 +43,17 @@ export const playClick = () => {
   } catch {}
 };
 
-// Correct answer — warmth grows with streak
+// Correct answer — warm bell tones, capped under 500 Hz even at high streaks
 export const playCorrect = (streak = 0) => {
   try {
     const ctx = ac();
     const t = ctx.currentTime;
-    const base = rnd(660, 0.025) * (1 + Math.min(streak, 12) * 0.015);
+    const base = rnd(390, 0.025) * (1 + Math.min(streak, 12) * 0.012);
     const vol = 0.17;
-    osc(ctx, base, 'sine', vol, t, 0.40);
-    if (streak >= 3)  osc(ctx, base * 1.25, 'sine', vol * 0.50, t + 0.04, 0.32);
-    if (streak >= 6)  osc(ctx, base * 1.5,  'sine', vol * 0.34, t + 0.08, 0.25);
-    if (streak >= 10) osc(ctx, base * 2,    'sine', vol * 0.20, t + 0.13, 0.20);
+    osc(ctx, base, 'sine', vol, t, 0.42);
+    if (streak >= 3)  osc(ctx, base * 1.20, 'sine', vol * 0.45, t + 0.04, 0.34);
+    if (streak >= 6)  osc(ctx, base * 1.33, 'sine', vol * 0.30, t + 0.08, 0.26);
+    if (streak >= 10) osc(ctx, base * 1.50, 'sine', vol * 0.18, t + 0.13, 0.20);
   } catch {}
 };
 
@@ -66,49 +67,72 @@ export const playWrong = () => {
   } catch {}
 };
 
-// Card flip — soft parchment slide, no transient
+// Old grimoire page turn — filtered noise burst, quick and light
 export const playCardFlip = () => {
   try {
     const ctx = ac();
     const t = ctx.currentTime;
-    // Gentle low swish: quick sine sweep down
-    osc(ctx, rnd(320, 0.08), 'sine', 0.06, t,        0.045, 180);
-    // Subtle thud on landing
-    osc(ctx, rnd(90,  0.08), 'sine', 0.09, t + 0.03, 0.07,  55);
+    const dur = 0.07;
+    const frames = Math.ceil(dur * ctx.sampleRate);
+
+    // White noise → bandpass 220-360 Hz = papery mid texture
+    const buf = ctx.createBuffer(1, frames, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < frames; i++) data[i] = Math.random() * 2 - 1;
+
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+
+    const bpf = ctx.createBiquadFilter();
+    bpf.type = 'bandpass';
+    bpf.frequency.value = 280;
+    bpf.Q.value = 0.55;
+
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.24, t);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+
+    src.connect(bpf);
+    bpf.connect(gain);
+    gain.connect(ctx.destination);
+    src.start(t);
+    src.stop(t + dur + 0.02);
+
+    // Subtle landing thud
+    osc(ctx, rnd(78, 0.08), 'sine', 0.07, t + 0.04, 0.055, 44);
   } catch {}
 };
 
-// Game start — low thump + soft click (no harsh high transient)
+// Game start — low thump + soft click
 export const playChip = () => {
   try {
     const ctx = ac();
     const t = ctx.currentTime;
-    osc(ctx, rnd(380, 0.08), 'sine', 0.12, t,       0.026);
-    osc(ctx, rnd(85,  0.08), 'sine', 0.18, t,       0.110, 42);
+    osc(ctx, rnd(340, 0.08), 'sine', 0.12, t,  0.026);
+    osc(ctx, rnd(85,  0.08), 'sine', 0.18, t,  0.110, 42);
   } catch {}
 };
 
-// Rank promotion fanfare — shifted down an octave, still impactful
+// Rank promotion fanfare — low arpegio, nothing above 450 Hz
 export const playRankUp = () => {
   try {
     const ctx = ac();
     const t = ctx.currentTime;
-    // C4 E4 G4 C5 E5
-    [261, 330, 392, 523, 659].forEach((f, i) => {
+    // G3 B3 D4 F#4 A4
+    [196, 247, 294, 370, 440].forEach((f, i) => {
       osc(ctx, f, 'sine', 0.18, t + i * 0.145, 0.56 - i * 0.04);
     });
-    // Subtle high shimmer on last note only
-    osc(ctx, 659 * 2, 'sine', 0.05, t + 4 * 0.145 + 0.05, 0.45);
   } catch {}
 };
 
-// Achievement unlocked — lower sparkle
+// Achievement unlocked — low ascending sparkle, max 494 Hz
 export const playAchievement = () => {
   try {
     const ctx = ac();
     const t = ctx.currentTime;
-    [520, 660, 880, 1100].forEach((f, i) =>
-      osc(ctx, rnd(f, 0.03), 'sine', 0.13, t + i * 0.075, 0.24)
+    // C4 E4 G4 B4
+    [262, 330, 392, 494].forEach((f, i) =>
+      osc(ctx, rnd(f, 0.03), 'sine', 0.13, t + i * 0.075, 0.26)
     );
   } catch {}
 };
@@ -118,17 +142,17 @@ export const playCountdown = (n) => {
   try {
     const ctx = ac();
     const t = ctx.currentTime;
-    osc(ctx, n === 1 ? 420 : 290, 'sine', 0.10, t, 0.075);
+    osc(ctx, n === 1 ? 330 : 220, 'sine', 0.10, t, 0.075);
   } catch {}
 };
 
-// "GO!" — round and warm
+// "GO!" — round and warm, under 450 Hz
 export const playGo = () => {
   try {
     const ctx = ac();
     const t = ctx.currentTime;
-    osc(ctx, 490, 'sine', 0.18, t,        0.36);
-    osc(ctx, 620, 'sine', 0.09, t + 0.06, 0.26);
+    osc(ctx, 370, 'sine', 0.18, t,        0.36);
+    osc(ctx, 440, 'sine', 0.09, t + 0.06, 0.26);
   } catch {}
 };
 

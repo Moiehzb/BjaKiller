@@ -621,7 +621,6 @@ const CountQuizStep = ({ onNext, onBack, t }) => {
   // Auto-deal cards one by one
   useEffect(() => {
     if (phase !== 'watching' || dealIdx < 0) return;
-    playCardFlip();
 
     if (dealIdx < COUNT_SEQ.length - 1) {
       dealRef.current = setTimeout(() => setDealIdx((i) => i + 1), 870);
