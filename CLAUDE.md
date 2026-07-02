@@ -1,4 +1,11 @@
-# Elite Counter — Blackjack Card Counting Trainer
+# Blackjack Academy I (ex-Elite Counter) — Blackjack Card Counting Trainer
+
+## Direction Artistique — « Académie Secrète des Compteurs »
+Dark academia / médiéval mystique. Palette dans l'objet `G` (EliteCounter.jsx, miroirs dans EliteCounterTutorial.jsx et LanguageSelect.jsx) : fonds violets profonds (`bgDeep #0d0a1a`, `bgCard`, `bgPanel`), or (`gold #c9a24b`), ambre, teal, textes parchemin/lavande. Typo : **Cinzel** (titres, labels caps letter-spacing large) + **EB Garamond** (corps). Zéro emoji structurel — SVG inline (`Coin`, `RankSigil`, `Merchant`, `Flag`) ou icônes lucide.
+- **Rangs** (noms propres, identiques dans toutes les langues) : Cuivre · Argent · Or · Émeraude · Saphir · Adamantium
+- **Noms des modes** (via i18n) : Entraînement = « Salle d'Étude », Ranked = « Les Portes de la Guilde », placement = « l'Initiation », ex-Casino Killer = « L'Épreuve » (étapes = « cercles »), défi du jour = « Rituel du jour », réglages = « Scriptorium », skins = « Artefacts », boutique = « La Salle des Artefacts », section payante = « Le Marchand » (4,99 €/artefact)
+- **Ton éditorial** : sobre, initiatique — pas de « Bravo ! », félicitations pesées
+- La clé localStorage reste `eliteSave` (ne pas renommer)
 
 ## Lancer l'app
 ```
@@ -40,7 +47,7 @@ Langues livrées : **FR, EN, ES, DE**. Moteur maison, **zéro dépendance**, dan
 
 **Câblage** : `EliteCounter` calcule `const lang = save.lang || DEFAULT_LANG` puis `const t = makeT(lang)`. `t` est passé en **prop** aux composants enfants (`TimePicker`, `SupportPreviewModal`, `TutorialOverlay`, `LanguageModal`). La langue vit dans `save.lang` (localStorage `eliteSave`) ; `null` = pas encore choisie → l'écran de choix s'affiche **avant** le tutoriel.
 
-**Noms propres NON traduits** (identiques dans toutes les langues) : rangs (Bronze…Master), noms de skins, noms de code des achievements (« The Architect »), labels de gates (« Bronze → Silver »). Les `desc`/`name` dans `CHALLENGES`/`RANKS_DEF` ne sont plus rendus (résolus via `t('challenges.<id>.name')` etc.) — données mortes laissées comme référence.
+**Noms propres NON traduits** (identiques dans toutes les langues) : rangs (Cuivre…Adamantium), noms de skins, noms de code des achievements (« The Architect »), labels de gates (« Cuivre → Argent »). Les `desc`/`name` dans `CHALLENGES`/`RANKS_DEF` ne sont plus rendus (résolus via `t('challenges.<id>.name')` etc.) — données mortes laissées comme référence.
 
 **Ajouter une langue** = (1) une entrée dans `LANGUAGES`, (2) un fichier `locales/<code>.js` copié sur `fr.js`/`en.js`, (3) l'enregistrer dans le `DICTS` de `i18n/index.js`. Rien d'autre à toucher.
 
@@ -58,6 +65,5 @@ Langues livrées : **FR, EN, ES, DE**. Moteur maison, **zéro dépendance**, dan
 - En début de session, si l'utilisateur demande "y'a quoi à faire ?", lire `TODO.md` et répondre directement
 
 ## Backlog prioritaire
-1. Renommer "Run Casino" (nom pas convainquant)
-2. Paywall 5.99€ one-time (localStorage en démo)
-3. App 2 séparée : mode table réaliste style Card Counter Lite
+1. Paywall 4,99 € par artefact (localStorage en démo — UI « Le Marchand » prête, logique de paiement à brancher)
+2. App 2 séparée : mode table réaliste style Card Counter Lite

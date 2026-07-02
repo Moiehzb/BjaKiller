@@ -10,7 +10,8 @@
       "Skill(update-config)",
       "PowerShell(npm run *)",
       "PowerShell(git *)",
-      "Skill(claude-api)"
+      "Skill(claude-api)",
+      "PowerShell(node \"C:\\\\Users\\\\PC1\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\D--CLAUDE-CODE-CS-CODE\\\\01c45904-f819-4ccf-955c-e8aae4bcb14c\\\\scratchpad\\\\parity-check.mjs\")"
     ]
   },
   "hooks": {

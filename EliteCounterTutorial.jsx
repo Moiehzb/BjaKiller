@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronRight, ChevronLeft, Check, Play } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Check, Play, BookOpen, DoorOpen, Flame, Lock } from 'lucide-react';
 import { makeT, DEFAULT_LANG } from './i18n';
 import { initAudio, playClick, playCorrect, playWrong, playChip, playGo } from './src/sounds.js';
 
@@ -7,10 +7,13 @@ import { initAudio, playClick, playCorrect, playWrong, playChip, playGo } from '
 // Design tokens — exact mirror of EliteCounter.jsx
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const G = {
-  bg: '#0a0d0a', felt: '#0f1a0f', feltLight: '#152115',
-  gold: '#c9a84c', goldLight: '#e8c96d', goldDim: '#7a6030',
-  border: '#1e2e1e', borderGold: '#3a2e10',
-  text: '#e8e4d8', textMuted: '#7a8a7a',
+  bgDeep: '#0d0a1a', bgCard: '#13102a', bgPanel: '#1a1535',
+  border: '#2e2654', borderGold: '#4a3a1d',
+  gold: '#c9a24b', goldLight: '#e8c97a', goldDark: '#8a6820',
+  amber: '#d4813a', amberLight: '#f0a860',
+  teal: '#2dd4bf', tealDark: '#0f766e',
+  textPrimary: '#f0e6cc', textSecondary: '#a896c8', textMuted: '#5c4f7a',
+  purpleMid: '#2d2060',
   red: '#c0392b', green: '#27ae60',
 };
 
@@ -18,19 +21,19 @@ const G = {
 // CSS — injecté via <style> comme dans le fichier principal
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const tutCss = `
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap');
 
-  .tov { position:fixed; inset:0; z-index:200; background:radial-gradient(ellipse at top,#102010,${G.bg} 72%); overflow-y:auto; font-family:'Inter',sans-serif; color:${G.text}; -webkit-font-smoothing:antialiased; }
+  .tov { position:fixed; inset:0; z-index:200; background:radial-gradient(ellipse at top,#1a1535,${G.bgDeep} 72%); overflow-y:auto; font-family:'EB Garamond',serif; color:${G.textPrimary}; -webkit-font-smoothing:antialiased; }
   .tov-wrap { max-width:480px; margin:0 auto; padding:0 16px 56px; min-height:100vh; display:flex; flex-direction:column; }
 
   /* Header */
-  .tov-hdr { display:flex; align-items:center; justify-content:space-between; padding:14px 0 10px; position:sticky; top:0; z-index:5; background:radial-gradient(ellipse at top,#102010,${G.bg} 72%); }
+  .tov-hdr { display:flex; align-items:center; justify-content:space-between; padding:14px 0 10px; position:sticky; top:0; z-index:5; background:radial-gradient(ellipse at top,#1a1535,${G.bgDeep} 72%); }
   .tdots { display:flex; gap:6px; }
   .tdot { width:6px; height:6px; border-radius:50%; background:${G.border}; transition:all .3s ease; }
   .tdot.active { width:22px; border-radius:3px; background:${G.gold}; }
-  .tdot.past { background:${G.goldDim}; }
-  .tskip { background:rgba(255,255,255,.04); border:1px solid ${G.border}; border-radius:20px; padding:5px 14px; color:${G.textMuted}; font-size:12px; font-family:'Inter',sans-serif; cursor:pointer; transition:all .15s; display:flex; align-items:center; gap:4px; }
-  .tskip:hover { border-color:${G.goldDim}; color:${G.gold}; }
+  .tdot.past { background:${G.goldDark}; }
+  .tskip { background:rgba(255,255,255,.04); border:1px solid ${G.border}; border-radius:20px; padding:5px 14px; color:${G.textSecondary}; font-size:12px; font-family:'EB Garamond',serif; cursor:pointer; transition:all .15s; display:flex; align-items:center; gap:4px; }
+  .tskip:hover { border-color:${G.goldDark}; color:${G.gold}; }
 
   /* Step wrappers with directional animation */
   .tstep-fwd { flex:1; display:flex; flex-direction:column; padding-top:14px; animation:tInFwd .32s ease forwards; }
@@ -39,13 +42,13 @@ const tutCss = `
   @keyframes tInBwd { from{opacity:0;transform:translateY(-18px);} to{opacity:1;transform:translateY(0);} }
 
   /* Typography */
-  .tlabel { font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:${G.textMuted}; display:flex; align-items:center; gap:8px; margin-bottom:12px; }
+  .tlabel { font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:${G.textSecondary}; display:flex; align-items:center; gap:8px; margin-bottom:12px; }
   .tlabel::after { content:''; flex:1; height:1px; background:${G.border}; }
-  .th1 { font-family:'Playfair Display',serif; font-size:27px; font-weight:700; line-height:1.2; color:${G.text}; margin-bottom:10px; }
-  .tp { font-size:13px; color:${G.textMuted}; line-height:1.65; margin-bottom:14px; }
+  .th1 { font-family:'Cinzel',serif; font-size:27px; font-weight:700; line-height:1.2; color:${G.textPrimary}; margin-bottom:10px; }
+  .tp { font-size:13px; color:${G.textSecondary}; line-height:1.65; margin-bottom:14px; }
 
   /* Playing card */
-  .tcard { background:#f7f4eb; border:1.5px solid #cfc8b4; border-radius:9px; display:flex; flex-direction:column; align-items:flex-start; justify-content:space-between; font-family:'Playfair Display',serif; font-weight:700; box-shadow:0 3px 12px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.9); user-select:none; flex-shrink:0; overflow:hidden; position:relative; }
+  .tcard { background:#f7f4eb; border:1.5px solid #cfc8b4; border-radius:9px; display:flex; flex-direction:column; align-items:flex-start; justify-content:space-between; font-family:'Cinzel',serif; font-weight:700; box-shadow:0 3px 12px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.9); user-select:none; flex-shrink:0; overflow:hidden; position:relative; }
   .tcard.sm  { width:36px; height:52px; padding:3px 4px; font-size:12px; border-radius:7px; }
   .tcard.md  { width:56px; height:78px; padding:5px 7px; font-size:18px; }
   .tcard.lg  { width:72px; height:102px; padding:7px 9px; font-size:24px; }
@@ -57,8 +60,8 @@ const tutCss = `
   .tcbot { position:absolute; bottom:3px; right:4px; transform:rotate(180deg); display:flex; flex-direction:column; align-items:center; line-height:1.1; }
 
   /* Welcome logo */
-  .tlogo { font-family:'Playfair Display',serif; font-size:33px; font-weight:700; letter-spacing:.04em; background:linear-gradient(135deg,${G.goldLight},${G.gold},#a07820); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:3px; }
-  .tlogsub { font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:${G.textMuted}; }
+  .tlogo { font-family:'Cinzel',serif; font-size:23px; font-weight:700; letter-spacing:.12em; background:linear-gradient(135deg,${G.goldLight},${G.gold},#8a6820); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:3px; }
+  .tlogsub { font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:${G.textSecondary}; }
 
   /* Card fan */
   .tfan { position:relative; width:230px; height:112px; margin:22px auto 26px; flex-shrink:0; }
@@ -70,29 +73,29 @@ const tutCss = `
   .tfc4 { margin-left:5px;   transform:rotate(19deg) translateY(10px); }
 
   /* Hi-Lo groups */
-  .hilo-row { background:${G.feltLight}; border:1px solid ${G.border}; border-radius:12px; padding:13px 15px; margin-bottom:9px; display:flex; align-items:center; gap:13px; }
+  .hilo-row { background:${G.bgPanel}; border:1px solid ${G.border}; border-radius:12px; padding:13px 15px; margin-bottom:9px; display:flex; align-items:center; gap:13px; }
   .hilo-row.plus  { border-left:3px solid ${G.green}; }
-  .hilo-row.zero  { border-left:3px solid ${G.textMuted}; }
+  .hilo-row.zero  { border-left:3px solid ${G.textSecondary}; }
   .hilo-row.minus { border-left:3px solid ${G.red}; }
   .hilo-cards { display:flex; gap:5px; flex:1; flex-wrap:wrap; align-items:center; }
   .hilo-info { display:flex; flex-direction:column; align-items:flex-end; flex-shrink:0; }
-  .hilo-val { font-family:'Playfair Display',serif; font-size:30px; font-weight:700; line-height:1; }
+  .hilo-val { font-family:'Cinzel',serif; font-size:30px; font-weight:700; line-height:1; }
   .hilo-val.plus  { color:${G.green}; }
-  .hilo-val.zero  { color:${G.textMuted}; }
+  .hilo-val.zero  { color:${G.textSecondary}; }
   .hilo-val.minus { color:${G.red}; }
-  .hilo-sub { font-size:10px; color:${G.textMuted}; text-transform:uppercase; letter-spacing:.07em; margin-top:2px; }
+  .hilo-sub { font-size:10px; color:${G.textSecondary}; text-transform:uppercase; letter-spacing:.07em; margin-top:2px; }
 
   /* Tip box */
-  .tip-gold { background:rgba(201,168,76,.07); border:1px solid ${G.borderGold}; border-radius:10px; padding:12px 14px; font-size:12px; color:${G.gold}; line-height:1.6; margin-top:8px; }
+  .tip-gold { background:rgba(201,162,75,.07); border:1px solid ${G.borderGold}; border-radius:10px; padding:12px 14px; font-size:12px; color:${G.gold}; line-height:1.6; margin-top:8px; }
   .tip-gold strong { color:${G.goldLight}; display:block; margin-bottom:3px; font-size:10px; letter-spacing:.08em; text-transform:uppercase; }
 
   /* Running count box */
-  .qcount-box { background:${G.feltLight}; border:1px solid ${G.border}; border-radius:12px; padding:12px 16px; text-align:center; margin-bottom:14px; }
-  .qcount-lbl { font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:${G.textMuted}; margin-bottom:4px; }
-  .qcount-val { font-family:'Playfair Display',serif; font-size:50px; font-weight:700; line-height:1; transition:color .18s; }
+  .qcount-box { background:${G.bgPanel}; border:1px solid ${G.border}; border-radius:12px; padding:12px 16px; text-align:center; margin-bottom:14px; }
+  .qcount-lbl { font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:${G.textSecondary}; margin-bottom:4px; }
+  .qcount-val { font-family:'Cinzel',serif; font-size:50px; font-weight:700; line-height:1; transition:color .18s; }
   .qcount-val.pos { color:${G.green}; }
   .qcount-val.neg { color:${G.red}; }
-  .qcount-val.zer { color:${G.textMuted}; }
+  .qcount-val.zer { color:${G.textSecondary}; }
 
   /* Quiz progress dots */
   .qdots { display:flex; gap:6px; justify-content:center; margin-bottom:12px; }
@@ -109,13 +112,13 @@ const tutCss = `
 
   /* Answer buttons */
   .ans-wrap { display:flex; gap:10px; justify-content:center; margin-bottom:12px; }
-  .ans-btn { width:80px; height:80px; border-radius:14px; border:2px solid ${G.border}; background:${G.feltLight}; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; transition:all .14s; font-family:'Playfair Display',serif; font-weight:700; font-size:26px; color:${G.textMuted}; -webkit-tap-highlight-color:transparent; }
-  .ans-btn:hover:not(:disabled) { border-color:${G.goldDim}; color:${G.goldLight}; transform:translateY(-2px); background:rgba(201,168,76,.06); }
+  .ans-btn { width:80px; height:80px; border-radius:14px; border:2px solid ${G.border}; background:${G.bgPanel}; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; transition:all .14s; font-family:'Cinzel',serif; font-weight:700; font-size:26px; color:${G.textSecondary}; -webkit-tap-highlight-color:transparent; }
+  .ans-btn:hover:not(:disabled) { border-color:${G.goldDark}; color:${G.goldLight}; transform:translateY(-2px); background:rgba(201,162,75,.06); }
   .ans-btn:active:not(:disabled) { transform:scale(.93); }
   .ans-btn:disabled { cursor:default; }
   .ans-btn.aok  { border-color:${G.green}; background:rgba(39,174,96,.1); color:${G.green}; }
   .ans-btn.aerr { border-color:${G.red}; background:rgba(192,57,43,.08); color:${G.red}; }
-  .albl { font-size:10px; font-family:'Inter',sans-serif; font-weight:500; letter-spacing:.05em; opacity:.55; }
+  .albl { font-size:10px; font-family:'EB Garamond',serif; font-weight:500; letter-spacing:.05em; opacity:.55; }
 
   /* Card animations */
   @keyframes tDeal      { from{opacity:0;transform:translateY(-22px) scale(.88);} to{opacity:1;transform:translateY(0) scale(1);} }
@@ -128,72 +131,72 @@ const tutCss = `
   /* Score banner */
   .qscore { border-radius:12px; padding:14px 16px; margin-bottom:14px; }
   .qscore.great { background:rgba(39,174,96,.08); border:1px solid rgba(39,174,96,.25); }
-  .qscore.ok    { background:rgba(201,168,76,.07); border:1px solid ${G.borderGold}; }
+  .qscore.ok    { background:rgba(201,162,75,.07); border:1px solid ${G.borderGold}; }
   .qscore.poor  { background:rgba(192,57,43,.07); border:1px solid rgba(192,57,43,.22); }
-  .qscore-title { font-family:'Playfair Display',serif; font-size:16px; margin-bottom:5px; }
-  .qscore-desc  { font-size:12px; color:${G.textMuted}; line-height:1.5; }
+  .qscore-title { font-family:'Cinzel',serif; font-size:16px; margin-bottom:5px; }
+  .qscore-desc  { font-size:12px; color:${G.textSecondary}; line-height:1.5; }
 
   /* Count quiz cards row */
   .cq-cards { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; min-height:88px; margin-bottom:18px; align-items:flex-end; }
   .cq-wrap { display:flex; flex-direction:column; align-items:center; gap:6px; }
-  .cq-val { font-family:'Playfair Display',serif; font-size:14px; font-weight:700; opacity:0; transition:opacity .38s; }
+  .cq-val { font-family:'Cinzel',serif; font-size:14px; font-weight:700; opacity:0; transition:opacity .38s; }
   .cq-val.vis { opacity:1; }
   .cq-val.pos { color:${G.green}; }
   .cq-val.neg { color:${G.red}; }
-  .cq-val.zer { color:${G.textMuted}; }
-  .cq-empty { width:36px; height:52px; background:${G.feltLight}; border:1px dashed ${G.border}; border-radius:7px; }
+  .cq-val.zer { color:${G.textSecondary}; }
+  .cq-empty { width:36px; height:52px; background:${G.bgPanel}; border:1px dashed ${G.border}; border-radius:7px; }
 
   /* Count stepper */
   .cnt-stepper { display:flex; align-items:center; justify-content:center; gap:18px; margin-bottom:14px; }
-  .csb { width:54px; height:54px; border-radius:12px; background:rgba(201,168,76,.08); border:1px solid ${G.borderGold}; color:${G.gold}; font-size:28px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .13s; user-select:none; -webkit-tap-highlight-color:transparent; font-family:'Playfair Display',serif; }
-  .csb:hover { background:rgba(201,168,76,.16); }
+  .csb { width:54px; height:54px; border-radius:12px; background:rgba(201,162,75,.08); border:1px solid ${G.borderGold}; color:${G.gold}; font-size:28px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .13s; user-select:none; -webkit-tap-highlight-color:transparent; font-family:'Cinzel',serif; }
+  .csb:hover { background:rgba(201,162,75,.16); }
   .csb:active { transform:scale(.9); }
-  .cnt-num { font-family:'Playfair Display',serif; font-size:56px; font-weight:700; line-height:1; min-width:90px; text-align:center; transition:color .15s; }
+  .cnt-num { font-family:'Cinzel',serif; font-size:56px; font-weight:700; line-height:1; min-width:90px; text-align:center; transition:color .15s; }
   .cnt-num.pos { color:${G.goldLight}; }
   .cnt-num.neg { color:${G.red}; }
-  .cnt-num.zer { color:${G.textMuted}; }
+  .cnt-num.zer { color:${G.textSecondary}; }
 
   /* Count feedback */
   .cnt-fb { border-radius:10px; padding:12px 14px; margin-bottom:12px; text-align:center; }
   .cnt-fb.ok  { background:rgba(39,174,96,.08); border:1px solid rgba(39,174,96,.25); }
   .cnt-fb.err { background:rgba(192,57,43,.07); border:1px solid rgba(192,57,43,.22); }
-  .cnt-fb-title { font-family:'Playfair Display',serif; font-size:15px; margin-bottom:3px; }
-  .cnt-fb-desc  { font-size:12px; color:${G.textMuted}; }
+  .cnt-fb-title { font-family:'Cinzel',serif; font-size:15px; margin-bottom:3px; }
+  .cnt-fb-desc  { font-size:12px; color:${G.textSecondary}; }
 
   /* Mode cards */
-  .mode-card { background:${G.feltLight}; border:1px solid ${G.border}; border-radius:12px; padding:14px 16px; margin-bottom:9px; position:relative; overflow:hidden; }
-  .mode-card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:${G.goldDim}; }
-  .mode-card.hl { border-color:${G.borderGold}; background:linear-gradient(135deg,#181200,${G.feltLight}); }
+  .mode-card { background:${G.bgPanel}; border:1px solid ${G.border}; border-radius:12px; padding:14px 16px; margin-bottom:9px; position:relative; overflow:hidden; }
+  .mode-card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:${G.goldDark}; }
+  .mode-card.hl { border-color:${G.borderGold}; background:linear-gradient(135deg,#2a2148,${G.bgPanel}); }
   .mode-card.hl::before { background:${G.gold}; }
   .mode-card.lkd { opacity:.42; }
   .mode-icon  { font-size:22px; margin-bottom:4px; }
-  .mode-title { font-family:'Playfair Display',serif; font-size:15px; font-weight:600; margin-bottom:3px; }
-  .mode-sub   { font-size:10px; color:${G.textMuted}; text-transform:uppercase; letter-spacing:.07em; }
-  .mode-desc  { font-size:12px; color:${G.textMuted}; line-height:1.5; margin-top:4px; }
+  .mode-title { font-family:'Cinzel',serif; font-size:15px; font-weight:600; margin-bottom:3px; }
+  .mode-sub   { font-size:10px; color:${G.textSecondary}; text-transform:uppercase; letter-spacing:.07em; }
+  .mode-desc  { font-size:12px; color:${G.textSecondary}; line-height:1.5; margin-top:4px; }
   .mode-badge { position:absolute; right:14px; top:50%; transform:translateY(-50%); font-size:11px; padding:3px 9px; border-radius:20px; font-weight:600; letter-spacing:.04em; }
   .mode-badge.un { background:rgba(39,174,96,.12); color:${G.green}; border:1px solid rgba(39,174,96,.3); }
-  .mode-badge.lk { font-size:16px; color:${G.textMuted}; padding:2px 6px; }
+  .mode-badge.lk { font-size:16px; color:${G.textSecondary}; padding:2px 6px; }
 
   /* Ready */
-  .ready-orb { width:88px; height:88px; border-radius:50%; border:2px solid ${G.borderGold}; background:rgba(201,168,76,.06); display:flex; align-items:center; justify-content:center; font-size:36px; margin:8px auto 16px; animation:orbPulse 2.5s ease infinite; }
-  @keyframes orbPulse { 0%,100%{box-shadow:0 0 0 0 rgba(201,168,76,.2);} 50%{box-shadow:0 0 0 22px rgba(201,168,76,0);} }
+  .ready-orb { width:88px; height:88px; border-radius:50%; border:2px solid ${G.borderGold}; background:rgba(201,162,75,.06); display:flex; align-items:center; justify-content:center; font-size:36px; margin:8px auto 16px; animation:orbPulse 2.5s ease infinite; }
+  @keyframes orbPulse { 0%,100%{box-shadow:0 0 0 0 rgba(201,162,75,.2);} 50%{box-shadow:0 0 0 22px rgba(201,162,75,0);} }
   .chk-list { list-style:none; padding:0; margin:0 0 16px; }
-  .chk-list li { display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid ${G.border}; font-size:13px; color:${G.text}; }
+  .chk-list li { display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid ${G.border}; font-size:13px; color:${G.textPrimary}; }
   .chk-list li:last-child { border-bottom:none; }
   .chk-ic { width:22px; height:22px; border-radius:50%; background:rgba(39,174,96,.12); border:1px solid rgba(39,174,96,.3); display:flex; align-items:center; justify-content:center; color:${G.green}; flex-shrink:0; }
 
   /* Buttons */
-  .tbtn-g { width:100%; padding:16px; background:linear-gradient(135deg,#3a2e10,${G.gold},#3a2e10); background-size:200% 100%; border:1px solid ${G.gold}; border-radius:12px; color:#0a0d0a; font-family:'Playfair Display',serif; font-size:15px; font-weight:700; letter-spacing:.08em; cursor:pointer; transition:all .3s; text-transform:uppercase; text-align:center; }
-  .tbtn-g:hover { background-position:right center; box-shadow:0 0 30px rgba(201,168,76,.2); transform:translateY(-1px); }
+  .tbtn-g { width:100%; padding:16px; background:linear-gradient(135deg,#8a6820,${G.gold},#8a6820); background-size:200% 100%; border:1px solid ${G.gold}; border-radius:12px; color:#0d0a1a; font-family:'Cinzel',serif; font-size:14px; font-weight:700; letter-spacing:.12em; cursor:pointer; transition:all .3s; text-transform:uppercase; text-align:center; }
+  .tbtn-g:hover { background-position:right center; box-shadow:0 0 30px rgba(201,162,75,.2); transform:translateY(-1px); }
   .tbtn-g:active { transform:none; }
   .tbtn-g:disabled { opacity:.38; cursor:default; transform:none; }
-  .tbtn-o { width:100%; padding:13px; background:transparent; border:1px solid ${G.border}; border-radius:10px; color:${G.textMuted}; font-family:'Inter',sans-serif; font-size:13px; cursor:pointer; transition:all .15s; text-align:center; margin-top:8px; }
-  .tbtn-o:hover { border-color:${G.goldDim}; color:${G.gold}; }
-  .tbtn-back { display:inline-flex; align-items:center; gap:5px; background:none; border:none; color:${G.textMuted}; font-size:13px; cursor:pointer; font-family:'Inter',sans-serif; padding:0; transition:color .14s; margin-bottom:14px; }
+  .tbtn-o { width:100%; padding:13px; background:transparent; border:1px solid ${G.border}; border-radius:10px; color:${G.textSecondary}; font-family:'EB Garamond',serif; font-size:13px; cursor:pointer; transition:all .15s; text-align:center; margin-top:8px; }
+  .tbtn-o:hover { border-color:${G.goldDark}; color:${G.gold}; }
+  .tbtn-back { display:inline-flex; align-items:center; gap:5px; background:none; border:none; color:${G.textSecondary}; font-size:13px; cursor:pointer; font-family:'EB Garamond',serif; padding:0; transition:color .14s; margin-bottom:14px; }
   .tbtn-back:hover { color:${G.gold}; }
 
   /* "Suivant" inline button in intro phases */
-  .cnt-watching-hint { text-align:center; padding:18px 0 10px; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:${G.textMuted}; }
+  .cnt-watching-hint { text-align:center; padding:18px 0 10px; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:${G.textSecondary}; }
 `;
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -268,7 +271,7 @@ const WelcomeStep = ({ onNext, onSkip, t }) => {
 
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', paddingTop: 10 }}>
-      <div className="tlogo">ELITE COUNTER</div>
+      <div className="tlogo">BLACKJACK ACADEMY I</div>
       <div className="tlogsub">{t('tutorial.welcome.logoSub')}</div>
 
       {/* Card fan */}
@@ -280,7 +283,7 @@ const WelcomeStep = ({ onNext, onSkip, t }) => {
         ))}
       </div>
 
-      <p style={{ fontSize: 14, color: G.textMuted, lineHeight: 1.7, marginBottom: 28, maxWidth: 300 }}>
+      <p style={{ fontSize: 14, color: G.textSecondary, lineHeight: 1.7, marginBottom: 28, maxWidth: 300 }}>
         {t('tutorial.welcome.intro')}
       </p>
 
@@ -368,12 +371,12 @@ const HiLoRefBar = () => (
   <div style={{ display: 'flex', gap: 6, marginBottom: 14 }}>
     {[
       { range: '2 – 6',  val: '+1', color: G.green },
-      { range: '7 – 9',  val: '0',  color: G.textMuted },
+      { range: '7 – 9',  val: '0',  color: G.textSecondary },
       { range: '10 – A', val: '−1', color: G.red },
     ].map((r) => (
-      <div key={r.range} style={{ flex: 1, background: G.feltLight, border: `1px solid ${G.border}`, borderRadius: 8, padding: '7px 4px', textAlign: 'center' }}>
-        <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 17, fontWeight: 700, color: r.color, lineHeight: 1 }}>{r.val}</div>
-        <div style={{ fontSize: 10, color: G.textMuted, marginTop: 3, letterSpacing: '.04em' }}>{r.range}</div>
+      <div key={r.range} style={{ flex: 1, background: G.bgPanel, border: `1px solid ${G.border}`, borderRadius: 8, padding: '7px 4px', textAlign: 'center' }}>
+        <div style={{ fontFamily: "'Cinzel', serif", fontSize: 17, fontWeight: 700, color: r.color, lineHeight: 1 }}>{r.val}</div>
+        <div style={{ fontSize: 10, color: G.textSecondary, marginTop: 3, letterSpacing: '.04em' }}>{r.range}</div>
       </div>
     ))}
   </div>
@@ -481,8 +484,8 @@ const HiLoQuizStep = ({ onNext, onBack, t }) => {
 
         {/* Fiche mémo — uniquement si des erreurs ont été faites */}
         {score < QUIZ_CARDS.length && (
-          <div style={{ marginTop: 16, background: G.feltLight, border: `1px solid ${G.border}`, borderRadius: 12, padding: '12px 14px' }}>
-            <div style={{ fontSize: 10, letterSpacing: '.12em', textTransform: 'uppercase', color: G.textMuted, marginBottom: 10 }}>
+          <div style={{ marginTop: 16, background: G.bgPanel, border: `1px solid ${G.border}`, borderRadius: 12, padding: '12px 14px' }}>
+            <div style={{ fontSize: 10, letterSpacing: '.12em', textTransform: 'uppercase', color: G.textSecondary, marginBottom: 10 }}>
               {t('tutorial.quiz.memoTitle')}
             </div>
             {[
@@ -491,9 +494,9 @@ const HiLoQuizStep = ({ onNext, onBack, t }) => {
               { range: '10 – A', val: '−1', cls: 'minus', label: t('tutorial.quiz.memoHigh')  },
             ].map((r) => (
               <div key={r.cls} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '7px 0', borderBottom: r.cls !== 'minus' ? `1px solid ${G.border}` : 'none' }}>
-                <span style={{ fontFamily: "'Playfair Display', serif", fontSize: 14, fontWeight: 600, color: G.text }}>{r.range}</span>
-                <span style={{ fontSize: 11, color: G.textMuted, textTransform: 'uppercase', letterSpacing: '.06em' }}>{r.label}</span>
-                <span style={{ fontFamily: "'Playfair Display', serif", fontSize: 22, fontWeight: 700, color: r.cls === 'plus' ? G.green : r.cls === 'zero' ? G.textMuted : G.red }}>{r.val}</span>
+                <span style={{ fontFamily: "'Cinzel', serif", fontSize: 14, fontWeight: 600, color: G.textPrimary }}>{r.range}</span>
+                <span style={{ fontSize: 11, color: G.textSecondary, textTransform: 'uppercase', letterSpacing: '.06em' }}>{r.label}</span>
+                <span style={{ fontFamily: "'Cinzel', serif", fontSize: 22, fontWeight: 700, color: r.cls === 'plus' ? G.green : r.cls === 'zero' ? G.textSecondary : G.red }}>{r.val}</span>
               </div>
             ))}
           </div>
@@ -586,7 +589,7 @@ const HiLoQuizStep = ({ onNext, onBack, t }) => {
         </button>
       )}
 
-      <div style={{ textAlign: 'center', fontSize: 11, color: G.textMuted, marginTop: 8 }}>
+      <div style={{ textAlign: 'center', fontSize: 11, color: G.textSecondary, marginTop: 8 }}>
         {t('tutorial.quiz.cardProgress', { n: idx + 1, total: QUIZ_CARDS.length })}
       </div>
     </div>
@@ -777,7 +780,7 @@ const CountQuizStep = ({ onNext, onBack, t }) => {
 const ModesStep = ({ onNext, onBack, t }) => {
   const MODES = [
     {
-      icon: '🎯',
+      icon: <BookOpen size={20} color={G.gold} />,
       name: t('tutorial.modes.trainingName'),
       sub: t('tutorial.modes.trainingSub'),
       desc: t('tutorial.modes.trainingDesc'),
@@ -785,7 +788,7 @@ const ModesStep = ({ onNext, onBack, t }) => {
       highlight: true,
     },
     {
-      icon: '🏆',
+      icon: <DoorOpen size={20} color={G.textSecondary} />,
       name: t('tutorial.modes.rankedName'),
       sub: t('tutorial.modes.rankedSub'),
       desc: t('tutorial.modes.rankedDesc'),
@@ -793,7 +796,7 @@ const ModesStep = ({ onNext, onBack, t }) => {
       highlight: false,
     },
     {
-      icon: '🔥',
+      icon: <Flame size={20} color={G.textSecondary} />,
       name: t('tutorial.modes.casinoName'),
       sub: t('tutorial.modes.casinoSub'),
       desc: t('tutorial.modes.casinoDesc'),
@@ -816,12 +819,12 @@ const ModesStep = ({ onNext, onBack, t }) => {
 
       {MODES.map((m) => (
         <div key={m.name} className={`mode-card ${m.highlight ? 'hl' : 'lkd'}`}>
-          <div className="mode-icon">{m.icon}</div>
+          <div className="mode-icon" style={{ display: 'flex' }}>{m.icon}</div>
           <div className="mode-title">{m.name}</div>
           <div className="mode-sub">{m.sub}</div>
           <div className="mode-desc">{m.desc}</div>
           <div className={`mode-badge ${m.status}`}>
-            {m.status === 'un' ? t('tutorial.modes.available') : '🔒'}
+            {m.status === 'un' ? t('tutorial.modes.available') : <Lock size={14} />}
           </div>
         </div>
       ))}
@@ -852,8 +855,8 @@ const ReadyStep = ({ onComplete, t }) => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       <div style={{ textAlign: 'center', paddingTop: 16 }}>
-        <div className="ready-orb">🃏</div>
-        <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 26, fontWeight: 700, marginBottom: 6 }}>
+        <div className="ready-orb" style={{ color: G.gold, fontFamily: "'Cinzel', serif" }}>♠</div>
+        <div style={{ fontFamily: "'Cinzel', serif", fontSize: 26, fontWeight: 700, marginBottom: 6 }}>
           {t('tutorial.ready.title')}
         </div>
         <p className="tp" style={{ maxWidth: 300, margin: '0 auto 22px' }}>
@@ -871,12 +874,12 @@ const ReadyStep = ({ onComplete, t }) => {
       </ul>
 
       {/* First objective */}
-      <div style={{ background: G.feltLight, border: `1px solid ${G.border}`, borderRadius: 12, padding: '14px 16px', marginBottom: 18 }}>
-        <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 13, fontWeight: 600, color: G.gold, marginBottom: 6 }}>
+      <div style={{ background: G.bgPanel, border: `1px solid ${G.border}`, borderRadius: 12, padding: '14px 16px', marginBottom: 18 }}>
+        <div style={{ fontFamily: "'Cinzel', serif", fontSize: 13, fontWeight: 600, color: G.gold, marginBottom: 6 }}>
           {t('tutorial.ready.firstGoalTitle')}
         </div>
-        <div style={{ fontSize: 12, color: G.textMuted, lineHeight: 1.6 }}>
-          {t('tutorial.ready.firstGoalPre')}<strong style={{ color: G.text }}>{t('tutorial.ready.firstGoalStrong')}</strong>{t('tutorial.ready.firstGoalPost')}
+        <div style={{ fontSize: 12, color: G.textSecondary, lineHeight: 1.6 }}>
+          {t('tutorial.ready.firstGoalPre')}<strong style={{ color: G.textPrimary }}>{t('tutorial.ready.firstGoalStrong')}</strong>{t('tutorial.ready.firstGoalPost')}
         </div>
       </div>
 

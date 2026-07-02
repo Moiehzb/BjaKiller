@@ -1,4 +1,4 @@
-# Elite Counter — To-Do
+# Blackjack Academy I (ex-Elite Counter) — To-Do
 
 > Ce fichier est maintenu automatiquement par Claude.
 > Mis à jour quand une tâche est assignée ou complétée.
@@ -23,10 +23,19 @@
 ## 🔮 Fin de roadmap — ne jamais mentionner quand on demande quoi faire
 
 - [ ] Supprimer le code admin `adminmagueule` avant publication
-- [ ] Paywall / système d'achat réel (StoreKit / Play Billing) pour les skins support "Le Trésor de Guerre"
+- [ ] Paywall / système d'achat réel (StoreKit / Play Billing) pour les artefacts payants « Le Marchand » (4,99 €/artefact)
 - [ ] App 2 séparée : mode table réaliste style Card Counter Lite
 
 ## ✅ Fait
+
+- [x] **Refonte DA « Académie Secrète des Compteurs » + rebranding Blackjack Academy I — session 02/07/2026**
+  - **Palette** : objet `G` refait (fonds violets profonds `#0d0a1a`/`#13102a`/`#1a1535`, or `#c9a24b`, ambre `#d4813a`, teal `#2dd4bf`, textes parchemin/lavande) — appliqué à EliteCounter.jsx + miroirs Tutorial/LanguageSelect + index.html.
+  - **Typo** : Cinzel (titres, labels caps letter-spacing .22–.28em) + EB Garamond (corps) — Google Fonts en `<link>` (index.html) + `@import` des feuilles injectées. Playfair Display/Inter supprimés.
+  - **Rangs renommés** : Bronze→**Cuivre**, Silver→**Argent**, Gold→**Or**, Platinum→**Émeraude**, Diamond→**Saphir**, Master→**Adamantium** (noms propres identiques dans les 4 langues, couleurs assorties). Gates relabellisées (« Cuivre → Argent »…). Emojis-médailles remplacés par le sceau SVG `RankSigil` (pentagone facetté teinté).
+  - **Renommage des modes** (i18n) : Entraînement→**Salle d'Étude**, Classement→**Les Portes de la Guilde** (placement = **l'Initiation**), Casino Killer→**L'Épreuve** (nom définitif, étapes = « cercles »), Défi du jour→**Rituel du jour**, Paramètres→**Scriptorium**, Succès→**Hauts Faits**, skins→**Artefacts**, boutique→**La Salle des Artefacts**.
+  - **Le Marchand** : section payante de la boutique refaite — silhouette SVG encapuchonnée (`Merchant`, zéro emoji), réplique du marchand (« Compteur… j'ai entendu parler de toi… »), 4,99 €/artefact, bouton « Acquérir ».
+  - **Ton éditorial** : réécriture complète des 4 locales (FR/EN/ES/DE, 378 clés, parité vérifiée) — sobre, initiatique, sans exclamations ni emojis dans les textes. Presets de vitesse : Novice → Légende (progression d'académie).
+  - **Emojis structurels → SVG/lucide** : icônes du lobby (BookOpen/DoorOpen/Flame/CalendarDays/Sparkles/Award/Gem/BarChart3/ScrollText), verrous (Lock), clé d'Initiation (KeyRound), flammes de série (Flame). Logo « BLACKJACK ACADEMY I ». Build OK.
 
 - [x] **Défi du jour + stats améliorées — session 02/07/2026**
   - **Défi du jour** (façon Wordle) : deck seedé sur la date (`mulberry32` sur `AAAAMMJJ`, déterministe) + **difficulté calée sur le rang du joueur** (`getDailyConfig(seed, rankId, subRank)`). Volontairement **différent des games ranked** : moins de decks (1–2 en général), temps/carte un peu plus lent (×1.15 = légèrement plus simple) mais **beaucoup plus court** (~≤ 2 min, garde-fou `DAILY_MAX_SECONDS`). **Jours spéciaux** rares (~7 %, Diamond+ seulement pour rester jouables) : 8 decks à 50 % pén. mais temps/carte ×1.5 (bien plus lent) → 2–4 min. 1 tentative/jour (verrouillé ensuite), **compteur toujours caché**. **Score** : 1000 au compte exact, **−501 par unité d'écart** (peut être négatif) ; **score < 0 = manqué → série perdue** (écart ≤ 1 pardonné). Streak de jours + meilleure série + meilleur score + historique 14 jours. Coins bonus (30 + 10×streak). N'affecte **pas** le MMR ranked. Carte dédiée en tête du lobby (glow doré, ⭐ + style renforcé les jours spéciaux). Bloc résultat sur l'écran de fin.

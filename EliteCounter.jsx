@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Play, Pause, X, ChevronRight, ChevronLeft, Eye, EyeOff, AlertTriangle, Globe, Volume2, VolumeX } from 'lucide-react';
+import { Play, Pause, X, ChevronRight, ChevronLeft, Eye, EyeOff, AlertTriangle, Globe, Volume2, VolumeX, BookOpen, DoorOpen, Flame, CalendarDays, Sparkles, Award, Gem, BarChart3, ScrollText, Lock, KeyRound } from 'lucide-react';
 import TutorialOverlay from './EliteCounterTutorial.jsx';
 import { makeT, DEFAULT_LANG, getLanguage } from './i18n';
 import { LanguageSelectScreen, LanguageModal, Flag } from './LanguageSelect.jsx';
@@ -342,6 +342,40 @@ const Coin = ({ size = 14 }) => (
   </svg>
 );
 
+// ─── Sceau de rang — SVG inline ──────────────────────────────────
+// Remplace les emojis-médailles (🥉💎👑…) : pentagone facetté teinté par rang,
+// rendu identique partout (les emojis récents font des tofu sur Windows 10).
+const RankSigil = ({ color = '#c9a24b', size = 28, dim = false }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true"
+    style={{ display: 'block', flexShrink: 0, opacity: dim ? 0.45 : 1 }}>
+    <path d="M12 1.8 L21.2 8.6 L17.7 21 L6.3 21 L2.8 8.6 Z"
+      fill={color} fillOpacity="0.14" stroke={color} strokeWidth="1.4" strokeLinejoin="round" />
+    <path d="M12 6 L17 9.7 L15.1 16.4 L8.9 16.4 L7 9.7 Z"
+      fill={color} fillOpacity="0.5" stroke={color} strokeWidth="0.9" strokeLinejoin="round" />
+    <circle cx="12" cy="11.8" r="1.5" fill={color} />
+  </svg>
+);
+
+// ─── Le Marchand — silhouette encapuchonnée, SVG pur (zéro emoji) ──
+const Merchant = ({ size = 46 }) => (
+  <svg width={size} height={size} viewBox="0 0 48 48" aria-hidden="true" style={{ flexShrink: 0 }}>
+    {/* cape */}
+    <path d="M24 3.5 C15.5 3.5 10.5 11 9.8 19.5 C9.3 25.5 7.6 30 6.2 34.5 L6.2 43 L41.8 43 L41.8 34.5 C40.4 30 38.7 25.5 38.2 19.5 C37.5 11 32.5 3.5 24 3.5 Z"
+      fill="#1a1535" stroke="#c9a24b" strokeWidth="1.2" strokeLinejoin="round" />
+    {/* capuche — l'ombre sous le tissu */}
+    <path d="M24 7.5 C18.4 7.5 15 12.8 14.5 19 C14.2 23.5 15.8 27 24 27 C32.2 27 33.8 23.5 33.5 19 C33 12.8 29.6 7.5 24 7.5 Z"
+      fill="#0d0a1a" />
+    {/* regard sous la capuche */}
+    <circle cx="19.8" cy="19.2" r="1.2" fill="#e8c97a" />
+    <circle cx="28.2" cy="19.2" r="1.2" fill="#e8c97a" />
+    {/* fermoir */}
+    <path d="M24 29.5 L26 33.5 L24 37.5 L22 33.5 Z" fill="#c9a24b" opacity="0.85" />
+    {/* pli de la cape */}
+    <path d="M15 30 C14 34 13 38.5 12.5 43 M33 30 C34 34 35 38.5 35.5 43"
+      stroke="#2e2654" strokeWidth="1.1" fill="none" />
+  </svg>
+);
+
 // ─── CHALLENGES — Geometry Dash style: hard, short, retry-friendly ────
 // coins: reward credited on unlock, matched to a specific skin price.
 const CHALLENGES = [
@@ -355,9 +389,9 @@ const CHALLENGES = [
   {
     id: 'no_mercy',
     name: 'No Mercy',
-    desc: 'Réussis la gate Gold → Platinum du premier coup — compteur caché',
+    desc: 'Réussis la porte Or → Émeraude du premier coup — compteur caché',
     icon: '⚔️', coins: 500,
-    // gateId 2 = Gold→Platinum (the hardest gate most players will first attempt)
+    // gateId 2 = Or→Émeraude (the hardest gate most players will first attempt)
     check: (ctx) => ctx.won && ctx.mode === 'placement' && ctx.slotType === 'gate' && ctx.gateId === 2 && ctx.firstAttemptOnThisSlot && !ctx.countWasShown,
   },
   {
@@ -479,31 +513,33 @@ const dailyScore = (error) => 1000 - Math.abs(error) * 501;
 // Source de vérité par rang : id, name, icon, color, decks, mmrPerWin/Loss.
 // NOTE : penetration / secPerCard / mmrToPromo / desc sont OBSOLÈTES — la pénétration
 // et la vitesse sont désormais dérivées du sous-rang (voir getRankConfig / TIER_SPC).
+// Rangs de la Guilde — noms propres NON traduits (identiques dans toutes les langues).
+// Les emojis-médailles sont remplacés par le sceau SVG <RankSigil color={rank.color} />.
 const RANKS_DEF = [
-  { id: 1, name: 'Bronze',   icon: '🥉', color: '#a05a2c', decks: 1, penetration: 75, secPerCard: 0.80, mmrPerWin: 20, mmrPerLoss: -15, mmrToPromo: 100, desc: '1 deck · 0.80s/carte' },
-  { id: 2, name: 'Silver',   icon: '🥈', color: '#8a8a9a', decks: 2, penetration: 75, secPerCard: 0.70, mmrPerWin: 20, mmrPerLoss: -15, mmrToPromo: 100, desc: '2 decks · 0.70s/carte' },
-  { id: 3, name: 'Gold',     icon: '🥇', color: '#c9a84c', decks: 4, penetration: 75, secPerCard: 0.62, mmrPerWin: 20, mmrPerLoss: -15, mmrToPromo: 100, desc: '4 decks · 0.62s/carte' },
-  { id: 4, name: 'Platinum', icon: '💎', color: '#4ecdc4', decks: 6, penetration: 75, secPerCard: 0.55, mmrPerWin: 20, mmrPerLoss: -15, mmrToPromo: 100, desc: '6 decks · 0.55s/carte' },
-  { id: 5, name: 'Diamond',  icon: '💠', color: '#5b8dee', decks: 8, penetration: 80, secPerCard: 0.50, mmrPerWin: 20, mmrPerLoss: -15, mmrToPromo: 100, desc: '8 decks · 0.50s/carte' },
-  { id: 6, name: 'Master',   icon: '👑', color: '#9b59b6', decks: 8, penetration: 85, secPerCard: 0.45, mmrPerWin: 20, mmrPerLoss: -15, mmrToPromo: null, desc: '8 decks · 0.45s/carte — Rang final' },
+  { id: 1, name: 'Cuivre',     color: '#b87333', decks: 1, penetration: 75, secPerCard: 0.80, mmrPerWin: 20, mmrPerLoss: -15, mmrToPromo: 100, desc: '1 deck · 0.80s/carte' },
+  { id: 2, name: 'Argent',     color: '#a8aabc', decks: 2, penetration: 75, secPerCard: 0.70, mmrPerWin: 20, mmrPerLoss: -15, mmrToPromo: 100, desc: '2 decks · 0.70s/carte' },
+  { id: 3, name: 'Or',         color: '#c9a24b', decks: 4, penetration: 75, secPerCard: 0.62, mmrPerWin: 20, mmrPerLoss: -15, mmrToPromo: 100, desc: '4 decks · 0.62s/carte' },
+  { id: 4, name: 'Émeraude',   color: '#2ecc71', decks: 6, penetration: 75, secPerCard: 0.55, mmrPerWin: 20, mmrPerLoss: -15, mmrToPromo: 100, desc: '6 decks · 0.55s/carte' },
+  { id: 5, name: 'Saphir',     color: '#4a7de8', decks: 8, penetration: 80, secPerCard: 0.50, mmrPerWin: 20, mmrPerLoss: -15, mmrToPromo: 100, desc: '8 decks · 0.50s/carte' },
+  { id: 6, name: 'Adamantium', color: '#9b59b6', decks: 8, penetration: 85, secPerCard: 0.45, mmrPerWin: 20, mmrPerLoss: -15, mmrToPromo: null, desc: '8 decks · 0.45s/carte — Rang final' },
 ];
 
 // ─── SUB-RANK SYSTEM ─────────────────────────────────────────────
-// Chaque rang (Bronze…Master) a 3 sous-rangs (I, II, III) = 18 paliers.
+// Chaque rang (Cuivre…Adamantium) a 3 sous-rangs (I, II, III) = 18 paliers.
 // Pénétration par sous-rang : I=60%, II=70%, III=80% (identique pour tous les rangs).
-// Vitesse : courbe géométrique de Bronze I (3.00s/carte) → Master III (0.42s/carte)
+// Vitesse : courbe géométrique de Cuivre I (3.00s/carte) → Adamantium III (0.42s/carte)
 // sur les 18 paliers (ratio ≈ 0.8908). Decks repris de RANKS_DEF.
 const SUB_RANKS = 3;
 const SUBRANK_PEN = { 1: 60, 2: 70, 3: 80 };
 const TIER_SPC = [
-  3.00, 2.67, 2.38,  // Bronze   I/II/III
-  2.12, 1.89, 1.68,  // Silver   I/II/III
-  1.50, 1.34, 1.19,  // Gold     I/II/III
-  1.06, 0.94, 0.84,  // Platinum I/II/III
-  0.75, 0.67, 0.59,  // Diamond  I/II/III
-  0.53, 0.47, 0.42,  // Master   I/II/III
+  3.00, 2.67, 2.38,  // Cuivre     I/II/III
+  2.12, 1.89, 1.68,  // Argent     I/II/III
+  1.50, 1.34, 1.19,  // Or         I/II/III
+  1.06, 0.94, 0.84,  // Émeraude   I/II/III
+  0.75, 0.67, 0.59,  // Saphir     I/II/III
+  0.53, 0.47, 0.42,  // Adamantium I/II/III
 ];
-const MAX_TIER = TIER_SPC.length - 1; // 17 = Master III (palier final absolu)
+const MAX_TIER = TIER_SPC.length - 1; // 17 = Adamantium III (palier final absolu)
 const tierIndex = (rankId, subRank) => (rankId - 1) * SUB_RANKS + (subRank - 1);
 const tierToRank = (tier) => ({ rankId: Math.floor(tier / SUB_RANKS) + 1, subRank: (tier % SUB_RANKS) + 1 });
 const ROMAN = ['I', 'II', 'III'];
@@ -538,11 +574,11 @@ const getRankConfig = (rankId, subRank) => {
 // Les gates ne portent que le mapping rang/label ; la difficulté (decks, pen, spc)
 // est dérivée du sous-rang 2 (70% pénétration) du rang FROM via getRankConfig.
 const PLACEMENT_GATES = [
-  { gateId: 0, label: 'Bronze → Silver',   fromRankId: 1, toRankId: 2 },
-  { gateId: 1, label: 'Silver → Gold',     fromRankId: 2, toRankId: 3 },
-  { gateId: 2, label: 'Gold → Platinum',   fromRankId: 3, toRankId: 4 },
-  { gateId: 3, label: 'Platinum → Diamond',fromRankId: 4, toRankId: 5 },
-  { gateId: 4, label: 'Diamond → Master',  fromRankId: 5, toRankId: 6 },
+  { gateId: 0, label: 'Cuivre → Argent',      fromRankId: 1, toRankId: 2 },
+  { gateId: 1, label: 'Argent → Or',          fromRankId: 2, toRankId: 3 },
+  { gateId: 2, label: 'Or → Émeraude',        fromRankId: 3, toRankId: 4 },
+  { gateId: 3, label: 'Émeraude → Saphir',    fromRankId: 4, toRankId: 5 },
+  { gateId: 4, label: 'Saphir → Adamantium',  fromRankId: 5, toRankId: 6 },
 ];
 
 const getGateConfig = (gateId) => {
@@ -610,7 +646,7 @@ const nextPlacementSlot = (history) => {
 // After placement ends, determine rank + MMR
 const placementResult = (history, isLastGameWin, isLastGame) => {
   let currentGateId = 0;
-  let placedRankId = 1; // Bronze if 0 gates passed
+  let placedRankId = 1; // Cuivre if 0 gates passed
 
   for (const h of history) {
     if (h.type === 'gate') {
@@ -650,40 +686,50 @@ const ACHIEVEMENT_PERFECT_PLACEMENT = {
 
 
 
-// ─── Design tokens ────────────────────────────────────────────────
+// ─── Design tokens — Académie Secrète des Compteurs ──────────────
 const G = {
-  bg: '#0a0d0a', felt: '#0f1a0f', feltLight: '#152115',
-  gold: '#c9a84c', goldLight: '#e8c96d', goldDim: '#7a6030',
-  border: '#1e2e1e', borderGold: '#3a2e10',
-  text: '#e8e4d8', textMuted: '#7a8a7a',
+  // Fonds
+  bgDeep: '#0d0a1a', bgCard: '#13102a', bgPanel: '#1a1535',
+  border: '#2e2654', borderGold: '#4a3a1d',
+  // Or (accent chaud principal)
+  gold: '#c9a24b', goldLight: '#e8c97a', goldDark: '#8a6820',
+  // Ambre (CTA secondaires)
+  amber: '#d4813a', amberLight: '#f0a860',
+  // Teal (accent froid)
+  teal: '#2dd4bf', tealDark: '#0f766e',
+  // Textes
+  textPrimary: '#f0e6cc', textSecondary: '#a896c8', textMuted: '#5c4f7a',
+  // Fond mid
+  purpleMid: '#2d2060',
+  // États
   red: '#c0392b', green: '#27ae60',
 };
 
 const css = `
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap');
-  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Share+Tech+Mono&family=Righteous&family=Special+Elite&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Righteous&family=Special+Elite&display=swap');
   * { box-sizing: border-box; }
-  .r { background:${G.bg}; min-height:100vh; font-family:'Inter',sans-serif; color:${G.text}; -webkit-font-smoothing:antialiased; }
-  .serif { font-family:'Playfair Display',serif; }
+  .r { background:${G.bgDeep}; min-height:100vh; font-family:'EB Garamond',serif; font-size:15px; color:${G.textPrimary}; -webkit-font-smoothing:antialiased; }
+  .serif { font-family:'Cinzel',serif; }
 
-  .hd { background:linear-gradient(180deg,#080c08,${G.felt}); border-bottom:1px solid ${G.borderGold}; padding:16px 20px 12px; position:sticky; top:0; z-index:50; }
-  .logo { font-family:'Playfair Display',serif; font-size:21px; font-weight:700; letter-spacing:.04em;
-    background:linear-gradient(135deg,${G.goldLight},${G.gold},#a07820); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-  .pill { background:rgba(201,168,76,.08); border:1px solid ${G.borderGold}; border-radius:20px; padding:4px 10px; font-size:12px; font-weight:500; color:${G.gold}; }
+  .hd { background:linear-gradient(180deg,#0a0816,${G.bgCard}); border-bottom:1px solid ${G.borderGold}; padding:16px 20px 12px; position:sticky; top:0; z-index:50; }
+  .logo { font-family:'Cinzel',serif; font-size:15px; font-weight:700; letter-spacing:.14em;
+    background:linear-gradient(135deg,${G.goldLight},${G.gold},#8a6820); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .pill { background:rgba(201,162,75,.08); border:1px solid ${G.borderGold}; border-radius:20px; padding:4px 10px; font-size:12px; font-weight:500; color:${G.gold}; }
 
-  .crumb { display:flex; align-items:center; gap:6px; padding:9px 20px; background:${G.felt}; border-bottom:1px solid ${G.border}; font-size:11px; color:${G.textMuted}; letter-spacing:.08em; text-transform:uppercase; overflow-x:auto; white-space:nowrap; }
+  .crumb { display:flex; align-items:center; gap:6px; padding:9px 20px; background:${G.bgCard}; border-bottom:1px solid ${G.border}; font-family:'Cinzel',serif; font-size:10px; color:${G.textMuted}; letter-spacing:.22em; text-transform:uppercase; overflow-x:auto; white-space:nowrap; }
   .crumb .ca { color:${G.gold}; }
   .crumb .sep { opacity:.4; }
 
   .lobby { padding:20px 16px; max-width:480px; margin:0 auto; }
-  .sec { font-size:10px; letter-spacing:.15em; text-transform:uppercase; color:${G.textMuted}; margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+  .sec { font-family:'Cinzel',serif; font-size:10px; letter-spacing:.28em; text-transform:uppercase; color:${G.textSecondary}; margin-bottom:10px; display:flex; align-items:center; gap:8px; }
   .sec::after { content:''; flex:1; height:1px; background:${G.border}; }
 
-  .card { background:${G.feltLight}; border:1px solid ${G.border}; border-radius:12px; padding:16px 18px; cursor:pointer; transition:all .18s; display:flex; align-items:center; justify-content:space-between; margin-bottom:9px; position:relative; overflow:hidden; }
-  .card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:${G.goldDim}; transition:all .18s; }
-  .card:hover { border-color:${G.goldDim}; background:#1a271a; transform:translateX(2px); }
+  .card { background:${G.bgPanel}; border:1px solid ${G.border}; border-radius:12px; padding:16px 18px; cursor:pointer; transition:all .18s; display:flex; align-items:center; justify-content:space-between; margin-bottom:9px; position:relative; overflow:hidden; }
+  .card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:${G.goldDark}; transition:all .18s; }
+  .card:hover { border-color:${G.goldDark}; background:#201a45; transform:translateX(2px); }
   .card:hover::before { background:${G.gold}; }
-  .card.feat { border-color:${G.borderGold}; background:linear-gradient(135deg,#1a1a0a,${G.feltLight}); }
+  .card.feat { border-color:${G.borderGold}; background:linear-gradient(135deg,#2a2148,${G.bgPanel}); }
   .card.feat::before { background:${G.gold}; }
   .card.danger::before { background:${G.red}; }
   .card.danger:hover { border-color:rgba(192,57,43,.4); }
@@ -691,43 +737,43 @@ const css = `
   .card.static:hover { transform:none; border-color:${G.border}; }
 
   .ci { font-size:24px; margin-right:12px; flex-shrink:0; }
-  .ct { font-family:'Playfair Display',serif; font-size:15px; font-weight:600; margin-bottom:1px; }
-  .cs { font-size:11px; color:${G.textMuted}; }
-  .chev { color:${G.textMuted}; flex-shrink:0; margin-left:10px; transition:transform .18s; }
+  .ct { font-family:'Cinzel',serif; font-size:14px; font-weight:600; letter-spacing:.08em; margin-bottom:2px; }
+  .cs { font-size:12.5px; color:${G.textSecondary}; }
+  .chev { color:${G.textSecondary}; flex-shrink:0; margin-left:10px; transition:transform .18s; }
   .card:hover .chev { transform:translateX(3px); color:${G.gold}; }
 
   .cfg { padding:18px 16px; max-width:480px; margin:0 auto; }
-  .cfgc { background:${G.feltLight}; border:1px solid ${G.border}; border-radius:12px; padding:18px; margin-bottom:10px; }
-  .cfgt { font-family:'Playfair Display',serif; font-size:12px; color:${G.gold}; letter-spacing:.06em; margin-bottom:12px; text-transform:uppercase; }
+  .cfgc { background:${G.bgPanel}; border:1px solid ${G.border}; border-radius:12px; padding:18px; margin-bottom:10px; }
+  .cfgt { font-family:'Cinzel',serif; font-size:11px; color:${G.gold}; letter-spacing:.26em; margin-bottom:12px; text-transform:uppercase; }
 
   .dgrid { display:grid; grid-template-columns:repeat(5,1fr); gap:7px; }
-  .dbtn { background:rgba(255,255,255,.03); border:1px solid ${G.border}; border-radius:8px; padding:11px 4px; cursor:pointer; text-align:center; transition:all .14s; color:${G.textMuted}; font-size:13px; }
-  .dbtn:hover { border-color:${G.goldDim}; color:${G.gold}; }
-  .dbtn.a { background:rgba(201,168,76,.12); border-color:${G.gold}; color:${G.gold}; }
+  .dbtn { background:rgba(255,255,255,.03); border:1px solid ${G.border}; border-radius:8px; padding:11px 4px; cursor:pointer; text-align:center; transition:all .14s; color:${G.textSecondary}; font-size:13px; }
+  .dbtn:hover { border-color:${G.goldDark}; color:${G.gold}; }
+  .dbtn.a { background:rgba(201,162,75,.12); border-color:${G.gold}; color:${G.gold}; }
   .dnum { font-size:19px; font-weight:700; display:block; }
   .dlbl { font-size:10px; margin-top:1px; display:block; }
 
   .pgrid { display:grid; grid-template-columns:repeat(5,1fr); gap:6px; }
-  .pbtn { background:rgba(255,255,255,.03); border:1px solid ${G.border}; border-radius:6px; padding:9px 4px; cursor:pointer; text-align:center; transition:all .14s; color:${G.textMuted}; font-size:12px; }
-  .pbtn:hover { border-color:${G.goldDim}; color:${G.gold}; }
-  .pbtn.a { background:rgba(201,168,76,.12); border-color:${G.gold}; color:${G.gold}; }
+  .pbtn { background:rgba(255,255,255,.03); border:1px solid ${G.border}; border-radius:6px; padding:9px 4px; cursor:pointer; text-align:center; transition:all .14s; color:${G.textSecondary}; font-size:12px; }
+  .pbtn:hover { border-color:${G.goldDark}; color:${G.gold}; }
+  .pbtn.a { background:rgba(201,162,75,.12); border-color:${G.gold}; color:${G.gold}; }
 
   /* Time picker */
   .tpre { display:flex; gap:7px; flex-wrap:wrap; }
-  .tpb { background:rgba(255,255,255,.03); border:1px solid ${G.border}; border-radius:8px; padding:9px 10px; cursor:pointer; text-align:center; transition:all .14s; color:${G.textMuted}; font-size:12px; font-weight:500; flex:1; min-width:52px; }
-  .tpb:hover { border-color:${G.goldDim}; color:${G.gold}; }
-  .tpb.a { background:rgba(201,168,76,.12); border-color:${G.gold}; color:${G.gold}; font-weight:600; }
+  .tpb { background:rgba(255,255,255,.03); border:1px solid ${G.border}; border-radius:8px; padding:9px 10px; cursor:pointer; text-align:center; transition:all .14s; color:${G.textSecondary}; font-size:12px; font-weight:500; flex:1; min-width:52px; }
+  .tpb:hover { border-color:${G.goldDark}; color:${G.gold}; }
+  .tpb.a { background:rgba(201,162,75,.12); border-color:${G.gold}; color:${G.gold}; font-weight:600; }
   .tcust { display:flex; align-items:center; gap:8px; margin-top:9px; background:rgba(0,0,0,.2); border:1px solid ${G.border}; border-radius:8px; padding:7px 12px; }
   .tstep { display:flex; align-items:center; gap:10px; flex:1; }
-  .tsb { background:rgba(201,168,76,.1); border:1px solid ${G.borderGold}; border-radius:6px; width:32px; height:32px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:${G.gold}; font-size:17px; font-weight:600; transition:all .14s; flex-shrink:0; user-select:none; }
-  .tsb:hover { background:rgba(201,168,76,.2); }
+  .tsb { background:rgba(201,162,75,.1); border:1px solid ${G.borderGold}; border-radius:6px; width:32px; height:32px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:${G.gold}; font-size:17px; font-weight:600; transition:all .14s; flex-shrink:0; user-select:none; }
+  .tsb:hover { background:rgba(201,162,75,.2); }
   .tsb:active { transform:scale(.94); }
-  .tdsp { font-family:'Playfair Display',serif; font-size:26px; font-weight:700; color:${G.goldLight}; text-align:center; flex:1; }
-  .tpc { font-size:11px; color:${G.textMuted}; margin-top:5px; text-align:center; }
+  .tdsp { font-family:'Cinzel',serif; font-size:26px; font-weight:700; color:${G.goldLight}; text-align:center; flex:1; }
+  .tpc { font-size:11px; color:${G.textSecondary}; margin-top:5px; text-align:center; }
 
   /* Launch */
-  .lbtn { width:100%; padding:16px; background:linear-gradient(135deg,#3a2e10,${G.gold},#3a2e10); background-size:200% 100%; border:1px solid ${G.gold}; border-radius:12px; color:#0a0d0a; font-family:'Playfair Display',serif; font-size:16px; font-weight:700; letter-spacing:.08em; cursor:pointer; transition:all .3s; text-transform:uppercase; margin-top:6px; }
-  .lbtn:hover { background-position:right center; box-shadow:0 0 30px rgba(201,168,76,.22); transform:translateY(-1px); }
+  .lbtn { width:100%; padding:16px; background:linear-gradient(135deg,#8a6820,${G.gold},#8a6820); background-size:200% 100%; border:1px solid ${G.gold}; border-radius:12px; color:#0d0a1a; font-family:'Cinzel',serif; font-size:15px; font-weight:700; letter-spacing:.14em; cursor:pointer; transition:all .3s; text-transform:uppercase; margin-top:6px; }
+  .lbtn:hover { background-position:right center; box-shadow:0 0 30px rgba(201,162,75,.22); transform:translateY(-1px); }
   .lbtn:active { transform:translateY(0); }
   .lbtn:disabled { opacity:.4; cursor:not-allowed; transform:none; }
   .lbtn.red { background:linear-gradient(135deg,#5a0a0a,${G.red},#5a0a0a); border-color:${G.red}; color:#fff; }
@@ -737,29 +783,29 @@ const css = `
   .mmrfill { height:100%; border-radius:3px; transition:width .5s ease; }
 
   /* Rank badge */
-  .rbadge { display:flex; align-items:center; gap:10px; background:rgba(201,168,76,.05); border:1px solid ${G.borderGold}; border-radius:10px; padding:12px 15px; margin-bottom:14px; }
+  .rbadge { display:flex; align-items:center; gap:10px; background:rgba(201,162,75,.05); border:1px solid ${G.borderGold}; border-radius:10px; padding:12px 15px; margin-bottom:14px; }
 
   /* Placement */
   .pdot { width:12px; height:12px; border-radius:50%; border:2px solid ${G.border}; flex-shrink:0; transition:all .3s; }
   .pdot.win { background:${G.green}; border-color:${G.green}; }
   .pdot.loss { background:${G.red}; border-color:${G.red}; }
-  .pdot.pend { background:transparent; border-color:${G.goldDim}; }
+  .pdot.pend { background:transparent; border-color:${G.goldDark}; }
 
   /* Game */
-  .gm { min-height:100vh; display:flex; flex-direction:column; background:radial-gradient(ellipse at top,#142014,${G.bg} 70%); }
+  .gm { min-height:100vh; display:flex; flex-direction:column; background:radial-gradient(ellipse at top,#1a1535,${G.bgDeep} 70%); }
   .ghud { display:flex; align-items:center; justify-content:space-between; padding:13px 18px; background:rgba(0,0,0,.35); border-bottom:1px solid ${G.border}; }
-  .gtimer { font-family:'Playfair Display',serif; font-size:26px; font-weight:700; color:${G.goldLight}; min-width:68px; text-align:center; }
-  .gctr { font-size:11px; color:${G.textMuted}; text-align:center; letter-spacing:.05em; }
-  .gctr strong { color:${G.text}; font-size:14px; display:block; font-weight:600; }
-  .ghbtn { background:rgba(255,255,255,.06); border:1px solid ${G.border}; border-radius:8px; width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:${G.textMuted}; transition:all .14s; }
-  .ghbtn:hover { border-color:${G.goldDim}; color:${G.gold}; }
+  .gtimer { font-family:'Cinzel',serif; font-size:26px; font-weight:700; color:${G.goldLight}; min-width:68px; text-align:center; }
+  .gctr { font-size:11px; color:${G.textSecondary}; text-align:center; letter-spacing:.05em; }
+  .gctr strong { color:${G.textPrimary}; font-size:14px; display:block; font-weight:600; }
+  .ghbtn { background:rgba(255,255,255,.06); border:1px solid ${G.border}; border-radius:8px; width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:${G.textSecondary}; transition:all .14s; }
+  .ghbtn:hover { border-color:${G.goldDark}; color:${G.gold}; }
   .gstage { flex:1; display:flex; align-items:center; justify-content:center; padding:16px; position:relative; }
-  .gcrev { position:absolute; bottom:18px; left:50%; transform:translateX(-50%); background:rgba(201,168,76,.12); border:1px solid ${G.borderGold}; border-radius:8px; padding:5px 14px; font-size:13px; color:${G.gold}; white-space:nowrap; }
+  .gcrev { position:absolute; bottom:18px; left:50%; transform:translateX(-50%); background:rgba(201,162,75,.12); border:1px solid ${G.borderGold}; border-radius:8px; padding:5px 14px; font-size:13px; color:${G.gold}; white-space:nowrap; }
   .gpaused { position:absolute; inset:0; background:rgba(0,0,0,.65); backdrop-filter:blur(8px); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; }
 
   /* Countdown */
   .cdwn { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; }
-  .cdnum { font-family:'Playfair Display',serif; font-size:88px; font-weight:700; line-height:1;
+  .cdnum { font-family:'Cinzel',serif; font-size:88px; font-weight:700; line-height:1;
     background:linear-gradient(135deg,${G.goldLight},${G.gold}); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
     animation:cpulse 1s ease-in-out; }
   @keyframes cpulse { from{opacity:0;transform:scale(1.4)} to{opacity:1;transform:scale(1)} }
@@ -769,22 +815,22 @@ const css = `
   .canim { animation:cfin .08s ease; }
 
   /* Answer */
-  .ans { width:100%; background:rgba(255,255,255,.04); border:1px solid ${G.border}; border-radius:10px; padding:14px 18px; font-family:'Playfair Display',serif; font-size:30px; font-weight:700; color:${G.text}; text-align:center; outline:none; transition:border-color .2s; -moz-appearance:textfield; }
+  .ans { width:100%; background:rgba(255,255,255,.04); border:1px solid ${G.border}; border-radius:10px; padding:14px 18px; font-family:'Cinzel',serif; font-size:30px; font-weight:700; color:${G.textPrimary}; text-align:center; outline:none; transition:border-color .2s; -moz-appearance:textfield; }
   .ans::-webkit-outer-spin-button,.ans::-webkit-inner-spin-button{-webkit-appearance:none;}
   .ans:focus { border-color:${G.gold}; }
 
   /* Result */
-  .rc { color:${G.green}; font-family:'Playfair Display',serif; font-size:60px; font-weight:700; line-height:1; }
-  .rw { color:${G.red}; font-family:'Playfair Display',serif; font-size:60px; font-weight:700; line-height:1; }
+  .rc { color:${G.green}; font-family:'Cinzel',serif; font-size:60px; font-weight:700; line-height:1; }
+  .rw { color:${G.red}; font-family:'Cinzel',serif; font-size:60px; font-weight:700; line-height:1; }
 
   /* Modal */
   .moverlay { position:fixed; inset:0; background:rgba(0,0,0,.72); backdrop-filter:blur(4px); z-index:100; display:flex; align-items:flex-end; justify-content:center; }
-  .mdl { background:linear-gradient(180deg,#1a261a,${G.bg}); border:1px solid ${G.border}; border-top:1px solid ${G.borderGold}; border-radius:20px 20px 0 0; padding:22px 18px 34px; width:100%; max-width:480px; max-height:82vh; overflow-y:auto; }
+  .mdl { background:linear-gradient(180deg,#1a1535,${G.bgDeep}); border:1px solid ${G.border}; border-top:1px solid ${G.borderGold}; border-radius:20px 20px 0 0; padding:22px 18px 34px; width:100%; max-width:480px; max-height:82vh; overflow-y:auto; }
   .mhndl { width:38px; height:4px; background:${G.border}; border-radius:2px; margin:0 auto 18px; }
-  .mtitle { font-family:'Playfair Display',serif; font-size:19px; font-weight:700; margin-bottom:3px; }
+  .mtitle { font-family:'Cinzel',serif; font-size:19px; font-weight:700; margin-bottom:3px; }
 
   /* Achievement toast */
-  .acht { position:fixed; top:78px; left:50%; transform:translateX(-50%); background:linear-gradient(135deg,#1a1a0a,#2a2010); border:1px solid ${G.gold}; border-radius:12px; padding:13px 18px; z-index:200; min-width:270px; box-shadow:0 8px 32px rgba(201,168,76,.2); }
+  .acht { position:fixed; top:78px; left:50%; transform:translateX(-50%); background:linear-gradient(135deg,#2a2148,#332a52); border:1px solid ${G.gold}; border-radius:12px; padding:13px 18px; z-index:200; min-width:270px; box-shadow:0 8px 32px rgba(201,162,75,.2); }
   .acht.entering { animation:ains .3s ease forwards; }
   .acht.leaving  { animation:aout .4s ease forwards; }
   @keyframes ains { from{opacity:0;transform:translateX(-50%) translateY(-10px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
@@ -792,9 +838,9 @@ const css = `
 
   /* Abandon confirm */
   .abdlg { position:fixed; inset:0; background:rgba(0,0,0,.8); backdrop-filter:blur(6px); z-index:150; display:flex; align-items:center; justify-content:center; padding:20px; }
-  .abdbox { background:linear-gradient(180deg,#1a0a0a,#0a0d0a); border:1px solid rgba(192,57,43,.4); border-radius:16px; padding:28px 24px; width:100%; max-width:340px; text-align:center; }
+  .abdbox { background:linear-gradient(180deg,#251020,#0d0a1a); border:1px solid rgba(192,57,43,.4); border-radius:16px; padding:28px 24px; width:100%; max-width:340px; text-align:center; }
 
-  .back { display:flex; align-items:center; gap:5px; background:none; border:none; color:${G.textMuted}; font-size:13px; cursor:pointer; padding:4px 0; transition:color .14s; letter-spacing:.04em; }
+  .back { display:flex; align-items:center; gap:5px; background:none; border:none; color:${G.textSecondary}; font-size:13px; cursor:pointer; padding:4px 0; transition:color .14s; letter-spacing:.04em; }
   .back:hover { color:${G.gold}; }
 
   ::-webkit-scrollbar{width:4px}
@@ -835,10 +881,10 @@ const KpKey = ({ children, onClick, alt = false }) => {
       style={{
         padding: '15px 0', fontSize: 21, fontWeight: 700, cursor: 'pointer',
         borderRadius: 11, transition: 'all .12s',
-        fontFamily: "'Playfair Display', serif",
-        background: alt ? (h ? 'rgba(255,255,255,.09)' : 'rgba(255,255,255,.04)') : (h ? 'rgba(201,168,76,.2)' : 'rgba(201,168,76,.08)'),
+        fontFamily: "'Cinzel', serif",
+        background: alt ? (h ? 'rgba(255,255,255,.09)' : 'rgba(255,255,255,.04)') : (h ? 'rgba(201,162,75,.2)' : 'rgba(201,162,75,.08)'),
         border: `1px solid ${alt ? G.border : (h ? G.gold : G.borderGold)}`,
-        color: alt ? G.textMuted : G.goldLight,
+        color: alt ? G.textSecondary : G.goldLight,
       }}
     >
       {children}
@@ -888,11 +934,11 @@ const TimePicker = ({ value, onChange, totalCards, t, snd = (fn) => fn() }) => {
       <div className="tcust">
         <button className="tsb" onClick={() => { snd(playClick); onChange(Math.max(5, value - 1)); }}>−</button>
         <div style={{ flex: 1, textAlign: 'center', cursor: 'pointer' }} onClick={openKp}>
-          <div className="tdsp">{value}<span style={{ fontSize: 13, color: G.goldDim, marginLeft: 2 }}>s</span></div>
+          <div className="tdsp">{value}<span style={{ fontSize: 13, color: G.goldDark, marginLeft: 2 }}>s</span></div>
         </div>
         <button className="tsb" onClick={() => { snd(playClick); onChange(Math.min(600, value + 1)); }}>+</button>
       </div>
-      <div style={{ fontSize: 10, color: G.textMuted, textAlign: 'center', marginTop: 5 }}>{t('timePicker.hint')}</div>
+      <div style={{ fontSize: 10, color: G.textSecondary, textAlign: 'center', marginTop: 5 }}>{t('timePicker.hint')}</div>
 
       {totalCards > 0 && (
         <div className="tpc">{t('timePicker.spcCards', { spc: currentSpc.toFixed(2), cards: totalCards })}</div>
@@ -906,12 +952,12 @@ const TimePicker = ({ value, onChange, totalCards, t, snd = (fn) => fn() }) => {
         >
           <div
             onClick={e => e.stopPropagation()}
-            style={{ background: 'linear-gradient(180deg,#1a261a,#0a0d0a)', border: `1px solid ${G.border}`, borderTop: `1px solid ${G.borderGold}`, borderRadius: 18, padding: '20px 18px 22px', width: '100%', maxWidth: 300 }}
+            style={{ background: 'linear-gradient(180deg,#1a1535,#0d0a1a)', border: `1px solid ${G.border}`, borderTop: `1px solid ${G.borderGold}`, borderRadius: 18, padding: '20px 18px 22px', width: '100%', maxWidth: 300 }}
           >
-            <div style={{ fontSize: 11, color: G.textMuted, letterSpacing: '.12em', textTransform: 'uppercase', textAlign: 'center', marginBottom: 12 }}>{t('timePicker.keypadTitle')}</div>
+            <div style={{ fontSize: 11, color: G.textSecondary, letterSpacing: '.12em', textTransform: 'uppercase', textAlign: 'center', marginBottom: 12 }}>{t('timePicker.keypadTitle')}</div>
             <div style={{ background: 'rgba(0,0,0,.35)', border: `1px solid ${G.borderGold}`, borderRadius: 10, padding: '12px', textAlign: 'center', marginBottom: 14 }}>
-              <span style={{ fontFamily: "'Playfair Display', serif", fontSize: 34, fontWeight: 700, color: G.goldLight }}>{kpVal || '0'}</span>
-              <span style={{ fontSize: 15, color: G.goldDim, marginLeft: 3 }}>s</span>
+              <span style={{ fontFamily: "'Cinzel', serif", fontSize: 34, fontWeight: 700, color: G.goldLight }}>{kpVal || '0'}</span>
+              <span style={{ fontSize: 15, color: G.goldDark, marginLeft: 3 }}>s</span>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
               {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(d => (
@@ -923,7 +969,7 @@ const TimePicker = ({ value, onChange, totalCards, t, snd = (fn) => fn() }) => {
             </div>
             <button
               onClick={kpConfirm}
-              style={{ width: '100%', marginTop: 12, padding: '13px', background: G.gold, border: 'none', borderRadius: 11, color: '#0a0d0a', fontWeight: 700, fontSize: 14, cursor: 'pointer', letterSpacing: '.03em' }}
+              style={{ width: '100%', marginTop: 12, padding: '13px', background: G.gold, border: 'none', borderRadius: 11, color: '#0d0a1a', fontWeight: 700, fontSize: 14, cursor: 'pointer', letterSpacing: '.03em' }}
             >
               {t('timePicker.keypadValidate')}
             </button>
@@ -1016,9 +1062,9 @@ const SupportPreviewModal = ({ skin, owned, active, onClose, onBuy, onEquip, t }
   const c = PREVIEW_CARDS[idx];
   return (
     <div className="moverlay" style={{ alignItems: 'center', zIndex: 160 }} onClick={onClose}>
-      <div onClick={e => e.stopPropagation()} style={{ background: 'linear-gradient(180deg,#1a261a,#0a0d0a)', border: `1px solid ${G.border}`, borderRadius: 18, padding: '22px 22px 24px', width: '100%', maxWidth: 320, textAlign: 'center' }}>
-        <div style={{ fontFamily: 'Playfair Display, serif', fontSize: 18, fontWeight: 700, color: skin.accent }}>{skin.name}</div>
-        <div style={{ fontSize: 12, color: G.textMuted, marginBottom: 18 }}>{t('shop.tagline.' + skin.id)}</div>
+      <div onClick={e => e.stopPropagation()} style={{ background: 'linear-gradient(180deg,#1a1535,#0d0a1a)', border: `1px solid ${G.border}`, borderRadius: 18, padding: '22px 22px 24px', width: '100%', maxWidth: 320, textAlign: 'center' }}>
+        <div style={{ fontFamily: 'Cinzel, serif', fontSize: 18, fontWeight: 700, color: skin.accent }}>{skin.name}</div>
+        <div style={{ fontSize: 12, color: G.textSecondary, marginBottom: 18 }}>{t('shop.tagline.' + skin.id)}</div>
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 320, marginBottom: 8 }}>
           <SupportCard key={idx} rank={c.rank} suitName={c.suitName} skin={skin} flash />
         </div>
@@ -1028,12 +1074,12 @@ const SupportPreviewModal = ({ skin, owned, active, onClose, onBuy, onEquip, t }
           ))}
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
-          <button onClick={onClose} style={{ flex: 1, padding: '11px', background: 'rgba(255,255,255,.05)', border: `1px solid ${G.border}`, borderRadius: 9, color: G.text, cursor: 'pointer', fontSize: 13 }}>{t('common.close')}</button>
+          <button onClick={onClose} style={{ flex: 1, padding: '11px', background: 'rgba(255,255,255,.05)', border: `1px solid ${G.border}`, borderRadius: 9, color: G.textPrimary, cursor: 'pointer', fontSize: 13 }}>{t('common.close')}</button>
           {active
-            ? <span style={{ flex: 1, padding: '11px', background: skin.accent, borderRadius: 9, color: '#0a0d0a', fontWeight: 700, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{t('common.equipped')}</span>
+            ? <span style={{ flex: 1, padding: '11px', background: skin.accent, borderRadius: 9, color: '#0d0a1a', fontWeight: 700, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{t('common.equipped')}</span>
             : owned
-              ? <button onClick={() => { onEquip(); onClose(); }} style={{ flex: 1, padding: '11px', background: G.green, border: 'none', borderRadius: 9, color: '#0a0d0a', fontWeight: 700, cursor: 'pointer', fontSize: 13 }}>{t('common.equip')}</button>
-              : <button onClick={() => { onBuy(); onClose(); }} style={{ flex: 1, padding: '11px', background: 'linear-gradient(135deg,#3a2e10,#e6c84c,#3a2e10)', border: '1px solid #e6c84c', borderRadius: 9, color: '#0a0d0a', fontWeight: 700, cursor: 'pointer', fontSize: 13 }}>{t('shop.forge')}</button>}
+              ? <button onClick={() => { onEquip(); onClose(); }} style={{ flex: 1, padding: '11px', background: G.green, border: 'none', borderRadius: 9, color: '#0d0a1a', fontWeight: 700, cursor: 'pointer', fontSize: 13 }}>{t('common.equip')}</button>
+              : <button onClick={() => { onBuy(); onClose(); }} style={{ flex: 1, padding: '11px', background: 'linear-gradient(135deg,#8a6820,#e8c97a,#8a6820)', border: '1px solid #e8c97a', borderRadius: 9, color: '#0d0a1a', fontWeight: 700, cursor: 'pointer', fontSize: 13 }}>{t('shop.forge')}</button>}
         </div>
       </div>
     </div>
@@ -1384,13 +1430,13 @@ export default function EliteCounter() {
   const curSubRank = save?.subRank || 1;
   // Config effective du sous-rang courant (decks/pen/spc/timeLimit)
   const curRankCfg = getRankConfig(save?.rankId || 1, curSubRank);
-  // "Bronze I", "Master III", … — nom de rang + chiffre romain du sous-rang
+  // "Cuivre I", "Adamantium III", … — nom de rang + chiffre romain du sous-rang
   const rankLabel = (rankId = save?.rankId || 1, subRank = curSubRank) =>
     `${RANKS_DEF[rankId - 1]?.name || ''} ${subRankRoman(subRank)}`;
   // Palier final absolu = Master III (plus de progression possible)
   const isMaxTier = (save?.rankId === 6) && (curSubRank === SUB_RANKS);
 
-  // Placement slot display label — gate labels ("Bronze → Silver") are
+  // Placement slot display label — gate labels ("Cuivre → Argent") are
   // language-neutral; recovery slots get a localized "(recovery)" suffix.
   const slotLabel = (slot) =>
     !slot ? '' : slot.type === 'recovery'
@@ -1741,7 +1787,7 @@ export default function EliteCounter() {
       patchSave({ mmr: Math.max(0, save.mmr - 25) });
       setMmrDelta(-25);
     } else if (save.mmr === 0) {
-      // Défaite à 0 → relégation (sauf si déjà Bronze I, plancher absolu).
+      // Défaite à 0 → relégation (sauf si déjà Cuivre I, plancher absolu).
       if (tier <= 0) {
         patchSave({ mmr: 0 });
         setMmrDelta(0);
@@ -1981,7 +2027,7 @@ export default function EliteCounter() {
     }
   };
 
-  if (!save) return <div className="r"><style>{css}</style><div style={{ padding: 40, textAlign: 'center', color: G.textMuted }}>{t('common.loading')}</div></div>;
+  if (!save) return <div className="r"><style>{css}</style><div style={{ padding: 40, textAlign: 'center', color: G.textSecondary }}>{t('common.loading')}</div></div>;
 
   // ── First launch: pick a language BEFORE the tutorial ──────────
   if (!save.lang) {
@@ -2017,10 +2063,10 @@ export default function EliteCounter() {
   const renderHeader = (minimal = false, showTutoBtn = false) => (
     <div className="hd">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div className="logo">ELITE COUNTER</div>
+        <div className="logo">BLACKJACK ACADEMY I</div>
         {!minimal && (
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <div className="pill" style={{ cursor: 'pointer' }} onClick={() => { snd(playClick); setShowRankLadder(true); }}>{displayRank.icon} {displayRank.name}</div>
+            <div className="pill" style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }} onClick={() => { snd(playClick); setShowRankLadder(true); }}><RankSigil color={displayRank.color} size={13} /> {displayRank.name}</div>
             <div className="pill" style={{ display: 'flex', alignItems: 'center', gap: 5 }}><Coin size={13} /> {save.coins}</div>
           </div>
         )}
@@ -2040,11 +2086,11 @@ export default function EliteCounter() {
         {nav === 'lobby' && (
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
             <button onClick={() => { snd(playClick); setShowTutorialReplay(true); }} title={t('header.tuto')}
-              style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,.06)', border: `1px solid ${G.border}`, borderRadius: 6, padding: '4px 10px', cursor: 'pointer', color: G.textMuted, fontSize: 11, fontWeight: 600, letterSpacing: '.04em' }}>
+              style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,.06)', border: `1px solid ${G.border}`, borderRadius: 6, padding: '4px 10px', cursor: 'pointer', color: G.textSecondary, fontSize: 11, fontWeight: 600, letterSpacing: '.04em' }}>
               {t('header.tuto')}
             </button>
             <button onClick={() => { snd(playClick); setShowLangModal(true); }} title={t('header.language')}
-              style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,.06)', border: `1px solid ${G.border}`, borderRadius: 6, padding: '4px 9px', cursor: 'pointer', color: G.textMuted }}>
+              style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,.06)', border: `1px solid ${G.border}`, borderRadius: 6, padding: '4px 9px', cursor: 'pointer', color: G.textSecondary }}>
               <Globe size={12} />
               <Flag code={lang} size={18} />
             </button>
@@ -2055,7 +2101,7 @@ export default function EliteCounter() {
   };
 
   // ── MMR bar color ──────────────────────────────────────────────
-  const mmrColor = save.mmr >= 80 ? G.gold : save.mmr >= 50 ? G.green : '#5b8dee';
+  const mmrColor = save.mmr >= 80 ? G.gold : save.mmr >= 50 ? G.green : '#2dd4bf';
 
   // ──────────────────────────────────────────────────────────────
   // LOBBY
@@ -2074,18 +2120,18 @@ export default function EliteCounter() {
           {/* Rank badge + MMR */}
           {save.placementDone ? (
             <div className="rbadge" style={{ cursor: 'pointer' }} onClick={() => { snd(playClick); setShowRankLadder(true); }}>
-              <div style={{ fontSize: 34 }}>{rank.icon}</div>
+              <RankSigil color={rank.color} size={34} />
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 11, color: G.textMuted, letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 2 }}>
+                <div style={{ fontSize: 11, color: G.textSecondary, letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 2 }}>
                   {t('lobby.currentRank')}
                 </div>
-                <div style={{ fontFamily: 'Playfair Display, serif', fontSize: 17, fontWeight: 700 }}>{rankLabel()}</div>
+                <div style={{ fontFamily: 'Cinzel, serif', fontSize: 17, fontWeight: 700 }}>{rankLabel()}</div>
                 {!isMaster && (
                   <>
                     <div className="mmrtrack">
-                      <div className="mmrfill" style={{ width: `${save.mmr}%`, background: `linear-gradient(90deg,${G.goldDim},${mmrColor})` }} />
+                      <div className="mmrfill" style={{ width: `${save.mmr}%`, background: `linear-gradient(90deg,${G.goldDark},${mmrColor})` }} />
                     </div>
-                    <div style={{ fontSize: 11, color: G.textMuted, marginTop: 3 }}>
+                    <div style={{ fontSize: 11, color: G.textSecondary, marginTop: 3 }}>
                       {t('lobby.mmr', { mmr: save.mmr })}
                     </div>
                   </>
@@ -2099,15 +2145,15 @@ export default function EliteCounter() {
             const nextSlot = nextPlacementSlot(history);
             const gamesLeft = PLACEMENT_TOTAL - save.placementGames;
             return (
-              <div className="rbadge" style={{ borderColor: 'rgba(91,141,238,.3)', background: 'rgba(91,141,238,.05)', cursor: 'pointer' }}
+              <div className="rbadge" style={{ borderColor: 'rgba(45,212,191,.3)', background: 'rgba(45,212,191,.05)', cursor: 'pointer' }}
                 onClick={() => { snd(playClick); setShowPlacementHistory(true); }}>
-                <div style={{ fontSize: 28 }}>🎲</div>
+                <KeyRound size={26} color="#2dd4bf" style={{ flexShrink: 0 }} />
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 11, color: '#5b8dee', letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 2 }}>{t('lobby.placementTitle')}</div>
-                  <div style={{ fontFamily: 'Playfair Display, serif', fontSize: 15, fontWeight: 700 }}>
+                  <div style={{ fontSize: 11, color: '#2dd4bf', letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 2 }}>{t('lobby.placementTitle')}</div>
+                  <div style={{ fontFamily: 'Cinzel, serif', fontSize: 15, fontWeight: 700 }}>
                     {nextSlot ? slotLabel(nextSlot) : t('lobby.placementDoneLabel')}
                   </div>
-                  <div style={{ fontSize: 11, color: G.textMuted, marginTop: 2 }}>
+                  <div style={{ fontSize: 11, color: G.textSecondary, marginTop: 2 }}>
                     {t('lobby.placementProgress', { played: save.placementGames, total: PLACEMENT_TOTAL, left: gamesLeft })}
                   </div>
                 </div>
@@ -2117,7 +2163,7 @@ export default function EliteCounter() {
                     const color = !h ? 'rgba(255,255,255,.06)' : h.won ? G.green : G.red;
                     const isCur = i === save.placementGames;
                     return (
-                      <div key={i} style={{ width: 10, height: 10, borderRadius: '50%', background: color, border: isCur ? `2px solid #5b8dee` : 'none', flexShrink: 0 }} />
+                      <div key={i} style={{ width: 10, height: 10, borderRadius: '50%', background: color, border: isCur ? `2px solid #2dd4bf` : 'none', flexShrink: 0 }} />
                     );
                   })}
                 </div>
@@ -2139,12 +2185,12 @@ export default function EliteCounter() {
                 style={dDone
                   ? { borderColor: G.border, background: 'rgba(255,255,255,.02)' }
                   : isSpecial
-                    ? { borderColor: G.gold, background: 'rgba(201,168,76,.12)', boxShadow: '0 0 22px rgba(201,168,76,.28)' }
-                    : { borderColor: G.borderGold, background: 'rgba(201,168,76,.07)', boxShadow: '0 0 18px rgba(201,168,76,.15)' }}>
+                    ? { borderColor: G.gold, background: 'rgba(201,162,75,.12)', boxShadow: '0 0 22px rgba(201,162,75,.28)' }
+                    : { borderColor: G.borderGold, background: 'rgba(201,162,75,.07)', boxShadow: '0 0 18px rgba(201,162,75,.15)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
-                  <div className="ci">{isSpecial ? '⭐' : '🗓️'}</div>
+                  <div className="ci" style={{ display: 'flex' }}>{isSpecial ? <Sparkles size={22} color={G.goldLight} /> : <CalendarDays size={22} color={dDone ? G.textMuted : G.gold} />}</div>
                   <div>
-                    <div className="ct" style={{ color: dDone ? G.text : G.goldLight }}>
+                    <div className="ct" style={{ color: dDone ? G.textPrimary : G.goldLight }}>
                       {isSpecial ? t('lobby.dailySpecialTitle') : t('lobby.dailyTitle')}
                     </div>
                     <div className="cs">
@@ -2155,8 +2201,8 @@ export default function EliteCounter() {
                   </div>
                 </div>
                 {dStreak > 0 && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginRight: 6, fontSize: 13, fontWeight: 700, color: G.gold }}>
-                    🔥 {dStreak}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginRight: 6, fontSize: 13, fontWeight: 700, color: G.gold }}>
+                    <Flame size={13} /> {dStreak}
                   </div>
                 )}
                 {!dDone && <ChevronRight className="chev" size={17} />}
@@ -2166,7 +2212,7 @@ export default function EliteCounter() {
 
           <div className="card feat" onClick={() => { snd(playClick); setNav('mode-training'); }}>
             <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
-              <div className="ci">🎯</div>
+              <div className="ci" style={{ display: 'flex' }}><BookOpen size={22} color={G.gold} /></div>
               <div>
                 <div className="ct">{t('modeName.training')}</div>
                 <div className="cs">{t('lobby.trainingSub')}</div>
@@ -2178,7 +2224,7 @@ export default function EliteCounter() {
           <div className="card" onClick={save.trainingDone ? () => { snd(playClick); setNav('mode-ranked'); } : undefined}
             style={!save.trainingDone ? { opacity: 0.45, cursor: 'not-allowed' } : {}}>
             <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
-              <div className="ci">🏆</div>
+              <div className="ci" style={{ display: 'flex' }}><DoorOpen size={22} color={save.trainingDone ? G.gold : G.textMuted} /></div>
               <div>
                 <div className="ct">{save.placementDone ? t('modeName.ranked') : t('lobby.rankedPlacement')}</div>
                 <div className="cs">
@@ -2196,7 +2242,7 @@ export default function EliteCounter() {
           <div className="card danger" onClick={save.rankedDone ? () => { snd(playClick); setNav('mode-casino'); } : undefined}
             style={!save.rankedDone ? { opacity: 0.45, cursor: 'not-allowed' } : {}}>
             <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
-              <div className="ci">🔥</div>
+              <div className="ci" style={{ display: 'flex' }}><Flame size={22} color={save.rankedDone ? G.amber : G.textMuted} /></div>
               <div>
                 <div className="ct">{t('modeName.casino')}</div>
                 <div className="cs">{save.rankedDone ? t('lobby.casinoSub') : t('lobby.casinoLocked')}</div>
@@ -2209,16 +2255,16 @@ export default function EliteCounter() {
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 8 }}>
             {[
-              { icon: '🏅', label: t('lobby.achievements'), sub: t('lobby.achievementsSub', { unlocked: (save.unlockedAchievements||[]).length, total: CHALLENGES.length + 1 }), action: () => setShowChallenges(true) },
-              { icon: '🎨', label: t('lobby.skins'), sub: t('lobby.skinsSub', { owned: save.unlockedSkins.length, total: CARD_SKINS.length + SUPPORT_SKINS.length }), action: () => setShowShop(true) },
-              { icon: '📊', label: t('lobby.stats'), sub: save.stats.total > 0 ? t('lobby.statsSub', { total: save.stats.total }) : t('lobby.statsNone'), action: () => setShowStats(true) },
-              { icon: '⚙️', label: t('lobby.settings'), sub: t('lobby.settingsSub'), action: () => setShowSettings(true) },
+              { icon: <Award size={17} color={G.gold} />, label: t('lobby.achievements'), sub: t('lobby.achievementsSub', { unlocked: (save.unlockedAchievements||[]).length, total: CHALLENGES.length + 1 }), action: () => setShowChallenges(true) },
+              { icon: <Gem size={17} color={G.gold} />, label: t('lobby.skins'), sub: t('lobby.skinsSub', { owned: save.unlockedSkins.length, total: CARD_SKINS.length + SUPPORT_SKINS.length }), action: () => setShowShop(true) },
+              { icon: <BarChart3 size={17} color={G.gold} />, label: t('lobby.stats'), sub: save.stats.total > 0 ? t('lobby.statsSub', { total: save.stats.total }) : t('lobby.statsNone'), action: () => setShowStats(true) },
+              { icon: <ScrollText size={17} color={G.gold} />, label: t('lobby.settings'), sub: t('lobby.settingsSub'), action: () => setShowSettings(true) },
             ].map(item => (
               <div key={item.label} className="card" style={{ marginBottom: 0, padding: '13px 14px' }} onClick={() => { snd(playClick); item.action(); }}>
                 <div>
-                  <div style={{ fontSize: 18, marginBottom: 4 }}>{item.icon}</div>
+                  <div style={{ marginBottom: 5, display: 'flex' }}>{item.icon}</div>
                   <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 2 }}>{item.label}</div>
-                  <div style={{ fontSize: 11, color: G.textMuted }}>{item.sub}</div>
+                  <div style={{ fontSize: 11, color: G.textSecondary }}>{item.sub}</div>
                 </div>
                 <ChevronRight className="chev" size={14} />
               </div>
@@ -2226,8 +2272,8 @@ export default function EliteCounter() {
           </div>
 
           {save.perfectStreak > 0 && (
-            <div style={{ background: 'rgba(201,168,76,.06)', border: `1px solid ${G.borderGold}`, borderRadius: 8, padding: '9px 14px', display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 18 }}>🔥</span>
+            <div style={{ background: 'rgba(201,162,75,.06)', border: `1px solid ${G.borderGold}`, borderRadius: 8, padding: '9px 14px', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Flame size={16} color={G.amber} />
               <span style={{ fontSize: 13, color: G.gold, fontWeight: 600 }}>{t('lobby.currentStreak', { streak: save.perfectStreak })}</span>
             </div>
           )}
@@ -2239,7 +2285,7 @@ export default function EliteCounter() {
             <div className="mdl" onClick={e => e.stopPropagation()}>
               <div className="mhndl" />
               <div className="mtitle">{t('achievementsModal.title')}</div>
-              <div style={{ color: G.textMuted, fontSize: 12, marginBottom: 14 }}>
+              <div style={{ color: G.textSecondary, fontSize: 12, marginBottom: 14 }}>
                 {t('achievementsModal.sub', { unlocked: (save.unlockedAchievements || []).length, total: CHALLENGES.length + 1 })}
               </div>
               {CHALLENGES.map(ch => {
@@ -2248,8 +2294,8 @@ export default function EliteCounter() {
                   <div key={ch.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 0', borderBottom: `1px solid ${G.border}`, opacity: done ? 1 : 0.55 }}>
                     <div style={{ fontSize: 22 }}>{ch.icon}</div>
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 1, color: done ? G.gold : G.text }}>{t('challenges.' + ch.id + '.name')}</div>
-                      <div style={{ fontSize: 11, color: G.textMuted }}>{t('challenges.' + ch.id + '.desc')}</div>
+                      <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 1, color: done ? G.gold : G.textPrimary }}>{t('challenges.' + ch.id + '.name')}</div>
+                      <div style={{ fontSize: 11, color: G.textSecondary }}>{t('challenges.' + ch.id + '.desc')}</div>
                     </div>
                     {done && <span style={{ color: G.green, fontSize: 16 }}>✓</span>}
                   </div>
@@ -2257,12 +2303,12 @@ export default function EliteCounter() {
               })}
               {/* Secret achievement */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 0', opacity: (save.unlockedAchievements || []).includes('perfect_placement') ? 1 : 0.4 }}>
-                <div style={{ fontSize: 22 }}>{(save.unlockedAchievements || []).includes('perfect_placement') ? '🌑' : '🔒'}</div>
+                <div style={{ fontSize: 22, display: 'flex', alignItems: 'center' }}>{(save.unlockedAchievements || []).includes('perfect_placement') ? '🌑' : <Lock size={18} color={G.textMuted} />}</div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 1, color: (save.unlockedAchievements || []).includes('perfect_placement') ? G.gold : G.text }}>
+                  <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 1, color: (save.unlockedAchievements || []).includes('perfect_placement') ? G.gold : G.textPrimary }}>
                     {(save.unlockedAchievements || []).includes('perfect_placement') ? t('achievementsModal.secretNameUnlocked') : t('achievementsModal.secretNameLocked')}
                   </div>
-                  <div style={{ fontSize: 11, color: G.textMuted }}>
+                  <div style={{ fontSize: 11, color: G.textSecondary }}>
                     {(save.unlockedAchievements || []).includes('perfect_placement') ? t('achievementsModal.secretDescUnlocked') : t('achievementsModal.secretDescLocked')}
                   </div>
                 </div>
@@ -2277,7 +2323,7 @@ export default function EliteCounter() {
             <div className="mdl" onClick={e => e.stopPropagation()}>
               <div className="mhndl" />
               <div className="mtitle">{t('placementModal.title')}</div>
-              <div style={{ color: G.textMuted, fontSize: 12, marginBottom: 16 }}>
+              <div style={{ color: G.textSecondary, fontSize: 12, marginBottom: 16 }}>
                 {t('placementModal.sub', { played: save.placementGames, total: PLACEMENT_TOTAL })}
               </div>
 
@@ -2291,7 +2337,7 @@ export default function EliteCounter() {
                     </div>
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: 13, fontWeight: 600, color: h.won ? G.green : G.red }}>{t('common.gameN', { n: i + 1 })} — {h.won ? t('common.win') : t('common.loss')}</div>
-                      <div style={{ fontSize: 11, color: G.textMuted }}>{h.type === 'recovery' ? t('placement.recoveryTag') : t('placement.gateTag')} {gate?.label}</div>
+                      <div style={{ fontSize: 11, color: G.textSecondary }}>{h.type === 'recovery' ? t('placement.recoveryTag') : t('placement.gateTag')} {gate?.label}</div>
                     </div>
                   </div>
                 );
@@ -2302,11 +2348,11 @@ export default function EliteCounter() {
                 const slot = nextPlacementSlot(save.placementHistory || []);
                 if (!slot) return null;
                 return (
-                  <div style={{ marginTop: 12, background: slot.type === 'recovery' ? 'rgba(232,160,58,.08)' : 'rgba(91,141,238,.08)', border: `1px solid ${slot.type === 'recovery' ? 'rgba(232,160,58,.2)' : 'rgba(91,141,238,.2)'}`, borderRadius: 8, padding: '12px 14px' }}>
-                    <div style={{ fontSize: 11, color: slot.type === 'recovery' ? '#e8a03a' : '#5b8dee', letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 6 }}>
+                  <div style={{ marginTop: 12, background: slot.type === 'recovery' ? 'rgba(212,129,58,.08)' : 'rgba(45,212,191,.08)', border: `1px solid ${slot.type === 'recovery' ? 'rgba(212,129,58,.2)' : 'rgba(45,212,191,.2)'}`, borderRadius: 8, padding: '12px 14px' }}>
+                    <div style={{ fontSize: 11, color: slot.type === 'recovery' ? '#d4813a' : '#2dd4bf', letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 6 }}>
                       {t('common.gameN', { n: save.placementGames + 1 })} — {slot.type === 'recovery' ? t('placement.recovery') : t('placement.gate')}
                     </div>
-                    <div style={{ fontFamily: 'Playfair Display, serif', fontSize: 15, fontWeight: 600, marginBottom: 4 }}>{slotLabel(slot)}</div>
+                    <div style={{ fontFamily: 'Cinzel, serif', fontSize: 15, fontWeight: 600, marginBottom: 4 }}>{slotLabel(slot)}</div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
                       {[
                         { label: t('placementModal.decks'), val: slot.decks },
@@ -2314,8 +2360,8 @@ export default function EliteCounter() {
                         { label: t('placementModal.limit'), val: `${slot.timeLimit}s` },
                       ].map(s => (
                         <div key={s.label} style={{ textAlign: 'center', background: 'rgba(0,0,0,.2)', borderRadius: 6, padding: '6px 4px' }}>
-                          <div style={{ fontSize: 14, fontWeight: 700, color: slot.type === 'recovery' ? '#e8a03a' : '#5b8dee' }}>{s.val}</div>
-                          <div style={{ fontSize: 10, color: G.textMuted }}>{s.label}</div>
+                          <div style={{ fontSize: 14, fontWeight: 700, color: slot.type === 'recovery' ? '#d4813a' : '#2dd4bf' }}>{s.val}</div>
+                          <div style={{ fontSize: 10, color: G.textSecondary }}>{s.label}</div>
                         </div>
                       ))}
                     </div>
@@ -2331,7 +2377,7 @@ export default function EliteCounter() {
             <div className="mdl" onClick={e => e.stopPropagation()}>
               <div className="mhndl" />
               <div className="mtitle">{t('rankLadder.title')}</div>
-              <div style={{ color: G.textMuted, fontSize: 12, marginBottom: 16 }}>
+              <div style={{ color: G.textSecondary, fontSize: 12, marginBottom: 16 }}>
                 {t('rankLadder.sub', { count: RANKS_DEF.length, tiers: RANKS_DEF.length * SUB_RANKS })}
               </div>
 
@@ -2343,7 +2389,7 @@ export default function EliteCounter() {
                 const spcFast = TIER_SPC[tierIndex(rk.id, SUB_RANKS)];
                 const spcSlow = TIER_SPC[tierIndex(rk.id, 1)];
                 const status = isCurrent ? t('rankLadder.you') : isReached ? t('rankLadder.reached') : t('rankLadder.locked');
-                const statusColor = isCurrent ? rk.color : isReached ? G.green : G.textMuted;
+                const statusColor = isCurrent ? rk.color : isReached ? G.green : G.textSecondary;
                 return (
                   <div key={rk.id} style={{
                     display: 'flex', gap: 12, alignItems: 'flex-start', padding: '13px 14px', marginBottom: 9,
@@ -2352,13 +2398,13 @@ export default function EliteCounter() {
                     border: `1px solid ${isCurrent ? rk.color : G.border}`,
                     opacity: isReached || isCurrent ? 1 : 0.62,
                   }}>
-                    <div style={{ fontSize: 30, lineHeight: 1, filter: isReached || isCurrent ? 'none' : 'grayscale(1)' }}>{rk.icon}</div>
+                    <RankSigil color={rk.color} size={30} dim={!isReached && !isCurrent} />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                        <div style={{ fontFamily: 'Playfair Display, serif', fontSize: 16, fontWeight: 700, color: rk.color }}>{rk.name}</div>
+                        <div style={{ fontFamily: 'Cinzel, serif', fontSize: 16, fontWeight: 700, color: rk.color }}>{rk.name}</div>
                         <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: statusColor, border: `1px solid ${statusColor}`, borderRadius: 20, padding: '1px 7px' }}>{status}</div>
                       </div>
-                      <div style={{ fontSize: 11, color: G.textMuted, marginBottom: 8 }}>{t('rankLadder.tiers')}</div>
+                      <div style={{ fontSize: 11, color: G.textSecondary, marginBottom: 8 }}>{t('rankLadder.tiers')}</div>
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
                         {[
                           { label: t('rankLadder.decksLabel'), val: rk.decks },
@@ -2367,11 +2413,11 @@ export default function EliteCounter() {
                         ].map(s => (
                           <div key={s.label} style={{ background: 'rgba(0,0,0,.22)', borderRadius: 6, padding: '7px 4px', textAlign: 'center' }}>
                             <div style={{ fontSize: 13, fontWeight: 700, color: rk.color }}>{s.val}</div>
-                            <div style={{ fontSize: 9.5, color: G.textMuted, marginTop: 2 }}>{s.label}</div>
+                            <div style={{ fontSize: 9.5, color: G.textSecondary, marginTop: 2 }}>{s.label}</div>
                           </div>
                         ))}
                       </div>
-                      <div style={{ fontSize: 11, color: isMasterRank ? G.gold : G.textMuted, marginTop: 8 }}>
+                      <div style={{ fontSize: 11, color: isMasterRank ? G.gold : G.textSecondary, marginTop: 8 }}>
                         {isMasterRank ? t('rankLadder.masterPerk') : t('rankLadder.rankPerk')}
                       </div>
                     </div>
@@ -2379,7 +2425,7 @@ export default function EliteCounter() {
                 );
               })}
 
-              <div style={{ fontSize: 11, color: G.textMuted, marginTop: 4, textAlign: 'center' }}>{t('rankLadder.footer')}</div>
+              <div style={{ fontSize: 11, color: G.textSecondary, marginTop: 4, textAlign: 'center' }}>{t('rankLadder.footer')}</div>
             </div>
           </div>
         )}
@@ -2389,7 +2435,7 @@ export default function EliteCounter() {
             <div className="mdl" onClick={e => e.stopPropagation()}>
               <div className="mhndl" />
               <div className="mtitle">{t('shop.title')}</div>
-              <div style={{ color: G.textMuted, fontSize: 12, marginBottom: 14, display: 'flex', alignItems: 'center', gap: 5 }}><Coin size={13} />{t('shop.coinsAvailable', { coins: save.coins })}</div>
+              <div style={{ color: G.textSecondary, fontSize: 12, marginBottom: 14, display: 'flex', alignItems: 'center', gap: 5 }}><Coin size={13} />{t('shop.coinsAvailable', { coins: save.coins })}</div>
               <div style={{ fontSize: 10, letterSpacing: '.15em', textTransform: 'uppercase', color: G.gold, marginBottom: 8 }}>{t('shop.boutiqueCoins')}</div>
               {CARD_SKINS.map(sk => {
                 const owned = save.unlockedSkins.includes(sk.id);
@@ -2400,7 +2446,7 @@ export default function EliteCounter() {
                   <div key={sk.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 0', borderBottom: `1px solid ${G.border}`, opacity: isSecret ? 0.5 : 1 }}>
                     <div style={{ width: 38, height: 52, borderRadius: 6, border: `2px solid ${active ? G.gold : G.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}
                          className={isSecret ? '' : sk.bg}>
-                      {isSecret && <span style={{ fontSize: 18 }}>🔒</span>}
+                      {isSecret && <Lock size={16} color={G.textMuted} />}
                       {!isSecret && sk.id === 'voidgold' && (
                         <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', filter: 'drop-shadow(0 0 1px #D4AF37)' }} viewBox="0 0 38 52" fill="none">
                           <path d="M 29 1 Q 37 1 37 9"  stroke="#D4AF37" strokeWidth="1" strokeDasharray="2 1.5"/>
@@ -2412,24 +2458,28 @@ export default function EliteCounter() {
                     </div>
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 1 }}>{isSecret ? t('shop.secretName') : sk.name}</div>
-                      <div style={{ fontSize: 12, color: G.textMuted }}>{isSecret ? t('shop.secretDesc') : sk.price === 0 ? t('shop.free') : <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>{t('shop.priceCoins', { price: sk.price })}<Coin size={11} /></span>}</div>
+                      <div style={{ fontSize: 12, color: G.textSecondary }}>{isSecret ? t('shop.secretDesc') : sk.price === 0 ? t('shop.free') : <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>{t('shop.priceCoins', { price: sk.price })}<Coin size={11} /></span>}</div>
                     </div>
                     {isSecret ? null : active
-                      ? <span style={{ fontSize: 11, color: '#0a0d0a', background: G.gold, borderRadius: 6, padding: '4px 10px', fontWeight: 700, letterSpacing: '.04em' }}>{t('common.equipped')}</span>
+                      ? <span style={{ fontSize: 11, color: '#0d0a1a', background: G.gold, borderRadius: 6, padding: '4px 10px', fontWeight: 700, letterSpacing: '.04em' }}>{t('common.equipped')}</span>
                       : owned
-                        ? <button style={{ fontSize: 11, color: '#0a0d0a', background: G.green, border: 'none', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', fontWeight: 700 }} onClick={() => { snd(playClick); patchSave({ activeSkin: sk.id }); }}>{t('common.equip')}</button>
-                        : <button style={{ fontSize: 11, color: canBuy ? '#0a0d0a' : G.textMuted, background: canBuy ? G.gold : 'rgba(255,255,255,.04)', border: `1px solid ${canBuy ? G.gold : G.border}`, borderRadius: 6, padding: '4px 10px', cursor: canBuy ? 'pointer' : 'not-allowed', fontWeight: canBuy ? 700 : 400 }}
+                        ? <button style={{ fontSize: 11, color: '#0d0a1a', background: G.green, border: 'none', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', fontWeight: 700 }} onClick={() => { snd(playClick); patchSave({ activeSkin: sk.id }); }}>{t('common.equip')}</button>
+                        : <button style={{ fontSize: 11, color: canBuy ? '#0d0a1a' : G.textSecondary, background: canBuy ? G.gold : 'rgba(255,255,255,.04)', border: `1px solid ${canBuy ? G.gold : G.border}`, borderRadius: 6, padding: '4px 10px', cursor: canBuy ? 'pointer' : 'not-allowed', fontWeight: canBuy ? 700 : 400 }}
                           onClick={() => { if (canBuy) { snd(playClick); patchSave({ coins: save.coins - sk.price, unlockedSkins: [...save.unlockedSkins, sk.id], activeSkin: sk.id }); } }}>
                           {canBuy ? t('common.buy') : <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>{t('shop.buyLocked', { price: sk.price })}<Coin size={10} /></span>}</button>}
                   </div>
                 );
               })}
 
-              {/* ─── Catégorie 2 : Le Trésor de Guerre ─── */}
-              <div style={{ marginTop: 26, marginBottom: 6, display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ fontFamily: 'Playfair Display, serif', fontSize: 17, fontWeight: 700, color: '#e6c84c' }}>{t('shop.warChest')}</span>
+              {/* ─── Catégorie 2 : Le Marchand (artefacts payants, 4,99 € pièce) ─── */}
+              <div style={{ marginTop: 26, marginBottom: 10, display: 'flex', alignItems: 'center', gap: 12 }}>
+                <Merchant size={46} />
+                <div>
+                  <div style={{ fontFamily: 'Cinzel, serif', fontSize: 15, fontWeight: 700, letterSpacing: '.08em', color: '#e8c97a' }}>{t('shop.warChest')}</div>
+                  <div style={{ fontFamily: 'Cinzel, serif', fontSize: 9.5, letterSpacing: '.24em', textTransform: 'uppercase', color: G.textMuted, marginTop: 2 }}>{t('shop.merchantSub')}</div>
+                </div>
               </div>
-              <div style={{ fontSize: 12, color: G.textMuted, marginBottom: 12, lineHeight: 1.5 }}>
+              <div style={{ fontSize: 13.5, fontStyle: 'italic', color: G.textSecondary, marginBottom: 12, lineHeight: 1.55, borderLeft: `2px solid ${G.borderGold}`, paddingLeft: 12 }}>
                 {t('shop.warChestDesc')}
               </div>
               {SUPPORT_SKINS.map(sk => {
@@ -2441,20 +2491,20 @@ export default function EliteCounter() {
                   <div key={sk.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 0', borderBottom: `1px solid ${G.border}`, opacity: owned ? 1 : 0.85 }}>
                     <div style={{ position: 'relative', width: 40, height: 56, borderRadius: 6, overflow: 'hidden', border: `2px solid ${active ? sk.accent : G.border}`, flexShrink: 0 }}>
                       <SupportCard rank="A" suitName="spades" skin={sk} mini />
-                      {!owned && <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15 }}>🔒</div>}
+                      {!owned && <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Lock size={15} color={G.goldLight} /></div>}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 1, color: owned ? sk.accent : G.text }}>{sk.name}</div>
-                      <div style={{ fontSize: 12, color: G.textMuted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{owned ? t('shop.tagline.' + sk.id) : t('shop.price499')}</div>
+                      <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 1, color: owned ? sk.accent : G.textPrimary }}>{sk.name}</div>
+                      <div style={{ fontSize: 12, color: G.textSecondary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{owned ? t('shop.tagline.' + sk.id) : t('shop.price499')}</div>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
                       <button onClick={() => { snd(playClick); setPreviewSkin(sk); }}
                         style={{ fontSize: 11, color: sk.accent, background: 'transparent', border: `1px solid ${sk.accent}55`, borderRadius: 6, padding: '4px 9px', cursor: 'pointer', fontWeight: 600 }}>{t('shop.preview')}</button>
                       {active
-                        ? <span style={{ fontSize: 11, color: '#0a0d0a', background: sk.accent, borderRadius: 6, padding: '4px 10px', fontWeight: 700, letterSpacing: '.04em' }}>{t('common.equipped')}</span>
+                        ? <span style={{ fontSize: 11, color: '#0d0a1a', background: sk.accent, borderRadius: 6, padding: '4px 10px', fontWeight: 700, letterSpacing: '.04em' }}>{t('common.equipped')}</span>
                         : owned
-                          ? <button style={{ fontSize: 11, color: '#0a0d0a', background: G.green, border: 'none', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', fontWeight: 700 }} onClick={() => { snd(playClick); equip(); }}>{t('common.equip')}</button>
-                          : <button style={{ fontSize: 11, color: '#0a0d0a', background: '#e6c84c', border: 'none', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', fontWeight: 700 }} onClick={() => { snd(playClick); buy(); }}>{t('shop.price499')}</button>}
+                          ? <button style={{ fontSize: 11, color: '#0d0a1a', background: G.green, border: 'none', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', fontWeight: 700 }} onClick={() => { snd(playClick); equip(); }}>{t('common.equip')}</button>
+                          : <button style={{ fontSize: 11, color: '#0d0a1a', background: '#e8c97a', border: 'none', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', fontWeight: 700 }} onClick={() => { snd(playClick); buy(); }}>{t('shop.price499')}</button>}
                     </div>
                   </div>
                 );
@@ -2510,39 +2560,39 @@ export default function EliteCounter() {
               <div className="mdl" onClick={e => e.stopPropagation()}>
                 <div className="mhndl" />
                 <div className="mtitle">{t('stats.title')}</div>
-                <div style={{ color: G.textMuted, fontSize: 12, marginBottom: 16 }}>{t('stats.sub')}</div>
+                <div style={{ color: G.textSecondary, fontSize: 12, marginBottom: 16 }}>{t('stats.sub')}</div>
 
                 {/* Key metrics */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 16 }}>
                   {[
-                    { label: t('stats.games'), val: total, color: G.text },
+                    { label: t('stats.games'), val: total, color: G.textPrimary },
                     { label: t('stats.wins'), val: `${save.totalWins || 0}`, color: G.green },
                     { label: t('stats.losses'), val: `${save.totalLosses || 0}`, color: G.red },
                     { label: t('stats.accuracy'), val: winRate !== null ? `${winRate}%` : '—', color: G.gold },
-                    { label: t('stats.last20'), val: recentWR !== null ? `${recentWR}%` : '—', color: '#5b8dee' },
+                    { label: t('stats.last20'), val: recentWR !== null ? `${recentWR}%` : '—', color: '#2dd4bf' },
                     { label: t('stats.bestTime'), val: s.bestTime ? `${s.bestTime.toFixed(1)}s` : '—', color: G.goldLight },
                   ].map(m => (
                     <div key={m.label} style={{ background: 'rgba(0,0,0,.2)', border: `1px solid ${G.border}`, borderRadius: 8, padding: '10px 8px', textAlign: 'center' }}>
-                      <div style={{ fontFamily: 'Playfair Display, serif', fontSize: 18, fontWeight: 700, color: m.color }}>{m.val}</div>
-                      <div style={{ fontSize: 10, color: G.textMuted, marginTop: 2 }}>{m.label}</div>
+                      <div style={{ fontFamily: 'Cinzel, serif', fontSize: 18, fontWeight: 700, color: m.color }}>{m.val}</div>
+                      <div style={{ fontSize: 10, color: G.textSecondary, marginTop: 2 }}>{m.label}</div>
                     </div>
                   ))}
                 </div>
 
                 {/* Streak info */}
-                <div style={{ background: 'rgba(201,168,76,.06)', border: `1px solid ${G.borderGold}`, borderRadius: 8, padding: '10px 14px', marginBottom: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ background: 'rgba(201,162,75,.06)', border: `1px solid ${G.borderGold}`, borderRadius: 8, padding: '10px 14px', marginBottom: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div style={{ fontSize: 13, color: G.gold }}>{t('stats.currentStreak')}</div>
-                  <div style={{ fontFamily: 'Playfair Display, serif', fontSize: 20, fontWeight: 700, color: G.goldLight }}>{save.perfectStreak || 0}</div>
+                  <div style={{ fontFamily: 'Cinzel, serif', fontSize: 20, fontWeight: 700, color: G.goldLight }}>{save.perfectStreak || 0}</div>
                 </div>
 
                 {/* Best streak with avg s/carte */}
-                <div style={{ background: 'rgba(91,141,238,.06)', border: '1px solid rgba(91,141,238,.25)', borderRadius: 8, padding: '10px 14px', marginBottom: 14 }}>
+                <div style={{ background: 'rgba(45,212,191,.06)', border: '1px solid rgba(45,212,191,.25)', borderRadius: 8, padding: '10px 14px', marginBottom: 14 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: (save.bestStreak || 0) > 0 ? 6 : 0 }}>
-                    <div style={{ fontSize: 13, color: '#5b8dee' }}>{t('stats.bestStreak')}</div>
-                    <div style={{ fontFamily: 'Playfair Display, serif', fontSize: 20, fontWeight: 700, color: '#5b8dee' }}>{save.bestStreak || 0}</div>
+                    <div style={{ fontSize: 13, color: '#2dd4bf' }}>{t('stats.bestStreak')}</div>
+                    <div style={{ fontFamily: 'Cinzel, serif', fontSize: 20, fontWeight: 700, color: '#2dd4bf' }}>{save.bestStreak || 0}</div>
                   </div>
                   {(save.bestStreak || 0) > 0 && (
-                    <div style={{ fontSize: 11, color: G.textMuted, display: 'flex', justifyContent: 'space-between' }}>
+                    <div style={{ fontSize: 11, color: G.textSecondary, display: 'flex', justifyContent: 'space-between' }}>
                       <span>{save.bestStreakAvgSpc != null ? t('stats.avgSpc', { spc: save.bestStreakAvgSpc.toFixed(2) }) : '—'}</span>
                       <span>{t('stats.totalCards', { cards: save.bestStreakCards || 0 })}</span>
                     </div>
@@ -2550,23 +2600,23 @@ export default function EliteCounter() {
                 </div>
 
                 {/* Défi du jour */}
-                <div style={{ background: 'rgba(201,168,76,.06)', border: `1px solid ${G.borderGold}`, borderRadius: 8, padding: '12px 14px', marginBottom: 14 }}>
-                  <div style={{ fontSize: 13, color: G.gold, marginBottom: dailyPlayed > 0 ? 10 : 0, display: 'flex', alignItems: 'center', gap: 6 }}>🗓️ {t('stats.dailyTitle')}</div>
+                <div style={{ background: 'rgba(201,162,75,.06)', border: `1px solid ${G.borderGold}`, borderRadius: 8, padding: '12px 14px', marginBottom: 14 }}>
+                  <div style={{ fontSize: 13, color: G.gold, marginBottom: dailyPlayed > 0 ? 10 : 0, display: 'flex', alignItems: 'center', gap: 6 }}><CalendarDays size={13} /> {t('stats.dailyTitle')}</div>
                   {dailyPlayed > 0 ? (
                     <>
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 10 }}>
                         {[
-                          { label: t('stats.dailyStreak'), val: `🔥 ${d.streak || 0}`, color: G.goldLight },
-                          { label: t('stats.dailyBestStreak'), val: `⭐ ${d.bestStreak || 0}`, color: '#5b8dee' },
+                          { label: t('stats.dailyStreak'), val: d.streak || 0, color: G.goldLight },
+                          { label: t('stats.dailyBestStreak'), val: d.bestStreak || 0, color: '#2dd4bf' },
                           { label: t('stats.dailyBestScore'), val: d.bestScore || 0, color: G.gold },
                         ].map(m => (
                           <div key={m.label} style={{ textAlign: 'center' }}>
-                            <div style={{ fontFamily: 'Playfair Display, serif', fontSize: 17, fontWeight: 700, color: m.color }}>{m.val}</div>
-                            <div style={{ fontSize: 10, color: G.textMuted, marginTop: 2 }}>{m.label}</div>
+                            <div style={{ fontFamily: 'Cinzel, serif', fontSize: 17, fontWeight: 700, color: m.color }}>{m.val}</div>
+                            <div style={{ fontSize: 10, color: G.textSecondary, marginTop: 2 }}>{m.label}</div>
                           </div>
                         ))}
                       </div>
-                      <div style={{ fontSize: 11, color: G.textMuted, marginBottom: dailyHist.length > 0 ? 8 : 0 }}>
+                      <div style={{ fontSize: 11, color: G.textSecondary, marginBottom: dailyHist.length > 0 ? 8 : 0 }}>
                         {t('stats.dailyRecap', { won: d.totalWon || 0, played: dailyPlayed, wr: dailyWR })}
                       </div>
                       {dailyHist.length > 0 && (
@@ -2580,17 +2630,17 @@ export default function EliteCounter() {
                       )}
                     </>
                   ) : (
-                    <div style={{ fontSize: 12, color: G.textMuted }}>{t('stats.dailyNever')}</div>
+                    <div style={{ fontSize: 12, color: G.textSecondary }}>{t('stats.dailyNever')}</div>
                   )}
                 </div>
 
                 {/* Most-played skin */}
                 {topSkinId && (
-                  <div style={{ background: 'rgba(201,168,76,.06)', border: `1px solid ${G.borderGold}`, borderRadius: 8, padding: '10px 14px', marginBottom: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
-                    <div style={{ fontSize: 13, color: G.gold, display: 'flex', alignItems: 'center', gap: 6 }}>🎨 {t('stats.topSkin')}</div>
+                  <div style={{ background: 'rgba(201,162,75,.06)', border: `1px solid ${G.borderGold}`, borderRadius: 8, padding: '10px 14px', marginBottom: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
+                    <div style={{ fontSize: 13, color: G.gold, display: 'flex', alignItems: 'center', gap: 6 }}><Gem size={13} /> {t('stats.topSkin')}</div>
                     <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontFamily: 'Playfair Display, serif', fontSize: 15, fontWeight: 700, color: G.goldLight }}>{skinNameById(topSkinId)}</div>
-                      <div style={{ fontSize: 11, color: G.textMuted }}>{t('stats.topSkinGames', { n: topSkinCount })}</div>
+                      <div style={{ fontFamily: 'Cinzel, serif', fontSize: 15, fontWeight: 700, color: G.goldLight }}>{skinNameById(topSkinId)}</div>
+                      <div style={{ fontSize: 11, color: G.textSecondary }}>{t('stats.topSkinGames', { n: topSkinCount })}</div>
                     </div>
                   </div>
                 )}
@@ -2598,7 +2648,7 @@ export default function EliteCounter() {
                 {/* Recent 20 results — clickable bars */}
                 {recent.length > 0 && (
                   <div style={{ marginBottom: 14 }}>
-                    <div style={{ fontSize: 11, color: G.textMuted, letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 8 }}>{t('stats.recentTitle')}</div>
+                    <div style={{ fontSize: 11, color: G.textSecondary, letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 8 }}>{t('stats.recentTitle')}</div>
                     <div style={{ display: 'flex', gap: 3, height: 28, alignItems: 'flex-end' }}>
                       {recent.map((r, i) => {
                         const won = typeof r === 'object' ? r.won : r;
@@ -2620,7 +2670,7 @@ export default function EliteCounter() {
                         <div key={`empty-${i}`} style={{ flex: 1, borderRadius: 2, background: 'rgba(255,255,255,.06)', height: '20%' }} />
                       ))}
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: G.textMuted, marginTop: 4 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: G.textSecondary, marginTop: 4 }}>
                       <span>{t('stats.oldest')}</span><span>{t('stats.newest')}</span>
                     </div>
 
@@ -2638,8 +2688,8 @@ export default function EliteCounter() {
                             { label: t('stats.timeLabel'), val: `${selected.timeSec}s` },
                           ].map(s => (
                             <div key={s.label} style={{ textAlign: 'center' }}>
-                              <div style={{ fontSize: 13, fontWeight: 700, color: G.text }}>{s.val}</div>
-                              <div style={{ fontSize: 9, color: G.textMuted, marginTop: 1 }}>{s.label}</div>
+                              <div style={{ fontSize: 13, fontWeight: 700, color: G.textPrimary }}>{s.val}</div>
+                              <div style={{ fontSize: 9, color: G.textSecondary, marginTop: 1 }}>{s.label}</div>
                             </div>
                           ))}
                         </div>
@@ -2651,19 +2701,19 @@ export default function EliteCounter() {
                 {/* Précision par nombre de decks */}
                 {deckRows.length > 0 && (
                   <div style={{ marginBottom: 14 }}>
-                    <div style={{ fontSize: 11, color: G.textMuted, letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 8 }}>{t('stats.byDeckTitle')}</div>
+                    <div style={{ fontSize: 11, color: G.textSecondary, letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 8 }}>{t('stats.byDeckTitle')}</div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                       {deckRows.map(r => {
                         const acc = Math.round(r.correct / r.total * 100);
-                        const barColor = acc >= 70 ? G.green : acc >= 45 ? '#e8a03a' : G.red;
+                        const barColor = acc >= 70 ? G.green : acc >= 45 ? '#d4813a' : G.red;
                         return (
                           <div key={r.decks} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <div style={{ width: 58, fontSize: 11, color: G.textMuted, flexShrink: 0 }}>{t('stats.deckLabel', { n: r.decks })}</div>
+                            <div style={{ width: 58, fontSize: 11, color: G.textSecondary, flexShrink: 0 }}>{t('stats.deckLabel', { n: r.decks })}</div>
                             <div style={{ flex: 1, height: 14, background: 'rgba(255,255,255,.05)', borderRadius: 7, overflow: 'hidden' }}>
                               <div style={{ width: `${acc}%`, height: '100%', background: barColor, borderRadius: 7, transition: 'width .3s' }} />
                             </div>
-                            <div style={{ width: 66, textAlign: 'right', fontSize: 11, color: G.text, flexShrink: 0 }}>
-                              <span style={{ fontWeight: 700, color: barColor }}>{acc}%</span> <span style={{ color: G.textMuted }}>({r.total})</span>
+                            <div style={{ width: 66, textAlign: 'right', fontSize: 11, color: G.textPrimary, flexShrink: 0 }}>
+                              <span style={{ fontWeight: 700, color: barColor }}>{acc}%</span> <span style={{ color: G.textSecondary }}>({r.total})</span>
                             </div>
                           </div>
                         );
@@ -2675,17 +2725,17 @@ export default function EliteCounter() {
                 {/* Cartes comptées à vie + répartition par mode */}
                 <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
                   <div style={{ flex: 1, background: 'rgba(0,0,0,.2)', border: `1px solid ${G.border}`, borderRadius: 8, padding: '10px 12px' }}>
-                    <div style={{ fontFamily: 'Playfair Display, serif', fontSize: 18, fontWeight: 700, color: G.goldLight }}>{cardsCounted.toLocaleString()}</div>
-                    <div style={{ fontSize: 10, color: G.textMuted, marginTop: 2 }}>{t('stats.cardsCounted')}</div>
+                    <div style={{ fontFamily: 'Cinzel, serif', fontSize: 18, fontWeight: 700, color: G.goldLight }}>{cardsCounted.toLocaleString()}</div>
+                    <div style={{ fontSize: 10, color: G.textSecondary, marginTop: 2 }}>{t('stats.cardsCounted')}</div>
                   </div>
                   {Object.keys(modeStats).length > 0 && (
                     <div style={{ flex: 1.4, background: 'rgba(0,0,0,.2)', border: `1px solid ${G.border}`, borderRadius: 8, padding: '10px 12px' }}>
-                      <div style={{ fontSize: 10, color: G.textMuted, letterSpacing: '.06em', textTransform: 'uppercase', marginBottom: 6 }}>{t('stats.byModeTitle')}</div>
+                      <div style={{ fontSize: 10, color: G.textSecondary, letterSpacing: '.06em', textTransform: 'uppercase', marginBottom: 6 }}>{t('stats.byModeTitle')}</div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                         {Object.keys(modeStats).sort((a, b) => modeStats[b] - modeStats[a]).map(m => (
                           <div key={m} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11 }}>
-                            <span style={{ color: G.textMuted }}>{modeLabel(m)}</span>
-                            <span style={{ color: G.text, fontWeight: 600 }}>{modeStats[m]}</span>
+                            <span style={{ color: G.textSecondary }}>{modeLabel(m)}</span>
+                            <span style={{ color: G.textPrimary, fontWeight: 600 }}>{modeStats[m]}</span>
                           </div>
                         ))}
                       </div>
@@ -2695,9 +2745,9 @@ export default function EliteCounter() {
 
                 {/* Rang + MMR */}
                 <div style={{ borderTop: `1px solid ${G.border}`, paddingTop: 14, marginBottom: 14 }}>
-                  <div style={{ fontSize: 11, color: G.textMuted, letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 10 }}>{t('stats.rankedProgress')}</div>
+                  <div style={{ fontSize: 11, color: G.textSecondary, letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 10 }}>{t('stats.rankedProgress')}</div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{ fontSize: 32 }}>{displayRank.icon}</div>
+                    <RankSigil color={displayRank.color} size={32} />
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 3 }}>{displayRank.name}</div>
                       {placementOngoing ? (
@@ -2705,9 +2755,9 @@ export default function EliteCounter() {
                       ) : displayRank.id < 6 && (
                         <>
                           <div className="mmrtrack">
-                            <div className="mmrfill" style={{ width: `${save.mmr}%`, background: `linear-gradient(90deg,${G.goldDim},${mmrColor})` }} />
+                            <div className="mmrfill" style={{ width: `${save.mmr}%`, background: `linear-gradient(90deg,${G.goldDark},${mmrColor})` }} />
                           </div>
-                          <div style={{ fontSize: 11, color: G.textMuted, marginTop: 3 }}>{save.mmr}/100 MMR</div>
+                          <div style={{ fontSize: 11, color: G.textSecondary, marginTop: 3 }}>{save.mmr}/100 MMR</div>
                         </>
                       )}
                     </div>
@@ -2717,7 +2767,7 @@ export default function EliteCounter() {
                 {/* Placement history if done */}
                 {save.placementDone && history.length > 0 && (
                   <div style={{ borderTop: `1px solid ${G.border}`, paddingTop: 14 }}>
-                    <div style={{ fontSize: 11, color: G.textMuted, letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 10 }}>{t('stats.initialPlacement')}</div>
+                    <div style={{ fontSize: 11, color: G.textSecondary, letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 10 }}>{t('stats.initialPlacement')}</div>
                     {history.map((h, i) => {
                       const gate = PLACEMENT_GATES[h.gateId];
                       return (
@@ -2725,14 +2775,14 @@ export default function EliteCounter() {
                           <div style={{ width: 22, height: 22, borderRadius: '50%', background: h.won ? 'rgba(39,174,96,.15)' : 'rgba(192,57,43,.15)', border: `1.5px solid ${h.won ? G.green : G.red}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, flexShrink: 0 }}>
                             {h.won ? '✓' : '✗'}
                           </div>
-                          <div style={{ flex: 1, fontSize: 12, color: G.textMuted }}>{t('common.gameN', { n: i + 1 })} · {h.type === 'recovery' ? t('placement.recoveryTag') : '🎯'} {gate?.label}</div>
+                          <div style={{ flex: 1, fontSize: 12, color: G.textSecondary }}>{t('common.gameN', { n: i + 1 })} · {h.type === 'recovery' ? t('placement.recoveryTag') : t('placement.gateTag')} {gate?.label}</div>
                           <div style={{ fontSize: 11, color: h.won ? G.green : G.red, fontWeight: 600 }}>{h.won ? t('common.winShort') : t('common.lossShort')}</div>
                         </div>
                       );
                     })}
                     {save.placementWins === PLACEMENT_GATES.length && (
-                      <div style={{ marginTop: 10, padding: '8px 12px', background: 'rgba(0,0,0,.3)', border: `1px solid ${G.border}`, borderRadius: 8, textAlign: 'center', fontSize: 12, color: G.textMuted }}>
-                        🌑 <span style={{ color: G.text }}>The Architect</span>{t('stats.architectSuffix')}
+                      <div style={{ marginTop: 10, padding: '8px 12px', background: 'rgba(0,0,0,.3)', border: `1px solid ${G.border}`, borderRadius: 8, textAlign: 'center', fontSize: 12, color: G.textSecondary }}>
+                        🌑 <span style={{ color: G.textPrimary }}>The Architect</span>{t('stats.architectSuffix')}
                       </div>
                     )}
                   </div>
@@ -2748,20 +2798,20 @@ export default function EliteCounter() {
               <div className="mhndl" />
               <div className="mtitle">{t('settings.title')}</div>
               <div style={{ padding: '14px 0', borderBottom: `1px solid ${G.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: G.text, fontSize: 13 }}>
-                  {save.soundEnabled !== false ? <Volume2 size={15} color={G.gold} /> : <VolumeX size={15} color={G.textMuted} />}
-                  <span>Sons</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: G.textPrimary, fontSize: 13 }}>
+                  {save.soundEnabled !== false ? <Volume2 size={15} color={G.gold} /> : <VolumeX size={15} color={G.textSecondary} />}
+                  <span>{t('settings.sound')}</span>
                 </div>
                 <button
                   onClick={() => { initAudio(); patchSave({ soundEnabled: save.soundEnabled === false }); }}
-                  style={{ padding: '6px 14px', background: save.soundEnabled !== false ? 'rgba(201,168,76,.15)' : 'rgba(255,255,255,.05)', border: `1px solid ${save.soundEnabled !== false ? G.borderGold : G.border}`, borderRadius: 6, color: save.soundEnabled !== false ? G.gold : G.textMuted, cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>
+                  style={{ padding: '6px 14px', background: save.soundEnabled !== false ? 'rgba(201,162,75,.15)' : 'rgba(255,255,255,.05)', border: `1px solid ${save.soundEnabled !== false ? G.borderGold : G.border}`, borderRadius: 6, color: save.soundEnabled !== false ? G.gold : G.textSecondary, cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>
                   {save.soundEnabled !== false ? 'ON' : 'OFF'}
                 </button>
               </div>
               {/* Dev · définir le rang sans passer par le placement */}
               <div style={{ padding: '14px 0', borderBottom: `1px solid ${G.border}` }}>
-                <div style={{ fontSize: 11, color: G.textMuted, letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 4 }}>{t('settings.devRankTitle')}</div>
-                <div style={{ fontSize: 11, color: G.textMuted, marginBottom: 10 }}>{t('settings.devRankHint')}</div>
+                <div style={{ fontSize: 11, color: G.textSecondary, letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 4 }}>{t('settings.devRankTitle')}</div>
+                <div style={{ fontSize: 11, color: G.textSecondary, marginBottom: 10 }}>{t('settings.devRankHint')}</div>
                 {/* Sous-rang I / II / III */}
                 <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
                   {ROMAN.map((r, i) => {
@@ -2769,21 +2819,21 @@ export default function EliteCounter() {
                     const active = save.subRank === sr;
                     return (
                       <button key={r} onClick={() => { snd(playClick); patchSave({ subRank: sr, placementDone: true, placementEnded: false, trainingDone: true, inPromo: false, promoLocked: false }); }}
-                        style={{ flex: 1, padding: '7px 0', background: active ? 'rgba(201,168,76,.15)' : 'rgba(255,255,255,.03)', border: `1px solid ${active ? G.borderGold : G.border}`, borderRadius: 6, color: active ? G.gold : G.textMuted, cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>
+                        style={{ flex: 1, padding: '7px 0', background: active ? 'rgba(201,162,75,.15)' : 'rgba(255,255,255,.03)', border: `1px solid ${active ? G.borderGold : G.border}`, borderRadius: 6, color: active ? G.gold : G.textSecondary, cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>
                         {r}
                       </button>
                     );
                   })}
                 </div>
-                {/* Rangs Bronze → Master */}
+                {/* Rangs Cuivre → Adamantium */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
                   {RANKS_DEF.map(rk => {
                     const active = save.rankId === rk.id;
                     return (
                       <button key={rk.id} onClick={() => { snd(playClick); patchSave({ rankId: rk.id, subRank: save.subRank || 1, mmr: 0, placementDone: true, placementEnded: false, trainingDone: true, inPromo: false, promoLocked: false }); }}
                         style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, padding: '9px 4px', background: active ? `${rk.color}22` : 'rgba(255,255,255,.03)', border: `1px solid ${active ? rk.color : G.border}`, borderRadius: 7, cursor: 'pointer' }}>
-                        <span style={{ fontSize: 20 }}>{rk.icon}</span>
-                        <span style={{ fontSize: 11, fontWeight: 700, color: active ? rk.color : G.textMuted }}>{rk.name}</span>
+                        <RankSigil color={rk.color} size={20} dim={!active} />
+                        <span style={{ fontSize: 11, fontWeight: 700, color: active ? rk.color : G.textSecondary }}>{rk.name}</span>
                       </button>
                     );
                   })}
@@ -2802,8 +2852,8 @@ export default function EliteCounter() {
             <div className="mdl">
               <div className="mhndl" />
               <div className="mtitle" style={{ color: G.red }}>{t('settings.resetTitle')}</div>
-              <div style={{ color: G.textMuted, fontSize: 13, margin: '10px 0 14px', lineHeight: 1.5 }}>{t('settings.resetWarnPre')}<strong style={{ color: G.text }}>RESET</strong>{t('settings.resetWarnPost')}</div>
-              <input style={{ width: '100%', background: 'rgba(255,255,255,.04)', border: `1px solid ${G.border}`, borderRadius: 8, padding: '11px 14px', color: G.text, fontSize: 14, outline: 'none', marginBottom: 10 }}
+              <div style={{ color: G.textSecondary, fontSize: 13, margin: '10px 0 14px', lineHeight: 1.5 }}>{t('settings.resetWarnPre')}<strong style={{ color: G.textPrimary }}>RESET</strong>{t('settings.resetWarnPost')}</div>
+              <input style={{ width: '100%', background: 'rgba(255,255,255,.04)', border: `1px solid ${G.border}`, borderRadius: 8, padding: '11px 14px', color: G.textPrimary, fontSize: 14, outline: 'none', marginBottom: 10 }}
                 value={resetText} onChange={e => {
                   const v = e.target.value;
                   if (v === 'adminmagueule') {
@@ -2819,9 +2869,9 @@ export default function EliteCounter() {
                   }
                 }} placeholder={t('settings.resetPlaceholder')} />
               <div style={{ display: 'flex', gap: 8 }}>
-                <button style={{ flex: 1, padding: 11, background: 'rgba(255,255,255,.05)', border: `1px solid ${G.border}`, borderRadius: 8, color: G.textMuted, cursor: 'pointer' }}
+                <button style={{ flex: 1, padding: 11, background: 'rgba(255,255,255,.05)', border: `1px solid ${G.border}`, borderRadius: 8, color: G.textSecondary, cursor: 'pointer' }}
                   onClick={() => { snd(playClick); setShowResetConfirm(false); setResetText(''); }}>{t('common.cancel')}</button>
-                <button style={{ flex: 1, padding: 11, background: resetText === 'RESET' ? 'rgba(192,57,43,.2)' : 'rgba(255,255,255,.03)', border: `1px solid ${resetText === 'RESET' ? G.red : G.border}`, borderRadius: 8, color: resetText === 'RESET' ? G.red : G.textMuted, cursor: resetText === 'RESET' ? 'pointer' : 'not-allowed', fontWeight: 600 }}
+                <button style={{ flex: 1, padding: 11, background: resetText === 'RESET' ? 'rgba(192,57,43,.2)' : 'rgba(255,255,255,.03)', border: `1px solid ${resetText === 'RESET' ? G.red : G.border}`, borderRadius: 8, color: resetText === 'RESET' ? G.red : G.textSecondary, cursor: resetText === 'RESET' ? 'pointer' : 'not-allowed', fontWeight: 600 }}
                   onClick={() => { if (resetText === 'RESET') { localStorage.removeItem('eliteSave'); window.location.reload(); } }}>{t('common.confirm')}</button>
               </div>
             </div>
@@ -2834,7 +2884,7 @@ export default function EliteCounter() {
               <div style={{ fontSize: 26 }}>{showAchievement.icon}</div>
               <div>
                 <div style={{ fontSize: 10, color: G.gold, letterSpacing: '.1em', textTransform: 'uppercase', marginBottom: 1 }}>{t('achievementsModal.toastLabel')}</div>
-                <div style={{ fontFamily: 'Playfair Display, serif', fontSize: 15, fontWeight: 700 }}>{showAchievement.name}</div>
+                <div style={{ fontFamily: 'Cinzel, serif', fontSize: 15, fontWeight: 700 }}>{showAchievement.name}</div>
               </div>
             </div>
           </div>
@@ -2868,10 +2918,10 @@ export default function EliteCounter() {
         <div className="cfg">
           <button className="back" onClick={() => { snd(playClick); goBack(); }} style={{ marginBottom: 14 }}><ChevronLeft size={13} /> {t('common.back')}</button>
 
-          <div style={{ fontFamily: 'Playfair Display, serif', fontSize: 21, fontWeight: 700, marginBottom: 3 }}>
+          <div style={{ fontFamily: 'Cinzel, serif', fontSize: 21, fontWeight: 700, marginBottom: 3 }}>
             {isPlacement ? t('rankedConfig.placementTitle') : isPromo ? t('rankedConfig.promoTitle') : t('rankedConfig.rankedTitle')}
           </div>
-          <div style={{ fontSize: 13, color: G.textMuted, marginBottom: 16 }}>
+          <div style={{ fontSize: 13, color: G.textSecondary, marginBottom: 16 }}>
             {isPlacement && nextSlot
               ? t('rankedConfig.placementSub', { n: save.placementGames + 1, total: PLACEMENT_TOTAL, type: nextSlot.type })
               : t('rankedConfig.rankedSub', { rank: rankLabel(), win: rank.mmrPerWin, loss: rank.mmrPerLoss })}
@@ -2888,20 +2938,20 @@ export default function EliteCounter() {
                   const isCur = i === save.placementGames;
                   return (
                     <div key={i} style={{ flex: 1, height: 6, borderRadius: 3,
-                      background: h ? (h.won ? G.green : G.red) : isCur ? '#5b8dee' : 'rgba(255,255,255,.06)' }} />
+                      background: h ? (h.won ? G.green : G.red) : isCur ? '#2dd4bf' : 'rgba(255,255,255,.06)' }} />
                   );
                 })}
               </div>
 
               {/* Slot card */}
-              <div style={{ background: nextSlot.type === 'recovery' ? 'rgba(232,160,58,.06)' : 'rgba(91,141,238,.06)',
-                border: `1px solid ${nextSlot.type === 'recovery' ? 'rgba(232,160,58,.3)' : 'rgba(91,141,238,.3)'}`,
+              <div style={{ background: nextSlot.type === 'recovery' ? 'rgba(212,129,58,.06)' : 'rgba(45,212,191,.06)',
+                border: `1px solid ${nextSlot.type === 'recovery' ? 'rgba(212,129,58,.3)' : 'rgba(45,212,191,.3)'}`,
                 borderRadius: 8, padding: '12px 14px', marginBottom: 10 }}>
-                <div style={{ fontSize: 11, color: nextSlot.type === 'recovery' ? '#e8a03a' : '#5b8dee',
+                <div style={{ fontSize: 11, color: nextSlot.type === 'recovery' ? '#d4813a' : '#2dd4bf',
                   letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 5 }}>
                   {nextSlot.type === 'recovery' ? t('placement.recoveryTag') : t('placement.gateTag')}
                 </div>
-                <div style={{ fontFamily: 'Playfair Display, serif', fontSize: 16, fontWeight: 700, marginBottom: 10 }}>
+                <div style={{ fontFamily: 'Cinzel, serif', fontSize: 16, fontWeight: 700, marginBottom: 10 }}>
                   {slotLabel(nextSlot)}
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 7 }}>
@@ -2911,12 +2961,12 @@ export default function EliteCounter() {
                     { label: t('rankedConfig.limit'), val: `${nextSlot.timeLimit}s` },
                   ].map(s => (
                     <div key={s.label} style={{ background: 'rgba(0,0,0,.2)', borderRadius: 6, padding: '8px 6px', textAlign: 'center' }}>
-                      <div style={{ fontSize: 15, fontWeight: 700, color: nextSlot.type === 'recovery' ? '#e8a03a' : '#5b8dee' }}>{s.val}</div>
-                      <div style={{ fontSize: 10, color: G.textMuted, marginTop: 2 }}>{s.label}</div>
+                      <div style={{ fontSize: 15, fontWeight: 700, color: nextSlot.type === 'recovery' ? '#d4813a' : '#2dd4bf' }}>{s.val}</div>
+                      <div style={{ fontSize: 10, color: G.textSecondary, marginTop: 2 }}>{s.label}</div>
                     </div>
                   ))}
                 </div>
-                <div style={{ fontSize: 11, color: G.textMuted, marginTop: 8, textAlign: 'center' }}>
+                <div style={{ fontSize: 11, color: G.textSecondary, marginTop: 8, textAlign: 'center' }}>
                   {t('rankedConfig.spcCards', { spc: nextSlot.secPerCard, cards: nextSlot.totalCards })}
                 </div>
               </div>
@@ -2926,14 +2976,14 @@ export default function EliteCounter() {
                 <div style={{ flex: 1, background: 'rgba(39,174,96,.07)', border: '1px solid rgba(39,174,96,.25)', borderRadius: 7, padding: '8px 10px', fontSize: 11 }}>
                   <div style={{ color: G.green, fontWeight: 700, marginBottom: 3 }}>{t('rankedConfig.winLabel')}</div>
                   {nextSlot.type === 'gate'
-                    ? <div style={{ color: G.textMuted }}>→ {nextSlot.gateId < PLACEMENT_GATES.length - 1 ? t('rankedConfig.nextGate') : t('rankedConfig.placedAt', { rank: RANKS_DEF[(nextSlot.toRankId||1)-1]?.name })}</div>
-                    : <div style={{ color: G.textMuted }}>→ {t('rankedConfig.retryGate', { gate: PLACEMENT_GATES[nextSlot.gateId]?.label })}</div>}
+                    ? <div style={{ color: G.textSecondary }}>→ {nextSlot.gateId < PLACEMENT_GATES.length - 1 ? t('rankedConfig.nextGate') : t('rankedConfig.placedAt', { rank: RANKS_DEF[(nextSlot.toRankId||1)-1]?.name })}</div>
+                    : <div style={{ color: G.textSecondary }}>→ {t('rankedConfig.retryGate', { gate: PLACEMENT_GATES[nextSlot.gateId]?.label })}</div>}
                 </div>
                 <div style={{ flex: 1, background: 'rgba(192,57,43,.07)', border: '1px solid rgba(192,57,43,.25)', borderRadius: 7, padding: '8px 10px', fontSize: 11 }}>
                   <div style={{ color: G.red, fontWeight: 700, marginBottom: 3 }}>{t('rankedConfig.lossLabel')}</div>
                   {nextSlot.type === 'gate'
-                    ? <div style={{ color: G.textMuted }}>→ {t('rankedConfig.recoveryTo', { rank: RANKS_DEF[(nextSlot.fromRankId||1)-1]?.name })}</div>
-                    : <div style={{ color: G.textMuted }}>→ {t('rankedConfig.placementOver')}</div>}
+                    ? <div style={{ color: G.textSecondary }}>→ {t('rankedConfig.recoveryTo', { rank: RANKS_DEF[(nextSlot.fromRankId||1)-1]?.name })}</div>
+                    : <div style={{ color: G.textSecondary }}>→ {t('rankedConfig.placementOver')}</div>}
                 </div>
               </div>
             </div>
@@ -2942,19 +2992,19 @@ export default function EliteCounter() {
               <div className="cfgc">
                 <div className="cfgt">{t('rankedConfig.configuration')}</div>
                 <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
-                  <div style={{ fontSize: 36 }}>{rank.icon}</div>
+                  <RankSigil color={rank.color} size={36} />
                   <div>
-                    <div style={{ fontFamily: 'Playfair Display, serif', fontSize: 15, fontWeight: 600, marginBottom: 3 }}>{rankLabel()}</div>
-                    <div style={{ fontSize: 12, color: G.textMuted, marginBottom: 2 }}>{t('rankedConfig.deckPen', { decks: curRankCfg.decks, pen: rankedPen })}</div>
-                    <div style={{ fontSize: 12, color: G.textMuted }}>{t('rankedConfig.timeSpcCards', { tl, spc: curRankCfg.secPerCard, cards: totalC })}</div>
+                    <div style={{ fontFamily: 'Cinzel, serif', fontSize: 15, fontWeight: 600, marginBottom: 3 }}>{rankLabel()}</div>
+                    <div style={{ fontSize: 12, color: G.textSecondary, marginBottom: 2 }}>{t('rankedConfig.deckPen', { decks: curRankCfg.decks, pen: rankedPen })}</div>
+                    <div style={{ fontSize: 12, color: G.textSecondary }}>{t('rankedConfig.timeSpcCards', { tl, spc: curRankCfg.secPerCard, cards: totalC })}</div>
                   </div>
                 </div>
               </div>
               <div className="cfgc">
                 <div className="cfgt">{t('rankedConfig.mmrCurrent')}</div>
-                <div style={{ fontFamily: 'Playfair Display, serif', fontSize: 28, fontWeight: 700, color: G.goldLight, marginBottom: 6 }}>{save.mmr}<span style={{ fontSize: 14, color: G.goldDim, marginLeft: 4 }}>/ 100</span></div>
+                <div style={{ fontFamily: 'Cinzel, serif', fontSize: 28, fontWeight: 700, color: G.goldLight, marginBottom: 6 }}>{save.mmr}<span style={{ fontSize: 14, color: G.goldDark, marginLeft: 4 }}>/ 100</span></div>
                 <div className="mmrtrack">
-                  <div className="mmrfill" style={{ width: `${save.mmr}%`, background: `linear-gradient(90deg,${G.goldDim},${mmrColor})` }} />
+                  <div className="mmrfill" style={{ width: `${save.mmr}%`, background: `linear-gradient(90deg,${G.goldDark},${mmrColor})` }} />
                 </div>
               </div>
             </>
@@ -2985,8 +3035,8 @@ export default function EliteCounter() {
         {renderCrumbs()}
         <div className="cfg">
           <button className="back" onClick={() => { snd(playClick); goBack(); }} style={{ marginBottom: 14 }}><ChevronLeft size={13} /> {t('common.back')}</button>
-          <div style={{ fontFamily: 'Playfair Display, serif', fontSize: 21, fontWeight: 700, marginBottom: 3 }}>{t('trainingConfig.title')}</div>
-          <div style={{ fontSize: 13, color: G.textMuted, marginBottom: 18 }}>{t('trainingConfig.sub')}</div>
+          <div style={{ fontFamily: 'Cinzel, serif', fontSize: 21, fontWeight: 700, marginBottom: 3 }}>{t('trainingConfig.title')}</div>
+          <div style={{ fontSize: 13, color: G.textSecondary, marginBottom: 18 }}>{t('trainingConfig.sub')}</div>
 
           <div className="cfgc">
             <div className="cfgt">{t('trainingConfig.deckCount')}</div>
@@ -3006,7 +3056,7 @@ export default function EliteCounter() {
                 <button key={p} className={`pbtn${trainPen === p ? ' a' : ''}`} onClick={() => { snd(playClick); setTrainPen(p); }}>{p}%</button>
               ))}
             </div>
-            <div style={{ fontSize: 11, color: G.textMuted, marginTop: 7 }}>{t('trainingConfig.cardsOf', { cards: tc, total: 52 * trainDecks })}</div>
+            <div style={{ fontSize: 11, color: G.textSecondary, marginTop: 7 }}>{t('trainingConfig.cardsOf', { cards: tc, total: 52 * trainDecks })}</div>
           </div>
 
           <div className="cfgc">
@@ -3019,9 +3069,9 @@ export default function EliteCounter() {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
                 <div style={{ fontSize: 13, fontWeight: 500 }}>{t('trainingConfig.showCounter')}</div>
-                <div style={{ fontSize: 11, color: G.textMuted }}>{t('trainingConfig.showCounterSub')}</div>
+                <div style={{ fontSize: 11, color: G.textSecondary }}>{t('trainingConfig.showCounterSub')}</div>
               </div>
-              <button style={{ background: trainShowCount ? 'rgba(201,168,76,.15)' : 'rgba(255,255,255,.05)', border: `1px solid ${trainShowCount ? G.gold : G.border}`, borderRadius: 20, padding: '5px 14px', color: trainShowCount ? G.gold : G.textMuted, cursor: 'pointer', fontSize: 13 }}
+              <button style={{ background: trainShowCount ? 'rgba(201,162,75,.15)' : 'rgba(255,255,255,.05)', border: `1px solid ${trainShowCount ? G.gold : G.border}`, borderRadius: 20, padding: '5px 14px', color: trainShowCount ? G.gold : G.textSecondary, cursor: 'pointer', fontSize: 13 }}
                 onClick={() => { snd(playClick); setTrainShowCount(p => !p); }}>{trainShowCount ? t('common.on') : t('common.off')}</button>
             </div>
           </div>
@@ -3044,11 +3094,11 @@ export default function EliteCounter() {
         {renderCrumbs()}
         <div className="cfg">
           <button className="back" onClick={() => { snd(playClick); goBack(); }} style={{ marginBottom: 14 }}><ChevronLeft size={13} /> {t('common.back')}</button>
-          <div style={{ fontFamily: 'Playfair Display, serif', fontSize: 21, fontWeight: 700, marginBottom: 4 }}>{t('casinoConfig.title')}</div>
-          <div style={{ fontSize: 13, color: G.textMuted, marginBottom: 18 }}>{t('casinoConfig.sub')}</div>
+          <div style={{ fontFamily: 'Cinzel, serif', fontSize: 21, fontWeight: 700, marginBottom: 4 }}>{t('casinoConfig.title')}</div>
+          <div style={{ fontSize: 13, color: G.textSecondary, marginBottom: 18 }}>{t('casinoConfig.sub')}</div>
 
           {alreadyCompleted && (
-            <div style={{ background: 'rgba(201,168,76,.08)', border: `1px solid ${G.borderGold}`, borderRadius: 10, padding: '10px 14px', marginBottom: 14, fontSize: 12, color: G.gold }}>
+            <div style={{ background: 'rgba(201,162,75,.08)', border: `1px solid ${G.borderGold}`, borderRadius: 10, padding: '10px 14px', marginBottom: 14, fontSize: 12, color: G.gold }}>
               {t('casinoConfig.alreadyDone')}
             </div>
           )}
@@ -3065,9 +3115,9 @@ export default function EliteCounter() {
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 13, fontWeight: 600 }}>{t('casinoConfig.deckLabel', { decks: s.decks })}</div>
-                    <div style={{ fontSize: 11, color: G.textMuted }}>{t('casinoConfig.stepCards', { cards: cfg.totalCards, tl: cfg.timeLimit })}</div>
+                    <div style={{ fontSize: 11, color: G.textSecondary }}>{t('casinoConfig.stepCards', { cards: cfg.totalCards, tl: cfg.timeLimit })}</div>
                   </div>
-                  <div style={{ fontSize: 11, color: G.textMuted, textAlign: 'right' }}>
+                  <div style={{ fontSize: 11, color: G.textSecondary, textAlign: 'right' }}>
                     <div>{t('casinoConfig.penShort', { pen: s.penetration })}</div>
                     <div>{t('casinoConfig.spcShort', { spc: s.secPerCard })}</div>
                   </div>
@@ -3102,7 +3152,7 @@ export default function EliteCounter() {
     const isDaily = gameModeRef.current === 'daily';
 
     const timePct = timeInSec / tl;
-    const timerColor = timePct > 0.9 ? G.red : timePct > 0.7 ? '#e8a03a' : G.goldLight;
+    const timerColor = timePct > 0.9 ? G.red : timePct > 0.7 ? '#d4813a' : G.goldLight;
 
     // ── 10s inter-step countdown screen ──────────────────────────
     if (casinoCountdown !== null) {
@@ -3115,11 +3165,11 @@ export default function EliteCounter() {
                   <div key={i} style={{ width: 28, height: 6, borderRadius: 3, background: i < casinoStep ? G.green : i === casinoStep ? G.gold : 'rgba(255,255,255,.1)' }} />
                 ))}
               </div>
-              <div style={{ fontSize: 12, color: G.textMuted, letterSpacing: '.1em', textTransform: 'uppercase', marginBottom: 8 }}>
+              <div style={{ fontSize: 12, color: G.textSecondary, letterSpacing: '.1em', textTransform: 'uppercase', marginBottom: 8 }}>
                 {t('game.stepDoneNext', { n: casinoStep })}
               </div>
               <div className="cdnum" key={casinoCountdown}>{casinoCountdown}</div>
-              <div style={{ fontSize: 13, color: G.textMuted }}>
+              <div style={{ fontSize: 13, color: G.textSecondary }}>
                 {t('game.stepNext', { n: casinoStep + 1, decks: getCasinoStepConfig(casinoStep).decks, tl: getCasinoStepConfig(casinoStep).timeLimit })}
               </div>
             </div>
@@ -3141,11 +3191,11 @@ export default function EliteCounter() {
                   ))}
                 </div>
               )}
-              <div style={{ fontSize: 12, color: G.textMuted, letterSpacing: '.1em', textTransform: 'uppercase' }}>
+              <div style={{ fontSize: 12, color: G.textSecondary, letterSpacing: '.1em', textTransform: 'uppercase' }}>
                 {isCasino ? t('game.countdownCasino', { n: casinoStep + 1 }) : gameModeRef.current === 'daily' ? t('modeName.daily') : gameModeRef.current === 'promo' ? t('game.countdownPromo') : gameModeRef.current === 'placement' ? t('game.countdownPlacement', { n: save.placementGames + 1, total: PLACEMENT_TOTAL }) : gameModeRef.current === 'training' ? t('game.countdownTraining') : t('game.countdownRanked')}
               </div>
               <div className="cdnum" key={countdown}>{countdown > 0 ? countdown : t('game.go')}</div>
-              <div style={{ fontSize: 12, color: G.textMuted }}>{t('game.cardsTime', { cards: deck.length, tl })}</div>
+              <div style={{ fontSize: 12, color: G.textSecondary }}>{t('game.cardsTime', { cards: deck.length, tl })}</div>
             </div>
           </div>
         </div>
@@ -3162,7 +3212,7 @@ export default function EliteCounter() {
           <div className="gm" style={{ padding: 0 }}>
             <div style={{ padding: '18px 18px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <button className="back" onClick={() => { snd(playClick); goBack(); }}><ChevronLeft size={13} /> {t('common.menu')}</button>
-              <div style={{ fontSize: 12, color: G.textMuted }}>{finalTimeSec.toFixed(1)}s / {tl}s</div>
+              <div style={{ fontSize: 12, color: G.textSecondary }}>{finalTimeSec.toFixed(1)}s / {tl}s</div>
             </div>
 
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '16px', gap: 20 }}>
@@ -3175,9 +3225,9 @@ export default function EliteCounter() {
               <div style={{ position: 'absolute', textAlign: 'center', width: '100%', padding: '0 24px' }}>
                 {!showResult ? (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'center', width: '100%', maxWidth: 280, margin: '0 auto' }}>
-                    <div style={{ fontSize: 11, color: G.textMuted, letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 4 }}>{t('game.countQuestion')}</div>
+                    <div style={{ fontSize: 11, color: G.textSecondary, letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 4 }}>{t('game.countQuestion')}</div>
                     <div className="ans" style={{ userSelect: 'none' }}>
-                      {userAnswer === '' || userAnswer === '-' ? <span style={{ color: G.goldDim }}>?</span> : userAnswer}
+                      {userAnswer === '' || userAnswer === '-' ? <span style={{ color: G.goldDark }}>?</span> : userAnswer}
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, width: '100%' }}>
                       {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(d => (
@@ -3192,20 +3242,20 @@ export default function EliteCounter() {
                 ) : (
                   <div style={{ textAlign: 'center', maxWidth: 300, margin: '0 auto' }}>
                     <div className={isCorrect ? 'rc' : 'rw'}>{isCorrect ? '✓' : '✗'}</div>
-                    <div style={{ fontFamily: 'Playfair Display, serif', fontSize: 22, marginTop: 8, marginBottom: 4 }}>
+                    <div style={{ fontFamily: 'Cinzel, serif', fontSize: 22, marginTop: 8, marginBottom: 4 }}>
                       {isCorrect ? t('game.perfect') : t('game.wasCount', { count: runningCount })}
                     </div>
-                    <div style={{ fontSize: 12, color: G.textMuted, marginBottom: 14 }}>
+                    <div style={{ fontSize: 12, color: G.textSecondary, marginBottom: 14 }}>
                       {t('game.resultStats', { time: finalTimeSec.toFixed(1), tl, decks: isDaily ? (dailyRef.current?.decks ?? 1) : (rankUsedRef.current || { decks: trainDecks }).decks })}
                     </div>
 
                     {/* MMR delta — promotion (999) / relégation (-998) / variation normale */}
                     {isRanked && !isPlace && mmrDelta !== 0 && (
-                      <div style={{ marginBottom: 12, padding: '8px 16px', background: mmrDelta === 999 ? 'rgba(201,168,76,.12)' : mmrDelta > 0 ? 'rgba(39,174,96,.1)' : 'rgba(192,57,43,.1)', border: `1px solid ${mmrDelta === 999 ? G.borderGold : mmrDelta > 0 ? 'rgba(39,174,96,.3)' : 'rgba(192,57,43,.3)'}`, borderRadius: 8 }}>
+                      <div style={{ marginBottom: 12, padding: '8px 16px', background: mmrDelta === 999 ? 'rgba(201,162,75,.12)' : mmrDelta > 0 ? 'rgba(39,174,96,.1)' : 'rgba(192,57,43,.1)', border: `1px solid ${mmrDelta === 999 ? G.borderGold : mmrDelta > 0 ? 'rgba(39,174,96,.3)' : 'rgba(192,57,43,.3)'}`, borderRadius: 8 }}>
                         {mmrDelta === 999
-                          ? <span style={{ color: G.gold, fontFamily: 'Playfair Display, serif', fontSize: 16, fontWeight: 700 }}>{t('game.promotion')} → {rankLabel()}</span>
+                          ? <span style={{ color: G.gold, fontFamily: 'Cinzel, serif', fontSize: 16, fontWeight: 700 }}>{t('game.promotion')} → {rankLabel()}</span>
                           : mmrDelta === -998
-                          ? <span style={{ color: G.red, fontFamily: 'Playfair Display, serif', fontSize: 16, fontWeight: 700 }}>{t('game.demotion')} → {rankLabel()}</span>
+                          ? <span style={{ color: G.red, fontFamily: 'Cinzel, serif', fontSize: 16, fontWeight: 700 }}>{t('game.demotion')} → {rankLabel()}</span>
                           : <span style={{ color: mmrDelta > 0 ? G.green : G.red, fontSize: 15, fontWeight: 700 }}>{t('game.mmrDelta', { delta: mmrDelta })}</span>}
                       </div>
                     )}
@@ -3215,12 +3265,12 @@ export default function EliteCounter() {
                       const isDone = save.placementDone; // patched synchronously by applyMMRChange before this renders
                       const nextSlot = isDone ? null : nextPlacementSlot(save.placementHistory || []);
                       return (
-                        <div style={{ marginBottom: 12, background: 'rgba(91,141,238,.08)', border: '1px solid rgba(91,141,238,.2)', borderRadius: 8, padding: '10px 12px', fontSize: 12 }}>
+                        <div style={{ marginBottom: 12, background: 'rgba(45,212,191,.08)', border: '1px solid rgba(45,212,191,.2)', borderRadius: 8, padding: '10px 12px', fontSize: 12 }}>
                           {isDone ? (
                             <>
-                              <div style={{ color: '#5b8dee', fontWeight: 700, marginBottom: 3, fontSize: 13 }}>{t('game.placementDoneTitle')}</div>
-                              <div style={{ color: G.text }}>{t('game.startRankPre')}<strong style={{ color: G.gold }}>{RANKS_DEF[save.rankId - 1]?.name} {RANKS_DEF[save.rankId - 1]?.icon}</strong></div>
-                              {save.mmr > 0 && <div style={{ color: G.textMuted, marginTop: 2 }}>{t('game.startMmr', { mmr: save.mmr })}</div>}
+                              <div style={{ color: '#2dd4bf', fontWeight: 700, marginBottom: 3, fontSize: 13 }}>{t('game.placementDoneTitle')}</div>
+                              <div style={{ color: G.textPrimary }}>{t('game.startRankPre')}<strong style={{ color: RANKS_DEF[save.rankId - 1]?.color || G.gold }}>{RANKS_DEF[save.rankId - 1]?.name}</strong></div>
+                              {save.mmr > 0 && <div style={{ color: G.textSecondary, marginTop: 2 }}>{t('game.startMmr', { mmr: save.mmr })}</div>}
                               {save.placementWins === PLACEMENT_GATES.length && (
                                 <div style={{ color: G.gold, marginTop: 4, fontWeight: 600 }}>{t('game.architectWin')}</div>
                               )}
@@ -3230,12 +3280,12 @@ export default function EliteCounter() {
                               <div style={{ color: isCorrect ? G.green : G.red, fontWeight: 700, marginBottom: 4 }}>
                                 {isCorrect ? t('rankedConfig.winLabel') : t('rankedConfig.lossLabel')}
                               </div>
-                              <div style={{ color: G.text, marginBottom: 2 }}>
-                                {t('game.nextPre')}<strong style={{ color: nextSlot.type === 'recovery' ? '#e8a03a' : '#5b8dee' }}>{slotLabel(nextSlot)}</strong>
-                                {nextSlot.type === 'recovery' && <span style={{ color: '#e8a03a' }}>{t('game.recoveryParen')}</span>}
+                              <div style={{ color: G.textPrimary, marginBottom: 2 }}>
+                                {t('game.nextPre')}<strong style={{ color: nextSlot.type === 'recovery' ? '#d4813a' : '#2dd4bf' }}>{slotLabel(nextSlot)}</strong>
+                                {nextSlot.type === 'recovery' && <span style={{ color: '#d4813a' }}>{t('game.recoveryParen')}</span>}
                               </div>
-                              <div style={{ color: G.textMuted }}>{t('game.placementStats', { decks: nextSlot.decks, pen: nextSlot.penetration, spc: nextSlot.secPerCard, tl: nextSlot.timeLimit })}</div>
-                              <div style={{ color: G.textMuted, marginTop: 3 }}>{t('game.gamesPlayed', { played: gamesPlayed, total: PLACEMENT_TOTAL })}</div>
+                              <div style={{ color: G.textSecondary }}>{t('game.placementStats', { decks: nextSlot.decks, pen: nextSlot.penetration, spc: nextSlot.secPerCard, tl: nextSlot.timeLimit })}</div>
+                              <div style={{ color: G.textSecondary, marginTop: 3 }}>{t('game.gamesPlayed', { played: gamesPlayed, total: PLACEMENT_TOTAL })}</div>
                             </>
                           ) : null}
                         </div>
@@ -3243,23 +3293,23 @@ export default function EliteCounter() {
                     })()}
 
                     {isCorrect && earnedCoins > 0 && (
-                      <div style={{ color: G.textMuted, fontSize: 13, marginBottom: 12, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 5 }}>{t('game.coinsEarned', { coins: earnedCoins })}<Coin size={13} /></div>
+                      <div style={{ color: G.textSecondary, fontSize: 13, marginBottom: 12, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 5 }}>{t('game.coinsEarned', { coins: earnedCoins })}<Coin size={13} /></div>
                     )}
 
                     {/* Défi du jour : score + streak + reviens demain */}
                     {isDaily && showResult && save.daily?.lastResult && (() => {
                       const lr = save.daily.lastResult;
                       return (
-                        <div style={{ marginBottom: 12, background: 'rgba(201,168,76,.08)', border: `1px solid ${G.borderGold}`, borderRadius: 8, padding: '12px 14px' }}>
-                          {lr.special && <div style={{ fontSize: 11, color: G.gold, textAlign: 'center', marginBottom: 6, letterSpacing: '.06em' }}>⭐ {t('game.dailySpecial')}</div>}
+                        <div style={{ marginBottom: 12, background: 'rgba(201,162,75,.08)', border: `1px solid ${G.borderGold}`, borderRadius: 8, padding: '12px 14px' }}>
+                          {lr.special && <div style={{ fontSize: 11, color: G.gold, textAlign: 'center', marginBottom: 6, letterSpacing: '.06em', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}><Sparkles size={11} /> {t('game.dailySpecial')}</div>}
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
-                            <span style={{ fontSize: 12, color: G.textMuted }}>{t('game.dailyScore')}</span>
-                            <span style={{ fontFamily: 'Playfair Display, serif', fontSize: 22, fontWeight: 700, color: lr.score >= 0 ? G.goldLight : G.red }}>{lr.score}</span>
+                            <span style={{ fontSize: 12, color: G.textSecondary }}>{t('game.dailyScore')}</span>
+                            <span style={{ fontFamily: 'Cinzel, serif', fontSize: 22, fontWeight: 700, color: lr.score >= 0 ? G.goldLight : G.red }}>{lr.score}</span>
                           </div>
                           <div style={{ fontSize: 12, color: lr.won ? G.green : G.red, textAlign: 'center', marginBottom: 4 }}>
                             {lr.won ? t('game.dailyStreakKept', { n: save.daily.streak }) : t('game.dailyStreakLost')}
                           </div>
-                          <div style={{ fontSize: 11, color: G.textMuted, textAlign: 'center' }}>{t('game.dailyComeBack')}</div>
+                          <div style={{ fontSize: 11, color: G.textSecondary, textAlign: 'center' }}>{t('game.dailyComeBack')}</div>
                         </div>
                       );
                     })()}
@@ -3276,7 +3326,7 @@ export default function EliteCounter() {
                             {t('game.casinoStepOk', { n: casinoStep + 1, next: casinoCountdown ?? '...' })}
                           </div>
                         ) : (
-                          <div style={{ background: 'rgba(201,168,76,.1)', border: `1px solid ${G.borderGold}`, borderRadius: 8, padding: '10px 14px', fontSize: 13, color: G.gold, fontWeight: 700 }}>
+                          <div style={{ background: 'rgba(201,162,75,.1)', border: `1px solid ${G.borderGold}`, borderRadius: 8, padding: '10px 14px', fontSize: 13, color: G.gold, fontWeight: 700 }}>
                             {t('game.casinoDone')}
                           </div>
                         )}
@@ -3284,7 +3334,7 @@ export default function EliteCounter() {
                     )}
 
                     <div style={{ display: 'flex', gap: 8 }}>
-                      <button style={{ flex: 1, padding: '11px 0', background: 'rgba(255,255,255,.04)', border: `1px solid ${G.border}`, borderRadius: 8, color: G.textMuted, cursor: 'pointer', fontSize: 13 }} onClick={() => { snd(playClick); goBack(); }}>{t('common.menu')}</button>
+                      <button style={{ flex: 1, padding: '11px 0', background: 'rgba(255,255,255,.04)', border: `1px solid ${G.border}`, borderRadius: 8, color: G.textSecondary, cursor: 'pointer', fontSize: 13 }} onClick={() => { snd(playClick); goBack(); }}>{t('common.menu')}</button>
                       {!isCasino && !isDaily && <button className="lbtn" style={{ flex: 2, marginTop: 0, padding: 11 }} onClick={() => { snd(playClick); playAgain(); }}>{t('common.replay')}</button>}
                       {isCasino && !isCorrect && <button className="lbtn red" style={{ flex: 2, marginTop: 0, padding: 11 }} onClick={() => { snd(playClick); startCasinoChallenge(); }}>{t('common.restart')}</button>}
                     </div>
@@ -3321,21 +3371,21 @@ export default function EliteCounter() {
               </div>
             )}
             <div className="ghbtn" onClick={() => patchSave({ soundEnabled: save.soundEnabled === false })} title="Son">
-              {save.soundEnabled !== false ? <Volume2 size={15} /> : <VolumeX size={15} color={G.textMuted} />}
+              {save.soundEnabled !== false ? <Volume2 size={15} /> : <VolumeX size={15} color={G.textSecondary} />}
             </div>
           </div>
 
           {/* Progress */}
           <div style={{ height: 2, background: 'rgba(255,255,255,.04)' }}>
-            <div style={{ height: '100%', width: `${progress}%`, background: `linear-gradient(90deg,${G.goldDim},${timerColor})`, transition: 'width .12s' }} />
+            <div style={{ height: '100%', width: `${progress}%`, background: `linear-gradient(90deg,${G.goldDark},${timerColor})`, transition: 'width .12s' }} />
           </div>
 
           {/* Ranked info bar */}
           {(isRanked || isCasino || isDaily) && (
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 18px', background: 'rgba(0,0,0,.2)', fontSize: 11, color: G.textMuted }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 18px', background: 'rgba(0,0,0,.2)', fontSize: 11, color: G.textSecondary }}>
               {isCasino
                 ? <><span>{t('game.infoCasino', { n: casinoStep + 1 })}</span><span style={{ display: 'flex', gap: 4 }}>{CASINO_STEPS.map((_, i) => <span key={i} style={{ width: 8, height: 8, borderRadius: '50%', background: i < casinoStep ? G.green : i === casinoStep ? G.gold : 'rgba(255,255,255,.15)', display: 'inline-block' }} />)}</span></>
-                : <><span>{isDaily ? `🗓️ ${t('modeName.daily')}` : gameModeRef.current === 'promo' ? t('game.infoPromo') : gameModeRef.current === 'placement' ? t('game.infoPlacement', { n: save.placementGames + 1, total: PLACEMENT_TOTAL }) : t('game.infoRank', { rank: currentRank.name })}</span><span style={{ color: timePct > 0.85 ? G.red : G.textMuted }}>{t('game.limit', { tl })}</span></>
+                : <><span>{isDaily ? t('modeName.daily') : gameModeRef.current === 'promo' ? t('game.infoPromo') : gameModeRef.current === 'placement' ? t('game.infoPlacement', { n: save.placementGames + 1, total: PLACEMENT_TOTAL }) : t('game.infoRank', { rank: currentRank.name })}</span><span style={{ color: timePct > 0.85 ? G.red : G.textSecondary }}>{t('game.limit', { tl })}</span></>
               }
             </div>
           )}
@@ -3347,8 +3397,8 @@ export default function EliteCounter() {
             )}
             {gameState === 'paused' && !showAbandon && (
               <div className="gpaused">
-                <div style={{ fontFamily: 'Playfair Display, serif', fontSize: 26, fontWeight: 700, color: G.goldLight }}>{t('game.pause')}</div>
-                <div style={{ fontSize: 12, color: G.textMuted }}>{t('game.pauseHint')}</div>
+                <div style={{ fontFamily: 'Cinzel, serif', fontSize: 26, fontWeight: 700, color: G.goldLight }}>{t('game.pause')}</div>
+                <div style={{ fontSize: 12, color: G.textSecondary }}>{t('game.pauseHint')}</div>
               </div>
             )}
             {showCount && gameModeRef.current === 'training' && (
@@ -3362,13 +3412,13 @@ export default function EliteCounter() {
           <div className="abdlg">
             <div className="abdbox">
               <AlertTriangle size={32} color={G.red} style={{ margin: '0 auto 12px' }} />
-              <div style={{ fontFamily: 'Playfair Display, serif', fontSize: 19, fontWeight: 700, marginBottom: 6, color: G.text }}>{t('game.abandonTitle')}</div>
-              <div style={{ fontSize: 13, color: G.textMuted, marginBottom: 20, lineHeight: 1.5 }}>
+              <div style={{ fontFamily: 'Cinzel, serif', fontSize: 19, fontWeight: 700, marginBottom: 6, color: G.textPrimary }}>{t('game.abandonTitle')}</div>
+              <div style={{ fontSize: 13, color: G.textSecondary, marginBottom: 20, lineHeight: 1.5 }}>
                 {t('game.abandonBody1')}<br />
                 <span style={{ color: G.red, fontWeight: 600 }}>{t('game.abandonMmr')}</span>{t('game.abandonBody2')}
               </div>
               <div style={{ display: 'flex', gap: 10 }}>
-                <button style={{ flex: 1, padding: '12px 0', background: 'rgba(255,255,255,.05)', border: `1px solid ${G.border}`, borderRadius: 9, color: G.text, cursor: 'pointer', fontSize: 13, fontWeight: 600 }}
+                <button style={{ flex: 1, padding: '12px 0', background: 'rgba(255,255,255,.05)', border: `1px solid ${G.border}`, borderRadius: 9, color: G.textPrimary, cursor: 'pointer', fontSize: 13, fontWeight: 600 }}
                   onClick={() => { snd(playClick); setShowAbandon(false); togglePause(); }}>{t('common.continue')}</button>
                 <button style={{ flex: 1, padding: '12px 0', background: 'rgba(192,57,43,.15)', border: `1px solid rgba(192,57,43,.4)`, borderRadius: 9, color: G.red, cursor: 'pointer', fontSize: 13, fontWeight: 600 }}
                   onClick={() => { snd(playClick); doAbandon(); }}>{t('game.abandon')}</button>
