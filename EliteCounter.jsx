@@ -464,14 +464,25 @@ const dayKey = (d = new Date()) => `${d.getFullYear()}-${d.getMonth() + 1}-${d.g
 // Graine numérique du jour (AAAAMMJJ) — pilote deck + config.
 const daySeed = (d = new Date()) => d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
 
-// Réglages du défi. Jour normal : rapide (~≤ 2 min), un poil plus simple que la
-// ranked du joueur. Jour spécial : rare, 8 decks mais temps/carte très généreux,
-// réservé aux hauts rangs (sinon 8 decks = injouable / interminable).
-const DAILY_MAX_SECONDS = 150;       // plafond de durée d'un jour normal
-const DAILY_SPECIAL_CHANCE = 0.07;   // ~1 jour sur 14
-const DAILY_EASE = 1.15;             // temps/carte un peu plus lent que la ranked = plus simple
-const DAILY_SPECIAL_SLOW = 1.5;      // jour spécial : bien plus lent que la ranked
-const DAILY_SPECIAL_PEN = 50;        // pénétration réduite pour garder les 8 decks jouables
+// Réglages du défi. Jour normal : court (≤ 45 s), un poil plus simple que la
+// ranked du joueur. Jour spécial (tous les 42 jours) : 8 decks mais temps/carte
+// très généreux, réservé aux hauts rangs (sinon 8 decks = injouable/interminable).
+const DAILY_MAX_SECONDS = 45;          // plafond strict d'un jour normal (toutes vitesses)
+const DAILY_SPECIAL_CYCLE = 42;        // jours entre deux rituels spéciaux 8 decks
+const DAILY_EASE = 1.15;               // temps/carte un peu plus lent que la ranked = plus simple
+const DAILY_SPECIAL_SLOW = 1.5;        // jour spécial : bien plus lent que la ranked
+const DAILY_SPECIAL_PEN = 50;          // pénétration réduite pour garder les 8 decks jouables
+// Ancre du cycle : 2 juillet 2026 = jour 0 (premier rituel spécial).
+// Jour d'install typique (3 juillet 2026) = jour 1 du cycle → 41 jours avant le suivant.
+const DAILY_SPECIAL_REF_MS = Date.UTC(2026, 6, 2);
+
+const isDailySpecialDay = (seed) => {
+  const y = Math.floor(seed / 10000);
+  const m = Math.floor((seed % 10000) / 100) - 1; // 0-indexé
+  const d = seed % 100;
+  const daysSinceRef = Math.floor((Date.UTC(y, m, d) - DAILY_SPECIAL_REF_MS) / 86400000);
+  return daysSinceRef >= 0 && daysSinceRef % DAILY_SPECIAL_CYCLE === 0;
+};
 
 // Config du défi du jour : dérivée de la date ET du rang courant du joueur.
 // Volontairement différente des games ranked (moins de decks, un peu plus lente
@@ -479,10 +490,10 @@ const DAILY_SPECIAL_PEN = 50;        // pénétration réduite pour garder les 8
 const getDailyConfig = (seed, rankId = 1, subRank = 1) => {
   const ranked = getRankConfig(rankId, subRank);
   const rng = mulberry32(seed);
-  const specialRoll = rng();   // graine seule → même "jour spécial" pour tout le monde
+  rng();             // slot réservé (maintenu pour ne pas décaler deckRoll/penRoll)
   const deckRoll = rng();
   const penRoll = rng();
-  const special = rankId >= 5 && specialRoll < DAILY_SPECIAL_CHANCE;
+  const special = rankId >= 5 && isDailySpecialDay(seed);
 
   if (special) {
     const decks = 8;
@@ -491,15 +502,21 @@ const getDailyConfig = (seed, rankId = 1, subRank = 1) => {
     return { seed, special: true, decks, penetration: DAILY_SPECIAL_PEN, secPerCard, totalCards, timeLimit: Math.round(secPerCard * totalCards) };
   }
 
-  const penetration = [65, 70, 75][Math.floor(penRoll * 3)];
+  let penetration = [65, 70, 75][Math.floor(penRoll * 3)];
   const secPerCard = parseFloat((ranked.secPerCard * DAILY_EASE).toFixed(2));
-  let decks = deckRoll < 0.6 ? 1 : 2;   // majoritairement 1 deck
+  let decks = deckRoll < 0.6 ? 1 : 2;
   let totalCards = Math.floor(52 * decks * penetration / 100);
   let timeLimit = Math.round(secPerCard * totalCards);
-  // Garde-fou "2 min" : si 2 decks dépasse le plafond (rangs lents), on repasse à 1.
+  // Downgrade 2→1 deck si ça dépasse le plafond
   if (timeLimit > DAILY_MAX_SECONDS && decks === 2) {
     decks = 1;
     totalCards = Math.floor(52 * decks * penetration / 100);
+    timeLimit = Math.round(secPerCard * totalCards);
+  }
+  // Cap absolu 45 s : on taille totalCards et on recalcule la pénétration réelle
+  if (timeLimit > DAILY_MAX_SECONDS) {
+    totalCards = Math.floor(DAILY_MAX_SECONDS / secPerCard);
+    penetration = Math.round(totalCards / (52 * decks) * 100);
     timeLimit = Math.round(secPerCard * totalCards);
   }
   return { seed, special: false, decks, penetration, secPerCard, totalCards, timeLimit };
