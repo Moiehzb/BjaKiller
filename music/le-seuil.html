@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>I · Le Seuil — Blackjack Academy</title>
+<style>
+  :root{
+    --bgDeep:#0d0a1a; --bgCard:#161027; --bgPanel:#1e1638;
+    --gold:#c9a24b; --amber:#d8a657; --teal:#5fb3a3;
+    --parch:#e8dcc0; --lav:#b9a8d8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:radial-gradient(1200px 700px at 50% -10%, #1a1030 0%, var(--bgDeep) 60%);
+    color:var(--parch); font-family:"EB Garamond",Georgia,"Times New Roman",serif;
+    display:flex; align-items:center; justify-content:center; min-height:100vh; padding:24px;
+  }
+  .card{
+    width:min(560px,100%); background:linear-gradient(180deg,var(--bgCard),var(--bgPanel));
+    border:1px solid rgba(201,162,75,.35); border-radius:14px; padding:38px 34px;
+    box-shadow:0 20px 60px rgba(0,0,0,.55), inset 0 1px 0 rgba(201,162,75,.12);
+    text-align:center;
+  }
+  .kicker{ font-size:12px; letter-spacing:.42em; text-transform:uppercase; color:var(--gold); opacity:.85 }
+  h1{ font-family:"Cinzel",Georgia,serif; font-weight:600; letter-spacing:.14em;
+      font-size:34px; margin:10px 0 4px; color:var(--parch);
+      text-transform:uppercase; text-shadow:0 2px 20px rgba(201,162,75,.15) }
+  .sub{ color:var(--lav); font-style:italic; font-size:16px; opacity:.85; margin-bottom:26px }
+  .sigil{ width:54px; height:54px; margin:0 auto 6px; display:block; opacity:.9 }
+  button{
+    font-family:"Cinzel",Georgia,serif; letter-spacing:.18em; text-transform:uppercase;
+    font-size:14px; color:var(--bgDeep); background:linear-gradient(180deg,var(--amber),var(--gold));
+    border:none; border-radius:9px; padding:14px 30px; cursor:pointer;
+    box-shadow:0 6px 20px rgba(201,162,75,.28); transition:transform .12s, box-shadow .12s;
+  }
+  button:hover{ transform:translateY(-1px); box-shadow:0 9px 26px rgba(201,162,75,.4) }
+  button:active{ transform:translateY(0) }
+  button.stop{ background:linear-gradient(180deg,#3a2f4f,#241a3a); color:var(--lav);
+               border:1px solid rgba(185,168,216,.3); box-shadow:none }
+  .ctrls{ display:flex; gap:14px; align-items:center; justify-content:center; margin-top:6px }
+  .vol{ display:flex; align-items:center; gap:8px; margin-top:22px; color:var(--lav); font-size:13px }
+  input[type=range]{ width:180px; accent-color:var(--gold) }
+  .stage{ margin-top:26px; height:6px; background:rgba(185,168,216,.14); border-radius:4px; overflow:hidden }
+  .fill{ height:100%; width:0%; background:linear-gradient(90deg,var(--teal),var(--gold)); transition:width .1s linear }
+  .read{ margin-top:12px; display:flex; justify-content:space-between; font-size:13px; color:var(--lav); opacity:.85 }
+  .read .chord{ color:var(--gold); font-variant:small-caps; letter-spacing:.05em }
+  .note{ margin-top:24px; font-size:12.5px; color:var(--lav); opacity:.7; line-height:1.6; font-style:italic }
+</style>
+</head>
+<body>
+  <div class="card">
+    <svg class="sigil" viewBox="0 0 100 100" fill="none" stroke="#c9a24b" stroke-width="2">
+      <circle cx="50" cy="50" r="34" opacity=".5"/>
+      <path d="M50 16 L50 84 M16 50 L84 50" opacity=".25"/>
+      <path d="M50 24 L69 50 L50 76 L31 50 Z" opacity=".9"/>
+      <circle cx="50" cy="50" r="6" fill="#c9a24b" stroke="none"/>
+    </svg>
+    <div class="kicker">Blackjack Academy · Lobby</div>
+    <h1>Le Seuil</h1>
+    <div class="sub">Ouverture — mesures 1 à 12 &middot; 6/8 &middot; La mineur andalou</div>
+
+    <div class="ctrls">
+      <button id="play">Franchir le seuil</button>
+    </div>
+
+    <div class="stage"><div class="fill" id="fill"></div></div>
+    <div class="read"><span id="pos">Mesure —</span><span class="chord" id="chd">—</span></div>
+
+    <div class="vol">
+      <span>volume</span>
+      <input type="range" id="vol" min="0" max="100" value="82">
+    </div>
+
+    <div class="note">
+      Drone (La, pédale flamenco) · harpe lointaine · guitare en arrière-plan · luth en ornements.
+      Le synthé‑lead n'entre qu'à « L'Appel » (mes. 13) — ici une résolution en La mineur signale ce seuil.
+    </div>
+  </div>
+
+<script>
+(() => {
+  // ============================================================
+  //  LE SEUIL — moteur audio Web Audio API (100% synthèse, offline)
+  //  6/8, croche = 180 (noire pointée = 60) -> mesure = 2.0 s
+  // ============================================================
+  const EIGHTH = 2/6;              // durée d'une croche (s)
+  const BAR    = 2.0;              // durée d'une mesure (s)
+  const LEAD   = 0.14;             // marge avant 1re note (le temps de bâtir les buffers)
+
+  let ctx=null, master=null, dry=null, wet=null, reverb=null, limiter=null;
+  let startAt=0, running=false, raf=0, endTimer=0;
+  let userVol=0.82, droneGain=null;
+  const ksCache = new Map();
+  const droneRefs = [];
+
+  // --- note -> fréquence ---------------------------------------
+  const PC = {C:0,Cs:1,D:2,Ds:3,E:4,F:5,Fs:6,G:7,Gs:8,A:9,As:10,B:11};
+  function f(n){ const o=+n.slice(-1), p=PC[n.slice(0,-1)]; return 440*Math.pow(2,((o+1)*12+p-69)/12); }
+  const cents = (fr,c)=> fr*Math.pow(2,c/1200);
+  const hum   = ()=> (Math.random()*2-1)*0.008;   // micro-décalage humain (±8ms)
+
+  // --- Karplus-Strong : génère un buffer de corde pincée -------
+  function ks(freq, dur, bright, decay, damp){
+    const key = [freq.toFixed(1),dur,bright,decay,damp].join('|');
+    if(ksCache.has(key)) return ksCache.get(key);
+    const sr=ctx.sampleRate, N=Math.max(2,Math.round(sr/freq)), len=Math.floor(dur*sr);
+    const buf=ctx.createBuffer(1,len,sr), y=buf.getChannelData(0);
+    let prev=0;
+    for(let i=0;i<N;i++){ let w=Math.random()*2-1; w=bright*w+(1-bright)*prev; prev=w; y[i]=w; }
+    for(let i=N;i<len;i++){
+      const avg=(y[i-N]+y[i-N+1])/2;
+      y[i]=decay*(damp*avg + (1-damp)*y[i-N]);
+    }
+    let mx=1e-6; for(let i=0;i<len;i++) mx=Math.max(mx,Math.abs(y[i]));
+    for(let i=0;i<len;i++) y[i]/=mx;
+    ksCache.set(key,buf); return buf;
+  }
+
+  // --- profils d'instruments (cordes pincées) ------------------
+  const INST = {
+    // harpe : brillante, longue résonance, aérienne (bien réverbérée = lointaine)
+    harp:   { ring:2.6, bright:0.72, decay:0.9965, damp:0.55, type:'highpass', cut:180, q:0.5, gain:0.17, send:0.5,  pan:-0.18 },
+    // guitare flamenco (nylon) : chaude, moyenne résonance — VOLONTAIREMENT en arrière-plan
+    guitar: { ring:1.7, bright:0.5,  decay:0.9925, damp:0.62, type:'lowpass', cut:2600, q:0.7, gain:0.092, send:0.24, pan:0.06 },
+    // luth : délicat, court, brillant mais discret (double corde détunée)
+    lute:   { ring:1.3, bright:0.66, decay:0.9895, damp:0.5,  type:'highpass', cut:300, q:0.5, gain:0.062, send:0.52, pan:0.2 },
+  };
+
+  function pluck(inst, note, t, vel, detune=0, panOv=null){
+    const p=INST[inst];
+    const fr = detune? cents(f(note),detune) : f(note);
+    const src=ctx.createBufferSource();
+    src.buffer = ks(fr, p.ring, p.bright, p.decay, p.damp);
+    const flt=ctx.createBiquadFilter(); flt.type=p.type; flt.frequency.value=p.cut; flt.Q.value=p.q;
+    const g=ctx.createGain();
+    g.gain.setValueAtTime(0,t);
+    g.gain.linearRampToValueAtTime(vel*p.gain, t+0.004);   // attaque douce anti-clic
+    const pan=ctx.createStereoPanner(); pan.pan.value = panOv!=null?panOv:p.pan;
+    src.connect(flt); flt.connect(g); g.connect(pan);
+    pan.connect(dry);
+    const s=ctx.createGain(); s.gain.value=p.send; pan.connect(s); s.connect(reverb);
+    src.start(t); src.stop(t+p.ring+0.05);
+  }
+  // luth = deux cordes légèrement désaccordées (effet "chœur" du luth)
+  function luteNote(note,t,vel){ pluck('lute',note,t,vel,-7); pluck('lute',note,t+0.006,vel*0.85,+7); }
+
+  // --- harpe : arpège roulé (bas -> haut) ----------------------
+  function harpRoll(notes,t,vel,spread=0.019){
+    notes.forEach((n,i)=> pluck('harp',n,t+i*spread+hum(),vel*(1-i*0.05)));
+  }
+  // --- guitare : arpège 6/8 en arrière-plan --------------------
+  function guitarArp(voicing,bar,vel){
+    const pat=[0,1,2,3,2,1];            // p-i-m-a doux, montée/descente
+    for(let e=0;e<6;e++){
+      const n=voicing[pat[e]%voicing.length];
+      pluck('guitar',n, T(bar,e)+hum(), vel*(e===0?1:0.8));
+    }
+  }
+
+  // --- drone : pédale de La analogique (nappe) -----------------
+  function startDrone(t){
+    const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=560; lp.Q.value=0.6;
+    const lfo=ctx.createOscillator(); lfo.frequency.value=0.06;
+    const lg=ctx.createGain(); lg.gain.value=170; lfo.connect(lg); lg.connect(lp.frequency); lfo.start(t);
+    const g=ctx.createGain();
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.exponentialRampToValueAtTime(0.17, t+3.6);       // long swell d'entrée
+    lp.connect(g); g.connect(dry);
+    const s=ctx.createGain(); s.gain.value=0.16; g.connect(s); s.connect(reverb);
+    // léger frémissement d'amplitude (respiration)
+    const amp=ctx.createOscillator(); amp.frequency.value=0.13;
+    const ag=ctx.createGain(); ag.gain.value=0.02; amp.connect(ag); ag.connect(g.gain); amp.start(t);
+    const voices=[['A1','sawtooth',0.85,-6],['A1','sawtooth',0.85,6],['A2','sawtooth',0.6,0],
+                  ['E2','triangle',0.42,0],['A3','triangle',0.16,4]];
+    voices.forEach(([n,ty,a,det])=>{
+      const o=ctx.createOscillator(); o.type=ty; o.frequency.value=f(n); o.detune.value=det;
+      const og=ctx.createGain(); og.gain.value=a; o.connect(og); og.connect(lp); o.start(t);
+      droneRefs.push(o);
+    });
+    droneRefs.push(lfo,amp);
+    droneGain=g; return g;
+  }
+
+  // --- position temporelle (mesure 1-indexée, croche 0..5) -----
+  function T(bar,e){ return startAt + (bar-1)*BAR + e*EIGHTH; }
+
+  // --- accords (voicings) --------------------------------------
+  const CH = {
+    Am:   { name:'Am(add9)', gtr:['A2','E3','A3','C4'],  harp:['A3','C4','E4','B4','A5'],  orn:['E5','C5','A4'] },
+    G:    { name:'G',        gtr:['G2','D3','G3','B3'],  harp:['G3','B3','D4','G4','B4'],  orn:['D5','B4','G4'] },
+    Fmaj7:{ name:'Fmaj7',    gtr:['F2','C3','A3','C4'],  harp:['A3','C4','E4','F4','A4'],  orn:['E5','C5','A4'] },
+    E7:   { name:'E7(♭9)',   gtr:['E2','B2','Gs3','D4'], harp:['Gs3','B3','D4','E4','Gs4'],orn:['E5','B4','Gs4'] },
+  };
+  const SEQ = ['Am','G','Fmaj7','E7','Am','G','Fmaj7','E7','Am','G','Fmaj7','E7'];
+
+  // --- partition : « Le Seuil » (12 mes.) ----------------------
+  function schedule(){
+    startDrone(startAt);
+
+    for(let bar=1; bar<=12; bar++){
+      const c = CH[SEQ[bar-1]];
+      // phase 1 (1-2): quasi vide  | 2 (3-4): harpe  | 3 (5-8): +guitare  | 4 (9-12): plein-doux
+      const phase = bar<=2?1 : bar<=4?2 : bar<=8?3 : 4;
+
+      // HARPE — roulé d'ouverture de mesure
+      if(phase===1){
+        harpRoll(c.harp.slice(0,3), T(bar,0), 0.5);
+        if(bar===2) harpRoll(c.harp.slice(2,5), T(bar,3), 0.34, 0.03);
+      } else {
+        harpRoll(c.harp, T(bar,0), 0.62);
+        if(phase>=3){ pluck('harp', c.harp[4], T(bar,3)+hum(), 0.42);          // sommet suspendu
+                      if(phase===4) pluck('harp', c.harp[3], T(bar,4.5)+hum(), 0.3); }
+      }
+
+      // GUITARE — arrière-plan, entre à la mesure 5
+      if(phase>=3) guitarArp(c.gtr, bar, phase===4?0.9:0.72);
+
+      // LUTH — ornement délicat en fin de cellule (mes. 4, 8, 12) + une grâce mes. 2
+      if(bar===2) luteNote('E5', T(bar,4)+hum(), 0.5);
+      if(bar===4||bar===8||bar===12){
+        c.orn.forEach((n,i)=> luteNote(n, T(bar,3+i)+hum(), 0.6-i*0.08));
+      }
+    }
+
+    // Seuil franchi : douce résolution en La mineur (là où le SYNTHÉ entrera, mes. 13)
+    const rt = startAt + 12*BAR;
+    harpRoll(['A3','C4','E4','A4','C5'], rt, 0.7, 0.024);
+    ['A2','E3','A3','C4'].forEach((n,i)=> pluck('guitar', n, rt+i*0.02, 0.6));
+    luteNote('A5', rt+0.05, 0.5);
+
+    // fondu du drone après la résolution
+    if(droneGain){ droneGain.gain.setTargetAtTime(0.0001, rt+1.4, 1.1); }
+  }
+
+  // --- réverbe (IR généré) -------------------------------------
+  function makeReverb(){
+    const sr=ctx.sampleRate, len=Math.floor(sr*2.6), ir=ctx.createBuffer(2,len,sr);
+    for(let ch=0; ch<2; ch++){ const d=ir.getChannelData(ch);
+      for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/len,2.4); }
+    const cv=ctx.createConvolver(); cv.buffer=ir; return cv;
+  }
+
+  // --- transport ----------------------------------------------
+  function build(){
+    ctx = new (window.AudioContext||window.webkitAudioContext)();
+    ksCache.clear(); droneRefs.length=0; droneGain=null;
+    limiter=ctx.createDynamicsCompressor();
+    limiter.threshold.value=-6; limiter.knee.value=6; limiter.ratio.value=4;
+    limiter.attack.value=0.003; limiter.release.value=0.25;
+    master=ctx.createGain(); master.gain.value=userVol;
+    dry=ctx.createGain(); wet=ctx.createGain(); wet.gain.value=0.9;
+    reverb=makeReverb();
+    dry.connect(master); reverb.connect(wet); wet.connect(master);
+    master.connect(limiter); limiter.connect(ctx.destination);
+  }
+
+  function play(){
+    build();
+    startAt = ctx.currentTime + LEAD;
+    schedule();
+    running=true; setBtn(true);
+    tick();
+    clearTimeout(endTimer);
+    endTimer=setTimeout(stop, (12*BAR + 4.2)*1000);
+  }
+
+  function stop(){
+    running=false; setBtn(false); cancelAnimationFrame(raf);
+    if(ctx){ const c=ctx; try{ master.gain.setTargetAtTime(0.0001,c.currentTime,0.15); }catch(e){}
+             setTimeout(()=>{ try{c.close()}catch(e){} }, 400); }
+    document.getElementById('fill').style.width='0%';
+    document.getElementById('pos').textContent='Mesure —';
+    document.getElementById('chd').textContent='—';
+  }
+
+  function tick(){
+    if(!running||!ctx) return;
+    const el = ctx.currentTime - startAt;
+    const total = 12*BAR;
+    const pct = Math.max(0,Math.min(1, el/total));
+    document.getElementById('fill').style.width=(pct*100)+'%';
+    const bar = Math.floor(el/BAR)+1;
+    if(el<0){ document.getElementById('pos').textContent='…'; }
+    else if(bar<=12){
+      document.getElementById('pos').textContent='Mesure '+bar+' / 12';
+      document.getElementById('chd').textContent=CH[SEQ[bar-1]].name;
+    } else {
+      document.getElementById('pos').textContent='Seuil franchi';
+      document.getElementById('chd').textContent='→ L’Appel';
+    }
+    raf=requestAnimationFrame(tick);
+  }
+
+  function setBtn(on){
+    const b=document.getElementById('play');
+    b.textContent = on?'Arrêter':'Franchir le seuil';
+    b.classList.toggle('stop',on);
+  }
+
+  document.getElementById('play').addEventListener('click',()=> running?stop():play());
+  document.getElementById('vol').addEventListener('input',e=>{
+    userVol=e.target.value/100;
+    if(master && ctx && ctx.state==='running') master.gain.setTargetAtTime(userVol,ctx.currentTime,0.05);
+  });
+})();
+</script>
+</body>
+</html>
