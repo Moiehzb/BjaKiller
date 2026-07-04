@@ -13,7 +13,8 @@
 - **Moteur** : Web Audio API, 100 % synthèse offline (aucun sample, aucun fetch). Marche en `file://`.
 - **Sections codées + validées à l'oreille** : **Le Seuil** (mes. 1-12), **L'Appel** (13-28), **La Marche** (29-44).
 - **Codé + validé à l'oreille** : **Le Cloître** (45-64) — pont lumineux (vamp **Cadd9⇄Fmaj7**). Flûte : ✅ **mélodie AABA validée**. Accompagnement : ✅ **texture progressive** + 2 moments hors-grille (harpe beat 2 mes.48, luth beat 1 mes.56).
-- **Reste à coder** : **L'Ascension** (65-92), **Le Retour** (93-120) + finalisation de la **boucle seamless**.
+- **Codé, à valider à l'oreille** : **L'Ascension** (65-92) + **Le Retour** (93-120) + **boucle seamless** (mes. 120 E7 → mes. 1 Am via `play(1)`). `TOTAL_BARS=120`.
+- **Reste** : validation à l'oreille + éventuels ajustements de mix.
 - **Journal / points de sauvegarde** : voir **§8 (Journal)** tout en bas — mis à jour à **chaque étape stable** (le plus récent en haut). Les **valeurs exactes = le code** ; le Journal ne logue **pas** les micro-réglages.
 
 ---
@@ -114,7 +115,7 @@ Tout est dans un `<script>` unique (IIFE). Ordre : constantes → utilitaires (`
 
 ## 7. Prochaine étape
 
-**Le Cloître est validé** (mes. 45-64 : vamp Cadd9⇄Fmaj7, flûte AABA + accompagnement progressif). Prochaine étape : **L'Ascension** (climax, mes. 65-92 — retour Am, arrangement plein, thème + harmonies, **pas de luth**), puis **Le Retour** (outro, 93-120 — dé-empilement vers texture d'ouverture, luth revient, + **bouclage seamless** E7→Am).
+**L'Ascension (65-92) + Le Retour (93-120) codés.** Boucle seamless active (mes. 120 → mes. 1). À valider à l'oreille : mix des nouvelles sections, équilibre dé-empilement Le Retour, jointure invisible E7→Am.
 
 Références analysées (dans `.midi/`, via parser maison — voir méthodologie) : **Gerudo Valley** (F♯m harmonique, cadence andalouse = ADN flamenco), **Corridors of Time** (loop hypnotique 2 accords), **Schala** (Fm, min-maj7/napolitain), **Terra** (Si maj penché sur le vi), **Pallet Town** (Sol maj diatonique, harmonie lente).
 
@@ -125,6 +126,12 @@ Références analysées (dans `.midi/`, via parser maison — voir méthodologie
 > **Point de sauvegarde par étape.** On met à jour cette fiche (ce §, + §0 « en un coup d'œil » + §7 « prochaine étape ») à **chaque état stable** : section codée, mix validé, décision verrouillée — **avant de s'arrêter**.
 > **On NE logue PAS chaque micro-réglage.** Les valeurs exactes vivent dans le **code** (`le-seuil.html` fait foi). Une session de tweaks = **une** ligne consolidée (« guitare La Marche portée à X, validé »), pas dix.
 > Format : `AAAA-MM-JJ — ce qui change — pourquoi`. Le plus récent en haut.
+
+### 2026-07-05 — L'Ascension + Le Retour codés (mes. 65-120), boucle seamless
+- **L'Ascension (65-92)** : 4 phases — thème A (65-72), thème B orné (73-80), climax B (81-88, palmas denses, harpe +shimmer+haute), transition (89-92, guitare arpège, perc s'allège). Pas de luth. Basse pulsée 1&4.
+- **Le Retour (93-120)** : dé-empilement en 4 phases — perc s'éteint à la phase 3, guitare à la phase 3, luth revient dès la phase 2 (comme au Seuil). Dernière expo du thème (synthé) à 93-100. Harpe seule en phase 4.
+- **Boucle seamless** : `play(1)` déclenché à `TOTAL_BARS*BAR + 3s`. Mes. 120 = E7 → mes. 1 = Am : jointure naturelle (cadence andalouse).
+- **À valider** : mix global des sections V et VI, jointure perceptible ou invisible.
 
 ### 2026-07-04 — Le Cloître entièrement validé (mes. 45-64)
 - **Flûte ✅** : forme **AABA** sur 16 mes. Thème 4 mes. (port E-G→La5, réponse Do-Ré-Mi, rebond Sol-La-Sol, Mi tenu). A+A' → dév. apex C6 + mordant → retour thème. vel=0.92, entrée franche (pas de fade-in).
