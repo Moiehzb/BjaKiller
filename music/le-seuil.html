@@ -230,47 +230,34 @@
     oss.forEach(o=>{ o.start(t); o.stop(t+dur+0.1); }); vib.stop(t+dur+0.1);
   }
 
-  // --- FLÛTE (voix soufflée, tenue) : porte le thème au « Cloître » quand le synthé se tait
+  // --- FLÛTE (voix claire, tenue) : porte le thème au « Cloître » quand le synthé se tait
+  //     PAS de bruit de souffle (ça faisait un « talkie-walkie ») — ton propre, sinus + octave + vibrato.
   function fluteNote(note, t, dur, vel){
-    const fr=f(note), out=ctx.createGain();
-    // corps : fondamentale sinus dominante + octave douce + soupçon de triangle (rondeur)
-    const mix=ctx.createGain(), oss=[];
-    [['sine',fr,0,0.5],['triangle',fr,0,0.12],['sine',fr*2,0,0.13],['sine',fr*3,0,0.045]]
+    const fr=f(note), mix=ctx.createGain(), oss=[];
+    // ton clair : sinus fondamental dominant + octave douce + soupçon de triangle (corps, pas de buzz)
+    [['sine',fr,0,0.62],['sine',fr*2,0,0.2],['triangle',fr,0,0.09]]
       .forEach(([ty,fq,det,a])=>{
         const o=ctx.createOscillator(); o.type=ty; o.frequency.value=fq; o.detune.value=det;
         const og=ctx.createGain(); og.gain.value=a; o.connect(og); og.connect(mix); oss.push(o);
       });
-    // vibrato retardé (le souffle qui « chante »)
-    const vib=ctx.createOscillator(); vib.frequency.value=5.0;
-    const vibg=ctx.createGain(); vibg.gain.setValueAtTime(0,t); vibg.gain.linearRampToValueAtTime(4,t+0.45);
+    // vibrato retardé, léger (la voix qui « chante », sans exagérer)
+    const vib=ctx.createOscillator(); vib.frequency.value=4.8;
+    const vibg=ctx.createGain(); vibg.gain.setValueAtTime(0,t); vibg.gain.linearRampToValueAtTime(3.5,t+0.5);
     vib.connect(vibg); oss.forEach(o=> vibg.connect(o.detune)); vib.start(t);
-    // filtre doux (rondeur, s'ouvre un peu à l'attaque)
-    const flt=ctx.createBiquadFilter(); flt.type='lowpass'; flt.Q.value=0.7;
-    flt.frequency.setValueAtTime(1100,t);
-    flt.frequency.linearRampToValueAtTime(2600,t+0.09);
-    flt.frequency.exponentialRampToValueAtTime(1900,t+Math.min(Math.max(dur,0.2),0.7));
-    // enveloppe tonale : attaque douce, tenue, release aérien
-    const ampT=ctx.createGain(), L=vel*0.16;
-    ampT.gain.setValueAtTime(0.0001,t);
-    ampT.gain.linearRampToValueAtTime(L,t+0.07);
-    ampT.gain.setValueAtTime(L,t+Math.max(0.1,dur-0.12));
-    ampT.gain.linearRampToValueAtTime(0.0001,t+dur+0.06);
-    mix.connect(flt); flt.connect(ampT); ampT.connect(out);
-    // souffle : bruit passe-haut, petit « chiff » d'attaque puis fond léger
-    const nz=ctx.createBufferSource(); nz.buffer=noiseBuf(); nz.loop=true;
-    const nhp=ctx.createBiquadFilter(); nhp.type='highpass'; nhp.frequency.value=1900;
-    const ampN=ctx.createGain();
-    ampN.gain.setValueAtTime(0.0001,t);
-    ampN.gain.linearRampToValueAtTime(L*0.42,t+0.03);
-    ampN.gain.exponentialRampToValueAtTime(L*0.10,t+0.16);
-    ampN.gain.setValueAtTime(L*0.10,t+Math.max(0.2,dur-0.12));
-    ampN.gain.linearRampToValueAtTime(0.0001,t+dur+0.06);
-    nz.connect(nhp); nhp.connect(ampN); ampN.connect(out);
-    // sortie + réverbe (aérien)
-    const pan=ctx.createStereoPanner(); pan.pan.value=0.03; out.connect(pan); pan.connect(dry);
-    const s=ctx.createGain(); s.gain.value=0.22; pan.connect(s); s.connect(reverb);
-    oss.forEach(o=>{ o.start(t); o.stop(t+dur+0.12); });
-    vib.stop(t+dur+0.12); nz.start(t); nz.stop(t+dur+0.12);
+    // filtre doux et OUVERT (clarté), stable
+    const flt=ctx.createBiquadFilter(); flt.type='lowpass'; flt.Q.value=0.6;
+    flt.frequency.setValueAtTime(1600,t);
+    flt.frequency.linearRampToValueAtTime(2900,t+0.12);
+    // enveloppe : attaque douce, tenue, release aérien
+    const amp=ctx.createGain(), L=vel*0.17;
+    amp.gain.setValueAtTime(0.0001,t);
+    amp.gain.linearRampToValueAtTime(L,t+0.06);
+    amp.gain.setValueAtTime(L,t+Math.max(0.1,dur-0.1));
+    amp.gain.linearRampToValueAtTime(0.0001,t+dur+0.08);
+    mix.connect(flt); flt.connect(amp);
+    const pan=ctx.createStereoPanner(); pan.pan.value=0.02; amp.connect(pan); pan.connect(dry);
+    const s=ctx.createGain(); s.gain.value=0.2; pan.connect(s); s.connect(reverb);   // réverbe = l'air
+    oss.forEach(o=>{ o.start(t); o.stop(t+dur+0.12); }); vib.stop(t+dur+0.12);
   }
 
   // thème principal (8 mes.) — [mesure locale 1..8, croche 0..5, durée(croches), note]
@@ -303,21 +290,32 @@
     THEME_B.forEach(([lb,e,d,note])=> ev(T(startBar+lb-1,e), at=> synthNote(note, at, d*EIGHTH, 0.92)));
   }
 
-  // thème porté par la FLÛTE au « Cloître » : ossature du thème, Sol♯ -> Sol (on quitte la sensible
-  // andalouse pour la lumière de Do majeur), plus aéré. Les notes pentatoniques rendent des couleurs
-  // Cmaj9 / Fmaj7♯11 sous le vamp Cadd9⇄Fmaj7.
-  const FLUTE_CLOITRE = [
-    [1,0,2,'A4'],[1,2,1,'C5'],[1,3,3,'E5'],              // (Cadd9)  A C E___
-    [2,0,3,'D5'],[2,3,3,'B4'],                           // (Fmaj7)  D___ B___  (B = ♯11 lydien, flotte)
-    [3,0,3,'C5'],[3,3,3,'A4'],                           // (Cadd9)  C___ A___
-    [4,0,3,'B4'],[4,3,3,'G4'],                           // (Fmaj7)  B___ G___  (Sol naturel : plus de tension)
-    [5,0,1,'A4'],[5,1,1,'C5'],[5,2,1,'E5'],[5,3,3,'A5'], // (Cadd9)  envol à l'octave A5
-    [6,0,3,'G5'],[6,3,3,'D5'],                           // (Fmaj7)  G___ D___
-    [7,0,3,'E5'],[7,3,3,'C5'],                           // (Cadd9)  E___ C___
-    [8,0,3,'G4'],[8,3,3,'A4'],                           // (Fmaj7)  résolution douce Sol->La
+  // MÉLODIE de la flûte au « Cloître » : une mélodie NOUVELLE (pas le thème rejoué) — plus aérée, chantante,
+  // qui exploite la lumière de Do majeur (E = maj7 rêveur sur Fmaj7). Contour différent du thème = vrai contraste.
+  // Phrase A (mes. 45-52) : monte doucement vers un petit sommet A5, puis se repose sur un Do tenu.
+  const FLUTE_CLOITRE_A = [
+    [1,0,3,'G4'],[1,3,3,'C5'],            // (Cadd9)  quinte -> tonique, calme
+    [2,0,4,'E5'],[2,4,2,'D5'],            // (Fmaj7)  E = maj7 rêveur, se pose sur D
+    [3,0,3,'E5'],[3,3,3,'G5'],            // (Cadd9)  monte E -> G
+    [4,0,4,'A5'],[4,4,2,'G5'],            // (Fmaj7)  petit sommet A5 tenu, retombe
+    [5,0,3,'E5'],[5,3,3,'D5'],            // (Cadd9)  redescend
+    [6,0,4,'C5'],[6,4,2,'A4'],            // (Fmaj7)  longue C, vers La
+    [7,0,3,'G4'],[7,3,3,'A4'],            // (Cadd9)  bas, calme
+    [8,0,6,'C5'],                         // (Fmaj7)  Do tenu = repos lumineux
   ];
-  function playFluteCloitre(startBar, vel){
-    FLUTE_CLOITRE.forEach(([lb,e,d,note])=> ev(T(startBar+lb-1,e), at=> fluteNote(note, at, d*EIGHTH, vel)));
+  // Phrase B (mes. 53-60) : développement — repart plus haut, apex doux C6, puis redescend vers le tag.
+  const FLUTE_CLOITRE_B = [
+    [1,0,3,'E5'],[1,3,3,'G5'],            // (Cadd9)  repart plus haut
+    [2,0,3,'A5'],[2,3,3,'G5'],            // (Fmaj7)  zone de sommet
+    [3,0,2,'E5'],[3,2,1,'G5'],[3,3,3,'C6'], // (Cadd9)  apex doux C6
+    [4,0,4,'A5'],[4,4,2,'G5'],            // (Fmaj7)  quitte le sommet
+    [5,0,3,'E5'],[5,3,3,'D5'],            // (Cadd9)  descend
+    [6,0,4,'C5'],[6,4,2,'D5'],            // (Fmaj7)
+    [7,0,3,'E5'],[7,3,3,'D5'],            // (Cadd9)
+    [8,0,6,'C5'],                         // (Fmaj7)  repos sur Do (prépare le tag)
+  ];
+  function playFluteCloitre(startBar, arr, vel){
+    arr.forEach(([lb,e,d,note])=> ev(T(startBar+lb-1,e), at=> fluteNote(note, at, d*EIGHTH, vel)));
   }
   // 61-64 : la flûte redescend et s'apaise (respiration finale du pont, prépare le retour à La mineur)
   const FLUTE_TAG = [
@@ -427,16 +425,25 @@
       } else if(bar<=44){
         // ---------- LA MARCHE (variation A', plus d'élan) ----------
         const stmt2 = bar>36;                            // 37-44 = « flammes » de guitare
+        const last  = bar===44;                          // dernière mesure : on AMORCE la bascule (au lieu de couper net)
         ev(T(bar,0), at=> harpRoll(c.harp, at, 0.5));
         ev(T(bar,3), at=> harpRoll(c.harp.slice(2), at, 0.32, 0.02));      // 2e roulé = mouvement
-        // « flammes » AUDIBLES sur toute La Marche (un peu plus fort au climax)
-        ev(T(bar,0), at=> guitarFlurry(c.gtr.map(up), at, stmt2?1.0:0.82));
-        ev(T(bar,0), at=> cajonBass(at+hum(), 0.95));
-        ev(T(bar,3), at=> cajonSlap(at+hum(), 0.8));
-        ev(T(bar,3), at=> palma(at+hum(), 0.5));
-        ev(T(bar,5), at=> palma(at+hum(), stmt2?0.44:0.34));               // contretemps (lilt de marche)
-        if(stmt2) ev(T(bar,1), at=> palma(at+hum(), 0.3));                 // palmas plus denses au climax
-        if(bar%4===0) c.orn.forEach((n,i)=> ev(T(bar,4+i*0.5), at=> luteNote(n, at+hum(), 0.34-i*0.05)));
+        if(!last){
+          // « flammes » AUDIBLES sur toute La Marche (un peu plus fort au climax)
+          ev(T(bar,0), at=> guitarFlurry(c.gtr.map(up), at, stmt2?1.0:0.82));
+          ev(T(bar,0), at=> cajonBass(at+hum(), 0.95));
+          ev(T(bar,3), at=> cajonSlap(at+hum(), 0.8));
+          ev(T(bar,3), at=> palma(at+hum(), 0.5));
+          ev(T(bar,5), at=> palma(at+hum(), stmt2?0.44:0.34));             // contretemps (lilt de marche)
+          if(stmt2) ev(T(bar,1), at=> palma(at+hum(), 0.3));               // palmas plus denses au climax
+          if(bar%4===0) c.orn.forEach((n,i)=> ev(T(bar,4+i*0.5), at=> luteNote(n, at+hum(), 0.34-i*0.05)));
+        } else {
+          // BASCULE vers Le Cloître : la percu s'efface, la harpe « ouvre » vers le haut, et le synthé
+          // se DISSOUT sur le Mi (note pivot commune E7↔Cadd9) au lieu de se couper net.
+          ev(T(bar,0), at=> cajonBass(at+hum(), 0.5));                             // un dernier boom, doux
+          ev(T(bar,3), at=> harpRoll(['E4','Gs4','B4','D5','E5'], at, 0.5, 0.03)); // gliss ascendant (E7) = respiration
+          ev(T(bar,3), at=> synthNote('E5', at, 5*EIGHTH, 0.5));                    // le synthé tient/fond le Mi dans le Cloître
+        }
 
       } else {
         // ---------- LE CLOÎTRE (pont lumineux : vamp Do majeur, la flûte respire) ----------
@@ -450,10 +457,10 @@
     playTheme(13);  playTheme(21);      // L'Appel : thème
     playThemeB(29); playThemeB(37);     // La Marche : variation ornée
 
-    // MÉLODIE flûte (Le Cloître) : le thème respiré dans la lumière de Do majeur
-    playFluteCloitre(45, 0.85);         // 1re respiration
-    playFluteCloitre(53, 0.95);         // 2e respiration, un peu plus présente
-    playFluteTag(61);                   // 61-64 : la flûte redescend vers le retour
+    // MÉLODIE flûte (Le Cloître) : mélodie NOUVELLE et aérée (contraste avec le thème), à travers 45-60
+    playFluteCloitre(45, FLUTE_CLOITRE_A, 0.85);   // phrase A
+    playFluteCloitre(53, FLUTE_CLOITRE_B, 0.9);    // phrase B (développée, apex C6)
+    playFluteTag(61);                              // 61-64 : la flûte redescend vers le retour
 
     // --- courte ouverture vers « L'Ascension » (retour à La mineur) après la mes. 64 ---
     const rt = 64*BAR;
