@@ -314,37 +314,42 @@
     THEME_B.forEach(([lb,e,d,note])=> ev(T(startBar+lb-1,e), at=> synthNote(note, at, d*EIGHTH, 0.92)));
   }
 
-  // MÉLODIE de la flûte au « Cloître » : un MOTIF reconnaissable (le « port ») revient 3×.
-  // Le port = E-G pickup rapide → La5 tenu + arche descendante G→E.
-  // ENTRE les rappels : syncopes, ornements, silences réels = la flûte respire, pas un synthé.
-  // Phrase A (mes. 45-52) : MOTIF(1-2) → réponse syncopée(3-4) → MOTIF(5-6) → mordant+SILENCE(7-8)
+  // MÉLODIE flûte — forme AABA sur 16 mesures (45-60) :
+  //   A  = thème 4 mes. (port E-G→A5, réponse Do-Ré-Mi, rebond Sol-La-Sol, Mi tenu)
+  //   A' = thème légt varié (même os, broderie)
+  //   B  = développement : monte vers C6, mordant, agité
+  //   A  = retour du thème = la mélodie qu'on a déjà entendue → reconnaissance immédiate
+  //
+  // Phrase A (mes. 45-52) : A (45-48) → A' (49-52)
   const FLUTE_CLOITRE_A = [
-    [1,0,1,'E5'],[1,1,1,'G5'],[1,2,4,'A5'],              // (Cadd9) ♦ MOTIF : pickup E-G → La5 tenu
-    [2,0,3,'G5'],[2,3,3,'E5'],                           // (Fmaj7) ♦ MOTIF : arche G→E
-    [3,3,2,'D5'],[3,5,1,'C5'],                           // (Cadd9) réponse tardive : silence 1re pulsation, entre sur la 2e
-    [4,0,2,'A4'],[4,2,4,'C5'],                           // (Fmaj7) La grave bref → Do tenu (rebond léger)
-    [5,0,1,'E5'],[5,1,1,'G5'],[5,2,4,'A5'],              // (Cadd9) ♦ MOTIF (rappel reconnaissable)
-    [6,0,3,'G5'],[6,3,3,'E5'],                           // (Fmaj7) ♦ MOTIF arche
-    [7,0,0.5,'E5'],[7,0.5,0.5,'F5'],[7,1,0.5,'E5'],[7,1.5,1.5,'D5'],[7,3,3,'C5'], // (Cadd9) mordant E-F-E → D→C
-    // mes. 8 = SILENCE COMPLET (vraie respiration avant la phrase B)
+    // --- A : thème (1re exposition) ---
+    [1,0,1,'E5'],[1,1,1,'G5'],[1,2,4,'A5'],        // (Cadd9) ♦ port : pickup E-G → La5 tenu
+    [2,0,3,'C5'],[2,3,2,'D5'],[2,5,1,'E5'],        // (Fmaj7) réponse montante Do-Ré-Mi (élan)
+    [3,0,2,'G5'],[3,2,1,'A5'],[3,3,3,'G5'],        // (Cadd9) rebond Sol-La-Sol
+    [4,0,4,'E5'],                                  // (Fmaj7) Mi tenu + 2 croches silence
+
+    // --- A' : thème (2e exposition, légèrement ornée) ---
+    [5,0,1,'E5'],[5,1,1,'G5'],[5,2,4,'A5'],        // (Cadd9) ♦ port (rappel — identique, ancre la mélodie)
+    [6,0,2,'C5'],[6,2,1,'E5'],[6,3,3,'F5'],        // (Fmaj7) variante : Do-Mi-Fa (couleur Fmaj7)
+    [7,0,2,'G5'],[7,2,0.5,'A5'],[7,2.5,0.5,'G5'],[7,3,3,'E5'], // (Cadd9) broderie Sol-La-Sol → Mi
+    [8,0,3,'D5'],                                  // (Fmaj7) Ré bref + SILENCE (respiration avant B)
   ];
-  // Phrase B (mes. 53-60) : montée agitée + apex C6 → mordant → MOTIF(57-58) = retour au port → résolution
+  // Phrase B (mes. 53-60) : B développement (53-56) → A retour (57-60)
   const FLUTE_CLOITRE_B = [
-    [1,0,1,'A5'],[1,1,1,'B5'],[1,2,1,'C6'],[1,3,3,'B5'], // (Cadd9) pickup ascendant A→B→C6 → Si5 tenu
-    [2,0,2,'C6'],[2,2,1,'A5'],[2,3,3,'G5'],              // (Fmaj7) apex C6 (confirmé) → retombe G5
-    [3,0,0.5,'G5'],[3,0.5,0.5,'A5'],[3,1,0.5,'G5'],[3,1.5,1.5,'F5'],[3,3,3,'E5'], // (Cadd9) mordant G-A-G → F→E
-    [4,0,3,'D5'],[4,4,2,'C5'],                           // (Fmaj7) Ré tenu → Do (une croche de silence entre les deux)
-    [5,0,1,'E5'],[5,1,1,'G5'],[5,2,4,'A5'],              // (Cadd9) ♦ MOTIF final — retour au port = unité
-    [6,0,3,'G5'],[6,3,3,'E5'],                           // (Fmaj7) ♦ MOTIF arche
-    [7,0,2,'D5'],[7,2,1,'C5'],[7,3,3,'G4'],              // (Cadd9) résolution : se pose vers le grave
-    [8,0,6,'C5'],                                        // (Fmaj7) Do tenu = repos (prépare le tag)
+    // --- B : développement — monte, s'agite, apex C6 ---
+    [1,0,1,'A5'],[1,1,2,'B5'],[1,3,3,'C6'],        // (Cadd9) montée A5→B5→C6 (apex lumineux)
+    [2,0,3,'B5'],[2,3,3,'A5'],                     // (Fmaj7) descend depuis le sommet
+    [3,0,0.5,'A5'],[3,0.5,0.5,'G5'],[3,1,1,'A5'],[3,2,1,'G5'],[3,3,3,'E5'], // (Cadd9) mordant A-G-A + descente
+    [4,0,3,'D5'],                                  // (Fmaj7) Ré + SILENCE (souffle, prépare le retour)
+
+    // --- A retour — le thème qu'on a déjà entendu : reconnaissance immédiate ---
+    [5,0,1,'E5'],[5,1,1,'G5'],[5,2,4,'A5'],        // (Cadd9) ♦ port (retour = on rentre au port)
+    [6,0,3,'C5'],[6,3,2,'D5'],[6,5,1,'E5'],        // (Fmaj7) réponse montante (identique à la 1re)
+    [7,0,2,'G5'],[7,2,1,'A5'],[7,3,3,'G5'],        // (Cadd9) rebond
+    [8,0,6,'E5'],                                  // (Fmaj7) Mi tenu long = repos avant le tag
   ];
-  // fadeInBars > 0 : la flûte monte progressivement en vélocité sur les N premières mesures
-  function playFluteCloitre(startBar, arr, vel, fadeInBars=0){
-    arr.forEach(([lb,e,d,note])=>{
-      const v = fadeInBars>0 ? vel * Math.min(1, (lb-0.5)/fadeInBars) : vel;
-      ev(T(startBar+lb-1,e), at=> fluteNote(note, at, d*EIGHTH, Math.max(0.28, v)));
-    });
+  function playFluteCloitre(startBar, arr, vel){
+    arr.forEach(([lb,e,d,note])=> ev(T(startBar+lb-1,e), at=> fluteNote(note, at, d*EIGHTH, vel)));
   }
   // 61-64 : la flûte redescend et s'apaise (respiration finale du pont, prépare le retour à La mineur)
   const FLUTE_TAG = [
@@ -492,8 +497,8 @@
     playThemeB(29); playThemeB(37);     // La Marche : variation ornée
 
     // MÉLODIE flûte (Le Cloître) : mélodie NOUVELLE et aérée (contraste avec le thème), à travers 45-60
-    playFluteCloitre(45, FLUTE_CLOITRE_A, 0.85, 3); // phrase A — fade-in sur 3 mes. (3e mes. du fondu)
-    playFluteCloitre(53, FLUTE_CLOITRE_B, 0.9);    // phrase B (développée, apex C6)
+    playFluteCloitre(45, FLUTE_CLOITRE_A, 0.92);    // A A' — thème exposé 2× (entrée franche)
+    playFluteCloitre(53, FLUTE_CLOITRE_B, 0.92);   // B + A retour — développement puis reconnaissance
     playFluteTag(61);                              // 61-64 : la flûte redescend vers le retour
 
     // --- courte ouverture vers « L'Ascension » (retour à La mineur) après la mes. 64 ---
