@@ -232,7 +232,7 @@
 
   // --- FLÛTE (voix claire, tenue) : porte le thème au « Cloître » quand le synthé se tait
   //     PAS de bruit de souffle (ça faisait un « talkie-walkie ») — ton propre, sinus + octave + vibrato.
-  function fluteNote(note, t, dur, vel){
+  function fluteNote(note, t, dur, vel, panOv){
     const fr=f(note), mix=ctx.createGain(), oss=[];
     // ton clair : sinus fondamental dominant + octave douce + soupçon de triangle (corps, pas de buzz)
     [['sine',fr,0,0.62],['sine',fr*2,0,0.2],['triangle',fr,0,0.09]]
@@ -261,7 +261,7 @@
     amp.gain.setValueAtTime(L,t+Math.max(0.1,dur-0.1));
     amp.gain.linearRampToValueAtTime(0.0001,t+dur+0.08);
     mix.connect(flt); flt.connect(form); form.connect(amp);
-    const pan=ctx.createStereoPanner(); pan.pan.value=0.02; amp.connect(pan); pan.connect(dry);
+    const pan=ctx.createStereoPanner(); pan.pan.value=panOv!=null?panOv:0.02; amp.connect(pan); pan.connect(dry);
     const s=ctx.createGain(); s.gain.value=0.2; pan.connect(s); s.connect(reverb);   // réverbe = l'air
     oss.forEach(o=>{ o.start(t); o.stop(t+dur+0.12); }); vib.stop(t+dur+0.12); drift.stop(t+dur+0.12);
   }
@@ -362,11 +362,11 @@
     FLUTE_TAG.forEach(([lb,e,d,note])=> ev(T(startBar+lb-1,e), at=> fluteNote(note, at, d*EIGHTH, 0.8)));
   }
   // flûte en chorale sur L'Ascension : double le synthé (même mélodie, timbre différent)
-  function playThemeFlute(startBar, vel){
-    THEME.forEach(([lb,e,d,note])=> ev(T(startBar+lb-1,e), at=> fluteNote(note,at,d*EIGHTH,vel)));
+  function playThemeFlute(startBar, vel, pan){
+    THEME.forEach(([lb,e,d,note])=> ev(T(startBar+lb-1,e), at=> fluteNote(note,at,d*EIGHTH,vel,pan)));
   }
-  function playThemeBFlute(startBar, vel){
-    THEME_B.forEach(([lb,e,d,note])=> ev(T(startBar+lb-1,e), at=> fluteNote(note,at,d*EIGHTH,vel)));
+  function playThemeBFlute(startBar, vel, pan){
+    THEME_B.forEach(([lb,e,d,note])=> ev(T(startBar+lb-1,e), at=> fluteNote(note,at,d*EIGHTH,vel,pan)));
   }
 
   // --- PERCUSSIONS légères : cajón (1 & 4) + palmas ------------
@@ -599,9 +599,10 @@
     playFluteTag(61);
 
     // FLÛTE en chorale sur L'Ascension — même mélodie que le synthé, monte en intensité
-    playThemeFlute(65,  0.88);   // entrée audible (synthé dominant mais flûte perceptible)
-    playThemeBFlute(73, 0.96);   // s'affirme
-    playThemeBFlute(81, 1.06);   // climax : les deux voix à égalité
+    // flûte à droite (+0.30), synthé à gauche (-0.04) : séparation stéréo = les deux voix perceptibles
+    playThemeFlute(65,  1.40, 0.30);
+    playThemeBFlute(73, 1.40, 0.30);
+    playThemeBFlute(81, 1.40, 0.30);
 
     events.sort((a,b)=> a.t - b.t);
   }
