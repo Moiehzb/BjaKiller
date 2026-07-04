@@ -115,7 +115,7 @@ Tout est dans un `<script>` unique (IIFE). Ordre : constantes → utilitaires (`
 
 ## 7. Prochaine étape
 
-**L'Ascension (65-92) + Le Retour (93-120) codés.** Boucle seamless active (mes. 120 → mes. 1). À valider à l'oreille : mix des nouvelles sections, équilibre dé-empilement Le Retour, jointure invisible E7→Am.
+**✅ MORCEAU TERMINÉ ET VALIDÉ.** 120 mesures, boucle seamless (E7→Am). Prochaine étape : intégrer dans l'app React (voir §9).
 
 Références analysées (dans `.midi/`, via parser maison — voir méthodologie) : **Gerudo Valley** (F♯m harmonique, cadence andalouse = ADN flamenco), **Corridors of Time** (loop hypnotique 2 accords), **Schala** (Fm, min-maj7/napolitain), **Terra** (Si maj penché sur le vi), **Pallet Town** (Sol maj diatonique, harmonie lente).
 
@@ -126,6 +126,10 @@ Références analysées (dans `.midi/`, via parser maison — voir méthodologie
 > **Point de sauvegarde par étape.** On met à jour cette fiche (ce §, + §0 « en un coup d'œil » + §7 « prochaine étape ») à **chaque état stable** : section codée, mix validé, décision verrouillée — **avant de s'arrêter**.
 > **On NE logue PAS chaque micro-réglage.** Les valeurs exactes vivent dans le **code** (`le-seuil.html` fait foi). Une session de tweaks = **une** ligne consolidée (« guitare La Marche portée à X, validé »), pas dix.
 > Format : `AAAA-MM-JJ — ce qui change — pourquoi`. Le plus récent en haut.
+
+### 2026-07-05 — Morceau validé à l'oreille, intégration app à faire
+- **Lobby ✅ terminé** : boucle validée, flûte dans l'Ascension retirée (tests concluants = pas nécessaire). Bouton toggle flûte (Le Cloître) conservé dans le player de démo.
+- **Prochaine étape** : intégrer dans React (voir §9).
 
 ### 2026-07-05 — L'Ascension + Le Retour codés (mes. 65-120), boucle seamless
 - **L'Ascension (65-92)** : 4 phases — thème A (65-72), thème B orné (73-80), climax B (81-88, palmas denses, harpe +shimmer+haute), transition (89-92, guitare arpège, perc s'allège). Pas de luth. Basse pulsée 1&4.
@@ -148,3 +152,25 @@ Références analysées (dans `.midi/`, via parser maison — voir méthodologie
 - **Fait & validé à l'oreille** : **Le Seuil** (mes. 1-12), **L'Appel** (13-28), **La Marche** (29-44). `TOTAL_BARS=44`.
 - **En attente utilisateur** : dosage de la **guitare à La Marche** — remontée `gain 0.092 → 0.12` + flammes doubles-croches (`guitarFlurry`) sur toute la section, car elle était passée sous le seuil d'audibilité (cf. §6.5).
 - **Prochaine étape** : **Le Cloître** (mes. 45-64) + coder la **flûte** (absente du code à ce jour).
+
+---
+
+## 9. Intégration dans l'app React — options
+
+Le morceau est terminé en `music/le-seuil.html` (Web Audio pur). Il faut maintenant le faire jouer dans l'app. Trois options, classées par effort :
+
+### Option A — Intégrer le Web Audio directement dans React ⭐ Recommandé
+- **Ce qu'on fait** : extraire le bloc `<script>` de `le-seuil.html`, l'adapter en module ES (`lobbyMusic.js`), l'importer dans `EliteCounter.jsx`. `play()` au montage du lobby, `stop()` au démontage.
+- **Avantages** : son strictement identique, 0 fichier audio à charger, fonctionne offline, pas de dépendance externe.
+- **Travail estimé** : 2-4h. Points d'attention : le module ne doit pas créer l'AudioContext avant un geste utilisateur (règle navigateur) — déclencher sur le premier clic.
+
+### Option B — Enregistrer et embedder (fichier audio)
+- **Ce qu'on fait** : jouer `le-seuil.html` dans le navigateur, capturer la sortie audio (OBS, Audacity en loopback, ou `MediaRecorder` sur le contexte). Exporter en OGG Vorbis (meilleur ratio qualité/taille pour le web). Mettre dans `public/music/`, lire avec `<audio loop>` ou Howler.js.
+- **Avantages** : très simple à intégrer, aucun code audio dans React.
+- **Inconvénients** : ~3-4 MB pour 4 min à 128 kbps, pas génératif, boucle avec crossfade à gérer.
+
+### Option C — Furnace (tracker chiptune/FM)
+- **Ce qu'on fait** : recomposer le morceau dans Furnace (tracker open-source). Exporter en WAV/OGG. Embedder comme option B.
+- **Avantages** : son stylisé cohérent "jeu vidéo", maîtrise totale du timbre.
+- **Inconvénients** : projet à part entière (apprentissage tracker + recomposition complète). Le rendu sera différent du Web Audio — ni mieux ni moins bien, juste autre.
+- **Quand choisir** : si on veut délibérément une couleur "chiptune/FM" plutôt que le son orchestral actuel.

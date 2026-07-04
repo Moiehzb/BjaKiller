@@ -5,9 +5,13 @@
 
 ## 🎯 Feedback utilisateur — à implémenter
 
-### Musique 8-bit
-- [ ] **Musiques (faites main en Web Audio API)** — approche définitive : on **code** les morceaux (méthode : `music/METHODE_COMPOSITION.md`). Générateurs (Beepbox/Suno/Gemini) **abandonnés**. Prévoir : lobby loop (en cours), game loop, jingle victoire, jingle défaite.
-  - **Lobby « Le Seuil »** — La mineur andalou, 6/8, 4 min / 120 mes. **Codé + validé** : Le Seuil (1-12), L'Appel (13-28), La Marche (29-44). **Reste** : Le Cloître (45-64, coder la flûte), L'Ascension, Le Retour + boucle seamless. État complet → **`music/LOBBY_RECAP.md`**. Fichier : `music/le-seuil.html`.
+### Musique
+- [x] **Lobby « Le Seuil »** — ✅ **TERMINÉ ET VALIDÉ** (120 mes., boucle seamless). Fichier : `music/le-seuil.html`. État complet → `music/LOBBY_RECAP.md`.
+- [ ] **Intégrer la musique du lobby dans l'app React** — 3 options, voir `music/LOBBY_RECAP.md` §9 pour le détail :
+  - **(A) Recommandé — Intégrer le Web Audio directement dans React** : refactoriser le script de `le-seuil.html` en module JS utilisable dans l'app. Son identique, 0 fichier audio, offline. ~2-4h.
+  - **(B) Rapide — Enregistrer et embedder** : jouer le HTML, capturer en MP3/OGG (OBS ou équivalent), mettre dans `public/`. Simple mais ~4 MB.
+  - **(C) Furnace** : recomposer dans le tracker Furnace (chiptune/FM), exporter audio. Son stylisé différent, projet à part entière. Voir mémoire `project-music-pipeline-furnace.md`.
+- [ ] **Autres morceaux à composer** : game loop, jingle victoire, jingle défaite (même méthode Web Audio — `music/METHODE_COMPOSITION.md`).
 
 ### UX
 - [ ] **Après le tuto → ouvrir directement le mode Training** : à la sortie du tutoriel, envoyer le joueur droit dans Training (ou au minimum un CTA "Commence ici" bien visible) au lieu de le lâcher devant le lobby (mur d'options).
@@ -17,7 +21,7 @@
 ## 🛠️ Features en attente (backlog)
 
 - [ ] Brancher l'achat des skins support (4,99 €/skin) sur un vrai paiement — aujourd'hui le clic "4,99 €" débloque directement en localStorage (démo). Voir aussi le paywall en fin de roadmap.
-- [ ] Ajouter des sons dans l'app (changement de carte, bonne/mauvaise réponse, victoire/défaite, achat/équipement de skin, clics UI) — prévoir un toggle son ON/OFF dans les réglages
+- [x] **Sons in-app** — flip de carte, bonne/mauvaise réponse, victoire/défaite, achat/équipement de skin, clics UI + toggle son dans les réglages. ✅ Fait.
 - [ ] Transformer l'app en APK Android (build mobile installable)
 - [ ] **Vibration (haptique)** sur bonne/mauvaise réponse — gratuit et satisfaisant sur mobile (à lier au toggle son/retour).
 
