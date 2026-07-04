@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>I · Le Seuil — Blackjack Academy</title>
+<title>Le Seuil → L'Appel — Blackjack Academy</title>
 <style>
   :root{
     --bgDeep:#0d0a1a; --bgCard:#161027; --bgPanel:#1e1638;
@@ -58,8 +58,8 @@
       <circle cx="50" cy="50" r="6" fill="#c9a24b" stroke="none"/>
     </svg>
     <div class="kicker">Blackjack Academy · Lobby</div>
-    <h1>Le Seuil</h1>
-    <div class="sub">Ouverture — mesures 1 à 12 &middot; 6/8 &middot; La mineur andalou</div>
+    <h1>L'Appel</h1>
+    <div class="sub">Le Seuil &rarr; L'Appel &middot; mesures 1 à 28 &middot; 6/8 &middot; La mineur andalou</div>
 
     <div class="ctrls">
       <button id="play">Franchir le seuil</button>
@@ -74,8 +74,9 @@
     </div>
 
     <div class="note">
-      Basse chaude descendante (La–Sol–Fa–Mi) · harpe lointaine · guitare en arrière-plan · luth en ornements.
-      Le synthé‑lead n'entre qu'à « L'Appel » (mes. 13) — ici une résolution en La mineur signale ce seuil.
+      Le thème principal (synthé‑lead) entre à « L'Appel » (mes. 13), au‑dessus de la basse descendante
+      La–Sol–Fa–Mi — avec harpe, guitare en arrière‑plan, luth et percussions légères (cajón 1 &amp; 4 + palmas).
+      Thème énoncé deux fois, puis une courte conclusion ouvre vers « La Marche ».
     </div>
   </div>
 
@@ -91,7 +92,7 @@
 
   let ctx=null, master=null, dry=null, wet=null, reverb=null, limiter=null;
   let startAt=0, running=false, raf=0, endTimer=0;
-  let userVol=0.82, droneGain=null;
+  let userVol=0.82, droneGain=null, _noise=null;
   const ksCache = new Map();
   const droneRefs = [];
 
@@ -184,6 +185,85 @@
   // --- position temporelle (mesure 1-indexée, croche 0..5) -----
   function T(bar,e){ return startAt + (bar-1)*BAR + e*EIGHTH; }
 
+  // --- SYNTHÉ analogique (LEAD) : la voix qu'on suit en priorité
+  function synthNote(note, t, dur, vel){
+    const fr=f(note), mix=ctx.createGain(), oss=[];
+    [['sawtooth',fr,-7,0.5],['sawtooth',fr,7,0.5],['triangle',fr,0,0.32],['triangle',fr/2,0,0.18]]
+      .forEach(([ty,fq,det,a])=>{
+        const o=ctx.createOscillator(); o.type=ty; o.frequency.value=fq; o.detune.value=det;
+        const og=ctx.createGain(); og.gain.value=a; o.connect(og); og.connect(mix); oss.push(o);
+      });
+    // vibrato retardé (donne le côté « chanté »)
+    const vib=ctx.createOscillator(); vib.frequency.value=5.2;
+    const vibg=ctx.createGain(); vibg.gain.setValueAtTime(0,t); vibg.gain.linearRampToValueAtTime(6,t+0.35);
+    vib.connect(vibg); oss.forEach(o=> vibg.connect(o.detune)); vib.start(t);
+    // filtre chantant avec enveloppe
+    const flt=ctx.createBiquadFilter(); flt.type='lowpass'; flt.Q.value=4;
+    flt.frequency.setValueAtTime(700,t);
+    flt.frequency.linearRampToValueAtTime(2300,t+0.05);
+    flt.frequency.exponentialRampToValueAtTime(1500,t+0.4);
+    // enveloppe d'amplitude
+    const amp=ctx.createGain(), L=vel*0.15;
+    amp.gain.setValueAtTime(0.0001,t);
+    amp.gain.linearRampToValueAtTime(L,t+0.04);              // attaque douce (chant, pas pluck)
+    amp.gain.setValueAtTime(L,t+Math.max(0.06,dur-0.1));
+    amp.gain.linearRampToValueAtTime(0.0001,t+dur+0.02);
+    mix.connect(flt); flt.connect(amp);
+    const pan=ctx.createStereoPanner(); pan.pan.value=-0.04; amp.connect(pan); pan.connect(dry);
+    const s=ctx.createGain(); s.gain.value=0.12; pan.connect(s); s.connect(reverb);
+    oss.forEach(o=>{ o.start(t); o.stop(t+dur+0.1); }); vib.stop(t+dur+0.1);
+  }
+
+  // thème principal (8 mes.) — [mesure locale 1..8, croche 0..5, durée(croches), note]
+  const THEME = [
+    [1,0,2,'A4'],[1,2,1,'C5'],[1,3,3,'E5'],          // La: A C E___
+    [2,0,3,'D5'],[2,3,3,'B4'],                        // Sol: D___ B___
+    [3,0,3,'C5'],[3,3,3,'A4'],                        // Fa: C___ A___
+    [4,0,3,'B4'],[4,3,3,'Gs4'],                       // Mi: B___ G#___ (tension, appelle La)
+    [5,0,1,'A4'],[5,1,1,'C5'],[5,2,1,'E5'],[5,3,3,'A5'], // La: montée à l'octave A5
+    [6,0,3,'G5'],[6,3,3,'D5'],                        // Sol: G___ D___
+    [7,0,3,'E5'],[7,3,3,'C5'],                        // Fa: E___ C___ (E = maj7, couleur)
+    [8,0,3,'Gs4'],[8,3,3,'A4'],                       // Mi: G#___ A___ (résolution)
+  ];
+  function playTheme(startBar){
+    THEME.forEach(([lb,e,d,note])=> synthNote(note, T(startBar+lb-1,e), d*EIGHTH, 0.9));
+  }
+
+  // --- PERCUSSIONS légères : cajón (1 & 4) + palmas ------------
+  function noiseBuf(){
+    if(_noise) return _noise;
+    const sr=ctx.sampleRate, n=ctx.createBuffer(1,Math.floor(sr*0.4),sr), d=n.getChannelData(0);
+    for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1; _noise=n; return n;
+  }
+  function cajonBass(t, vel){           // le « boom » grave (temps 1 & 4)
+    const o=ctx.createOscillator(); o.type='sine';
+    o.frequency.setValueAtTime(130,t); o.frequency.exponentialRampToValueAtTime(62,t+0.12);
+    const g=ctx.createGain();
+    g.gain.setValueAtTime(0.0001,t); g.gain.linearRampToValueAtTime(vel*0.5,t+0.006);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+0.22);
+    o.connect(g); g.connect(dry); o.start(t); o.stop(t+0.26);
+  }
+  function cajonSlap(t, vel){           // la claque aiguë (bord du cajón)
+    const s=ctx.createBufferSource(); s.buffer=noiseBuf();
+    const hp=ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=1400;
+    const g=ctx.createGain();
+    g.gain.setValueAtTime(0.0001,t); g.gain.linearRampToValueAtTime(vel*0.2,t+0.004);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+0.09);
+    s.connect(hp); hp.connect(g); g.connect(dry);
+    const rv=ctx.createGain(); rv.gain.value=0.06; g.connect(rv); rv.connect(reverb);
+    s.start(t, Math.random()*0.22); s.stop(t+0.12);
+  }
+  function palma(t, vel){               // claquement de mains (palmas flamenco)
+    const s=ctx.createBufferSource(); s.buffer=noiseBuf();
+    const bp=ctx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=1700; bp.Q.value=0.9;
+    const g=ctx.createGain();
+    g.gain.setValueAtTime(0.0001,t); g.gain.linearRampToValueAtTime(vel*0.2,t+0.003);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+0.055);
+    s.connect(bp); bp.connect(g); g.connect(dry);
+    const rv=ctx.createGain(); rv.gain.value=0.1; g.connect(rv); rv.connect(reverb);
+    s.start(t, Math.random()*0.22); s.stop(t+0.08);
+  }
+
   // --- accords (voicings) --------------------------------------
   const CH = {
     Am:   { name:'Am(add9)', gtr:['A2','E3','A3','C4'],  harp:['A3','C4','E4','B4','A5'],  orn:['E5','C5','A4'] },
@@ -193,45 +273,56 @@
   };
   const SEQ = ['Am','G','Fmaj7','E7','Am','G','Fmaj7','E7','Am','G','Fmaj7','E7'];
   const ROOT = { Am:'A', G:'G', Fmaj7:'F', E7:'E' };   // fondamentale de la basse par accord
+  const CELL = ['Am','G','Fmaj7','E7'];                // cellule andalouse (1 accord / mesure)
+  const chordAt = b => CELL[(b-1)%4];                  // l'accord de n'importe quelle mesure
 
-  // --- partition : « Le Seuil » (12 mes.) ----------------------
+  // --- partition : « Le Seuil » (1-12) + « L'Appel » (13-28) ---
   function schedule(){
-    for(let bar=1; bar<=12; bar++){
-      const c = CH[SEQ[bar-1]];
-      // phase 1 (1-2): quasi vide  | 2 (3-4): harpe  | 3 (5-8): +guitare  | 4 (9-12): plein-doux
-      const phase = bar<=2?1 : bar<=4?2 : bar<=8?3 : 4;
+    for(let bar=1; bar<=28; bar++){
+      const cn = chordAt(bar), c = CH[cn];
 
-      // BASSE — note tenue chaude sur la fondamentale (descend La-Sol-Fa-Mi à chaque mesure)
-      bassNote(ROOT[SEQ[bar-1]], T(bar,0), BAR, bar===1?1.4:0.12);
+      // BASSE — toutes les mesures (descend La-Sol-Fa-Mi)
+      bassNote(ROOT[cn], T(bar,0), BAR, bar===1?1.4:0.12);
 
-      // HARPE — roulé d'ouverture de mesure
-      if(phase===1){
-        harpRoll(c.harp.slice(0,3), T(bar,0), 0.5);
-        if(bar===2) harpRoll(c.harp.slice(2,5), T(bar,3), 0.34, 0.03);
+      if(bar<=12){
+        // ---------- LE SEUIL (intro qui s'ouvre) ----------
+        const phase = bar<=2?1 : bar<=4?2 : bar<=8?3 : 4;
+        if(phase===1){
+          harpRoll(c.harp.slice(0,3), T(bar,0), 0.5);
+          if(bar===2) harpRoll(c.harp.slice(2,5), T(bar,3), 0.34, 0.03);
+        } else {
+          harpRoll(c.harp, T(bar,0), 0.62);
+          if(phase>=3){ pluck('harp', c.harp[4], T(bar,3)+hum(), 0.42);
+                        if(phase===4) pluck('harp', c.harp[3], T(bar,4.5)+hum(), 0.3); }
+        }
+        if(phase>=3) guitarArp(c.gtr, bar, phase===4?0.9:0.72);
+        if(bar===2) luteNote('E5', T(bar,4)+hum(), 0.5);
+        if(bar===4||bar===8||bar===12) c.orn.forEach((n,i)=> luteNote(n, T(bar,3+i)+hum(), 0.6-i*0.08));
+
       } else {
-        harpRoll(c.harp, T(bar,0), 0.62);
-        if(phase>=3){ pluck('harp', c.harp[4], T(bar,3)+hum(), 0.42);          // sommet suspendu
-                      if(phase===4) pluck('harp', c.harp[3], T(bar,4.5)+hum(), 0.3); }
-      }
-
-      // GUITARE — arrière-plan, entre à la mesure 5
-      if(phase>=3) guitarArp(c.gtr, bar, phase===4?0.9:0.72);
-
-      // LUTH — ornement délicat en fin de cellule (mes. 4, 8, 12) + une grâce mes. 2
-      if(bar===2) luteNote('E5', T(bar,4)+hum(), 0.5);
-      if(bar===4||bar===8||bar===12){
-        c.orn.forEach((n,i)=> luteNote(n, T(bar,3+i)+hum(), 0.6-i*0.08));
+        // ---------- L'APPEL (thème synthé + percussions) ----------
+        const stmt2 = bar>20;                            // 2e énonciation (21-28) = plus dense
+        harpRoll(c.harp, T(bar,0), 0.46);                // harpe : soutien doux
+        pluck('harp', c.harp[3], T(bar,3)+hum(), 0.3);
+        guitarArp(c.gtr, bar, stmt2?0.8:0.66);           // guitare : arrière-plan (jamais devant)
+        cajonBass(T(bar,0)+hum(), 0.9);                  // percussion : cajón 1 & 4
+        cajonSlap(T(bar,3)+hum(), 0.7);
+        palma(T(bar,3)+hum(), stmt2?0.5:0.36);           // palmas légères
+        if(stmt2) palma(T(bar,5)+hum(), 0.3);            // petit contretemps au 2e passage
+        if(bar%4===0) c.orn.forEach((n,i)=> luteNote(n, T(bar,4+i*0.5)+hum(), 0.32-i*0.05)); // luth discret
       }
     }
 
-    // Seuil franchi : douce résolution en La mineur (là où le SYNTHÉ entrera, mes. 13)
-    const rt = startAt + 12*BAR;
-    harpRoll(['A3','C4','E4','A4','C5'], rt, 0.7, 0.024);
-    ['A2','E3','A3','C4'].forEach((n,i)=> pluck('guitar', n, rt+i*0.02, 0.6));
-    luteNote('A5', rt+0.05, 0.5);
+    // MÉLODIE synthé-lead : le thème énoncé 2 fois (13-20, puis 21-28)
+    playTheme(13);
+    playTheme(21);
 
-    // basse finale : La tenu qui s'éteint doucement
+    // --- courte conclusion après la mes. 28 (ouvre vers « La Marche ») ---
+    const rt = startAt + 28*BAR;
+    harpRoll(['A3','C4','E4','A4','C5'], rt, 0.6, 0.024);
+    synthNote('A4', rt, 1.4, 0.7);
     bassNote('A', rt, 2.8, 0.15);
+    cajonBass(rt, 0.6);
   }
 
   // --- réverbe (IR généré) -------------------------------------
@@ -250,7 +341,7 @@
   // --- transport ----------------------------------------------
   function build(){
     ctx = new (window.AudioContext||window.webkitAudioContext)();
-    ksCache.clear(); droneRefs.length=0; droneGain=null;
+    ksCache.clear(); droneRefs.length=0; droneGain=null; _noise=null;
     limiter=ctx.createDynamicsCompressor();
     limiter.threshold.value=-6; limiter.knee.value=6; limiter.ratio.value=4;
     limiter.attack.value=0.003; limiter.release.value=0.25;
@@ -268,7 +359,7 @@
     running=true; setBtn(true);
     tick();
     clearTimeout(endTimer);
-    endTimer=setTimeout(stop, (12*BAR + 4.2)*1000);
+    endTimer=setTimeout(stop, (28*BAR + 4.2)*1000);
   }
 
   function stop(){
@@ -283,17 +374,17 @@
   function tick(){
     if(!running||!ctx) return;
     const el = ctx.currentTime - startAt;
-    const total = 12*BAR;
+    const total = 28*BAR;
     const pct = Math.max(0,Math.min(1, el/total));
     document.getElementById('fill').style.width=(pct*100)+'%';
     const bar = Math.floor(el/BAR)+1;
-    if(el<0){ document.getElementById('pos').textContent='…'; }
-    else if(bar<=12){
-      document.getElementById('pos').textContent='Mesure '+bar+' / 12';
-      document.getElementById('chd').textContent=CH[SEQ[bar-1]].name;
+    const pos=document.getElementById('pos'), chd=document.getElementById('chd');
+    if(el<0){ pos.textContent='…'; chd.textContent='—'; }
+    else if(bar<=28){
+      pos.textContent=(bar<=12?'I · Le Seuil':'II · L’Appel')+' — mes. '+bar+'/28';
+      chd.textContent=CH[chordAt(bar)].name;
     } else {
-      document.getElementById('pos').textContent='Seuil franchi';
-      document.getElementById('chd').textContent='→ L’Appel';
+      pos.textContent='Fin — → La Marche'; chd.textContent='—';
     }
     raf=requestAnimationFrame(tick);
   }
