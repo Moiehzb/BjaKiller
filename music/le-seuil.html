@@ -64,6 +64,7 @@
 
     <div class="ctrls">
       <button id="play">Franchir le seuil</button>
+      <button id="flute-btn">Flûte · on</button>
     </div>
 
     <input type="range" id="seek" class="seek" min="1" max="120" step="1" value="1" aria-label="position de lecture">
@@ -95,6 +96,7 @@
   let ctx=null, master=null, dry=null, wet=null, reverb=null, limiter=null;
   let startAt=0, running=false, raf=0, endTimer=0;
   let userVol=0.82, droneGain=null, _noise=null;
+  let fluteBus=null, fluteMuted=false;
   const ksCache = new Map();
   const droneRefs = [];
 
@@ -261,8 +263,8 @@
     amp.gain.setValueAtTime(L,t+Math.max(0.1,dur-0.1));
     amp.gain.linearRampToValueAtTime(0.0001,t+dur+0.08);
     mix.connect(flt); flt.connect(form); form.connect(amp);
-    const pan=ctx.createStereoPanner(); pan.pan.value=panOv!=null?panOv:0.02; amp.connect(pan); pan.connect(dry);
-    const s=ctx.createGain(); s.gain.value=0.2; pan.connect(s); s.connect(reverb);   // réverbe = l'air
+    const pan=ctx.createStereoPanner(); pan.pan.value=panOv!=null?panOv:0.02; amp.connect(pan);
+    pan.connect(fluteBus); // tout passe par le bus (toggleable)
     oss.forEach(o=>{ o.start(t); o.stop(t+dur+0.12); }); vib.stop(t+dur+0.12); drift.stop(t+dur+0.12);
   }
 
@@ -599,10 +601,10 @@
     playFluteTag(61);
 
     // FLÛTE en chorale sur L'Ascension — même mélodie que le synthé, monte en intensité
-    // flûte à droite (+0.30), synthé à gauche (-0.04) : séparation stéréo = les deux voix perceptibles
-    playThemeFlute(65,  1.40, 0.30);
-    playThemeBFlute(73, 1.40, 0.30);
-    playThemeBFlute(81, 1.40, 0.30);
+    // canon : flûte démarre 2 bars après le synthé, panne droite pour séparer les voix
+    playThemeFlute(67,  1.40, 0.30);   // synth 65, flute 67 (+2 bars)
+    playThemeBFlute(75, 1.40, 0.30);   // synth 73, flute 75 (+2 bars)
+    playThemeBFlute(83, 1.40, 0.30);   // synth 81, flute 83 (+2 bars, termine sur la transition)
 
     events.sort((a,b)=> a.t - b.t);
   }
@@ -631,6 +633,9 @@
     dry=ctx.createGain(); wet=ctx.createGain(); wet.gain.value=0.32;
     reverb=makeReverb();
     dry.connect(master); reverb.connect(wet); wet.connect(master);
+    fluteBus=ctx.createGain(); fluteBus.gain.value=fluteMuted?0.0001:1;
+    fluteBus.connect(dry);
+    const frs=ctx.createGain(); frs.gain.value=0.2; fluteBus.connect(frs); frs.connect(reverb);
     master.connect(limiter); limiter.connect(ctx.destination);
   }
 
@@ -729,6 +734,14 @@
     dragging=false;
     if(running) play(+seekEl.value);   // en lecture : saute à la mesure choisie
   });                                   // à l'arrêt : la lecture partira de cette mesure
+
+  document.getElementById('flute-btn').addEventListener('click',()=>{
+    fluteMuted=!fluteMuted;
+    if(fluteBus && ctx) fluteBus.gain.setTargetAtTime(fluteMuted?0.0001:1, ctx.currentTime, 0.06);
+    const b=document.getElementById('flute-btn');
+    b.textContent=fluteMuted?'Flûte · off':'Flûte · on';
+    b.classList.toggle('stop',fluteMuted);
+  });
 
   document.getElementById('vol').addEventListener('input',e=>{
     userVol=e.target.value/100;
