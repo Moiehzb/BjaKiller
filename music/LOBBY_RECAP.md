@@ -12,7 +12,7 @@
 - **Banc de diagnostic** : `music/diagnostic.html` — joue chaque instrument isolément (+ tests « silence » et « sinus pur » pour écarter le matériel). À rouvrir dès qu'un son paraît buggé.
 - **Moteur** : Web Audio API, 100 % synthèse offline (aucun sample, aucun fetch). Marche en `file://`.
 - **Sections codées + validées à l'oreille** : **Le Seuil** (mes. 1-12), **L'Appel** (13-28), **La Marche** (29-44).
-- **Codé + validé à l'oreille** : **Le Cloître** (45-64) — pont lumineux (vamp **Cadd9⇄Fmaj7**). Flûte : ✅ **mélodie AABA validée** (thème 4 mes. exposé 2×, développement apex C6, retour = reconnaissance). Accompagnement : ✅ **texture progressive** (harpe s'intensifie + shimmer A' + luth contra-temps en B + luth régulier retour thème + harpe haute tag).
+- **Codé + validé à l'oreille** : **Le Cloître** (45-64) — pont lumineux (vamp **Cadd9⇄Fmaj7**). Flûte : ✅ **mélodie AABA validée**. Accompagnement : ✅ **texture progressive** + 2 moments hors-grille (harpe beat 2 mes.48, luth beat 1 mes.56).
 - **Reste à coder** : **L'Ascension** (65-92), **Le Retour** (93-120) + finalisation de la **boucle seamless**.
 - **Journal / points de sauvegarde** : voir **§8 (Journal)** tout en bas — mis à jour à **chaque étape stable** (le plus récent en haut). Les **valeurs exactes = le code** ; le Journal ne logue **pas** les micro-réglages.
 
@@ -126,10 +126,11 @@ Références analysées (dans `.midi/`, via parser maison — voir méthodologie
 > **On NE logue PAS chaque micro-réglage.** Les valeurs exactes vivent dans le **code** (`le-seuil.html` fait foi). Une session de tweaks = **une** ligne consolidée (« guitare La Marche portée à X, validé »), pas dix.
 > Format : `AAAA-MM-JJ — ce qui change — pourquoi`. Le plus récent en haut.
 
-### 2026-07-04 — Le Cloître validé (mes. 45-64)
-- **Flûte ✅ validée à l'oreille** : forme **AABA** sur 16 mes. Thème = 4 mes. (port E-G→La5 tenu, réponse Do-Ré-Mi, rebond Sol-La-Sol, Mi tenu). Exposé 2× (A+A') → développement apex C6 avec mordant (B) → retour thème reconnaissable (A). vel=0.92, entrée franche.
-- **Accompagnement ✅ validé** : texture progressive sur 20 mes. — harpe seule (45-48) → shimmer cristallin sur A' (49-52) → luth contra-temps impaires sur B (53-56) → luth régulier sur retour thème (57-60) → harpe haute plane sur tag (61-64). Léger crescendo harpe (vel 0.44→0.57).
-- **Transition ✅** : fondu 3 mesures (cloitrePad La3 à mes.43, Mi3+Mi4 à mes.44, Sol4+Do4 à mes.45).
+### 2026-07-04 — Le Cloître entièrement validé (mes. 45-64)
+- **Flûte ✅** : forme **AABA** sur 16 mes. Thème 4 mes. (port E-G→La5, réponse Do-Ré-Mi, rebond Sol-La-Sol, Mi tenu). A+A' → dév. apex C6 + mordant → retour thème. vel=0.92, entrée franche (pas de fade-in).
+- **Accompagnement ✅** : texture progressive — harpe seule (45-48) → shimmer cristallin beat 1.5 sur A' (49-52) → luth beat 4.5 impaires sur B (53-56) → luth beat 4.5 régulier retour thème (57-60) → harpe haute beat 2 tag (61-64). Crescendo harpe vel 0.44→0.57.
+- **2 moments hors-grille ✅** : harpe beat **2** mes.48 (suspension fin A, avant reprise thème) + luth beat **1** mes.56 (anticipation fin développement, annonce retour thème).
+- **Transition ✅** : fondu 3 mesures (cloitrePad La3 mes.43 / Mi3+Mi4 mes.44 / Sol4+Do4 mes.45).
 - **Prochaine étape** : L'Ascension (mes. 65-92).
 
 ### 2026-07-04 — La Marche validée → cap sur Le Cloître
