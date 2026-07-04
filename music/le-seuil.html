@@ -42,6 +42,7 @@
   .ctrls{ display:flex; gap:14px; align-items:center; justify-content:center; margin-top:6px }
   .vol{ display:flex; align-items:center; gap:8px; margin-top:22px; color:var(--lav); font-size:13px }
   input[type=range]{ width:180px; accent-color:var(--gold) }
+  input[type=range].seek{ width:100%; margin-top:24px; height:6px; cursor:pointer }
   .stage{ margin-top:26px; height:6px; background:rgba(185,168,216,.14); border-radius:4px; overflow:hidden }
   .fill{ height:100%; width:0%; background:linear-gradient(90deg,var(--teal),var(--gold)); transition:width .1s linear }
   .read{ margin-top:12px; display:flex; justify-content:space-between; font-size:13px; color:var(--lav); opacity:.85 }
@@ -65,8 +66,8 @@
       <button id="play">Franchir le seuil</button>
     </div>
 
-    <div class="stage"><div class="fill" id="fill"></div></div>
-    <div class="read"><span id="pos">Mesure —</span><span class="chord" id="chd">—</span></div>
+    <input type="range" id="seek" class="seek" min="1" max="28" step="1" value="1" aria-label="position de lecture">
+    <div class="read"><span id="pos">Prêt</span><span class="chord" id="chd">—</span></div>
 
     <div class="vol">
       <span>volume</span>
@@ -95,6 +96,11 @@
   let userVol=0.82, droneGain=null, _noise=null;
   const ksCache = new Map();
   const droneRefs = [];
+
+  // --- ordonnanceur à anticipation (look-ahead) : évite le pic de calcul au démarrage
+  let events=[], evIdx=0, pieceOrigin=0, schedTimer=0, dragging=false;
+  const LOOKAHEAD=0.12, TICKMS=25, TOTAL_BARS=28;
+  function ev(t,fn){ events.push({t,fn}); }
 
   // --- note -> fréquence ---------------------------------------
   const PC = {C:0,Cs:1,D:2,Ds:3,E:4,F:5,Fs:6,G:7,Gs:8,A:9,As:10,B:11};
@@ -154,11 +160,11 @@
     notes.forEach((n,i)=> pluck('harp',n,t+i*spread+hum(),vel*(1-i*0.05)));
   }
   // --- guitare : arpège 6/8 en arrière-plan --------------------
-  function guitarArp(voicing,bar,vel){
+  function guitarArp(voicing,tBase,vel){
     const pat=[0,1,2,3,2,1];            // p-i-m-a doux, montée/descente
     for(let e=0;e<6;e++){
       const n=voicing[pat[e]%voicing.length];
-      pluck('guitar',n, T(bar,e)+hum(), vel*(e===0?1:0.8));
+      pluck('guitar',n, tBase + e*EIGHTH + hum(), vel*(e===0?1:0.8));
     }
   }
 
@@ -182,8 +188,8 @@
     });
   }
 
-  // --- position temporelle (mesure 1-indexée, croche 0..5) -----
-  function T(bar,e){ return startAt + (bar-1)*BAR + e*EIGHTH; }
+  // --- temps RELATIF au début du morceau (mesure 1-indexée, croche 0..5)
+  function T(bar,e){ return (bar-1)*BAR + e*EIGHTH; }
 
   // --- SYNTHÉ analogique (LEAD) : la voix qu'on suit en priorité
   function synthNote(note, t, dur, vel){
@@ -226,7 +232,7 @@
     [8,0,3,'Gs4'],[8,3,3,'A4'],                       // Mi: G#___ A___ (résolution)
   ];
   function playTheme(startBar){
-    THEME.forEach(([lb,e,d,note])=> synthNote(note, T(startBar+lb-1,e), d*EIGHTH, 0.9));
+    THEME.forEach(([lb,e,d,note])=> ev(T(startBar+lb-1,e), at=> synthNote(note, at, d*EIGHTH, 0.9)));
   }
 
   // --- PERCUSSIONS légères : cajón (1 & 4) + palmas ------------
@@ -276,40 +282,42 @@
   const CELL = ['Am','G','Fmaj7','E7'];                // cellule andalouse (1 accord / mesure)
   const chordAt = b => CELL[(b-1)%4];                  // l'accord de n'importe quelle mesure
 
-  // --- partition : « Le Seuil » (1-12) + « L'Appel » (13-28) ---
-  function schedule(){
+  // --- partition : construit la LISTE d'ÉVÉNEMENTS (temps relatifs) ---
+  //     jouée ensuite par l'ordonnanceur (pas tout créé d'un coup = plus de grésillement)
+  function buildEvents(){
+    events = [];
     for(let bar=1; bar<=28; bar++){
       const cn = chordAt(bar), c = CH[cn];
 
       // BASSE — toutes les mesures (descend La-Sol-Fa-Mi)
-      bassNote(ROOT[cn], T(bar,0), BAR, bar===1?1.4:0.12);
+      ev(T(bar,0), at=> bassNote(ROOT[cn], at, BAR, bar===1?1.4:0.12));
 
       if(bar<=12){
         // ---------- LE SEUIL (intro qui s'ouvre) ----------
         const phase = bar<=2?1 : bar<=4?2 : bar<=8?3 : 4;
         if(phase===1){
-          harpRoll(c.harp.slice(0,3), T(bar,0), 0.5);
-          if(bar===2) harpRoll(c.harp.slice(2,5), T(bar,3), 0.34, 0.03);
+          ev(T(bar,0), at=> harpRoll(c.harp.slice(0,3), at, 0.5));
+          if(bar===2) ev(T(bar,3), at=> harpRoll(c.harp.slice(2,5), at, 0.34, 0.03));
         } else {
-          harpRoll(c.harp, T(bar,0), 0.62);
-          if(phase>=3){ pluck('harp', c.harp[4], T(bar,3)+hum(), 0.42);
-                        if(phase===4) pluck('harp', c.harp[3], T(bar,4.5)+hum(), 0.3); }
+          ev(T(bar,0), at=> harpRoll(c.harp, at, 0.62));
+          if(phase>=3){ ev(T(bar,3), at=> pluck('harp', c.harp[4], at+hum(), 0.42));
+                        if(phase===4) ev(T(bar,4.5), at=> pluck('harp', c.harp[3], at+hum(), 0.3)); }
         }
-        if(phase>=3) guitarArp(c.gtr, bar, phase===4?0.9:0.72);
-        if(bar===2) luteNote('E5', T(bar,4)+hum(), 0.5);
-        if(bar===4||bar===8||bar===12) c.orn.forEach((n,i)=> luteNote(n, T(bar,3+i)+hum(), 0.6-i*0.08));
+        if(phase>=3) ev(T(bar,0), at=> guitarArp(c.gtr, at, phase===4?0.9:0.72));
+        if(bar===2) ev(T(bar,4), at=> luteNote('E5', at+hum(), 0.5));
+        if(bar===4||bar===8||bar===12) c.orn.forEach((n,i)=> ev(T(bar,3+i), at=> luteNote(n, at+hum(), 0.6-i*0.08)));
 
       } else {
         // ---------- L'APPEL (thème synthé + percussions) ----------
         const stmt2 = bar>20;                            // 2e énonciation (21-28) = plus dense
-        harpRoll(c.harp, T(bar,0), 0.46);                // harpe : soutien doux
-        pluck('harp', c.harp[3], T(bar,3)+hum(), 0.3);
-        guitarArp(c.gtr, bar, stmt2?0.8:0.66);           // guitare : arrière-plan (jamais devant)
-        cajonBass(T(bar,0)+hum(), 0.9);                  // percussion : cajón 1 & 4
-        cajonSlap(T(bar,3)+hum(), 0.7);
-        palma(T(bar,3)+hum(), stmt2?0.5:0.36);           // palmas légères
-        if(stmt2) palma(T(bar,5)+hum(), 0.3);            // petit contretemps au 2e passage
-        if(bar%4===0) c.orn.forEach((n,i)=> luteNote(n, T(bar,4+i*0.5)+hum(), 0.32-i*0.05)); // luth discret
+        ev(T(bar,0), at=> harpRoll(c.harp, at, 0.46));   // harpe : soutien doux
+        ev(T(bar,3), at=> pluck('harp', c.harp[3], at+hum(), 0.3));
+        ev(T(bar,0), at=> guitarArp(c.gtr, at, stmt2?0.8:0.66));   // guitare : arrière-plan
+        ev(T(bar,0), at=> cajonBass(at+hum(), 0.9));     // percussion : cajón 1 & 4
+        ev(T(bar,3), at=> cajonSlap(at+hum(), 0.7));
+        ev(T(bar,3), at=> palma(at+hum(), stmt2?0.5:0.36));
+        if(stmt2) ev(T(bar,5), at=> palma(at+hum(), 0.3));
+        if(bar%4===0) c.orn.forEach((n,i)=> ev(T(bar,4+i*0.5), at=> luteNote(n, at+hum(), 0.32-i*0.05)));
       }
     }
 
@@ -318,11 +326,13 @@
     playTheme(21);
 
     // --- courte conclusion après la mes. 28 (ouvre vers « La Marche ») ---
-    const rt = startAt + 28*BAR;
-    harpRoll(['A3','C4','E4','A4','C5'], rt, 0.6, 0.024);
-    synthNote('A4', rt, 1.4, 0.7);
-    bassNote('A', rt, 2.8, 0.15);
-    cajonBass(rt, 0.6);
+    const rt = 28*BAR;
+    ev(rt, at=> harpRoll(['A3','C4','E4','A4','C5'], at, 0.6, 0.024));
+    ev(rt, at=> synthNote('A4', at, 1.4, 0.7));
+    ev(rt, at=> bassNote('A', at, 2.8, 0.15));
+    ev(rt, at=> cajonBass(at, 0.6));
+
+    events.sort((a,b)=> a.t - b.t);
   }
 
   // --- réverbe (IR généré) -------------------------------------
@@ -352,40 +362,55 @@
     master.connect(limiter); limiter.connect(ctx.destination);
   }
 
-  function play(){
-    build();
-    startAt = ctx.currentTime + LEAD;
-    schedule();
+  // boucle d'ordonnancement : ne programme que les ~120 ms à venir
+  function schedulerLoop(){
+    if(!ctx) return;
+    const now = ctx.currentTime;
+    const pos = now - pieceOrigin;                  // position courante (s) dans le morceau
+    while(evIdx < events.length && events[evIdx].t < pos + LOOKAHEAD){
+      const e = events[evIdx++];
+      e.fn(Math.max(pieceOrigin + e.t, now + 0.005));
+    }
+    if(pos >= TOTAL_BARS*BAR + 4) stop();            // fin (après la résonance)
+  }
+
+  function play(fromBar){
+    teardown();
+    build(); buildEvents();
+    if(ctx.state!=='running'){ try{ ctx.resume(); }catch(e){} }
+    const fromPos = Math.max(0, (fromBar||1) - 1) * BAR;
+    evIdx = 0; while(evIdx < events.length && events[evIdx].t < fromPos - 1e-6) evIdx++;
+    pieceOrigin = ctx.currentTime + LEAD - fromPos;
     running=true; setBtn(true);
+    schedTimer = setInterval(schedulerLoop, TICKMS);
     tick();
-    clearTimeout(endTimer);
-    endTimer=setTimeout(stop, (28*BAR + 4.2)*1000);
+  }
+
+  function teardown(){
+    clearInterval(schedTimer); cancelAnimationFrame(raf);
+    if(ctx){ const c=ctx; ctx=null;
+             try{ master.gain.setTargetAtTime(0.0001, c.currentTime, 0.03); }catch(e){}
+             setTimeout(()=>{ try{c.close()}catch(e){} }, 120); }
   }
 
   function stop(){
-    running=false; setBtn(false); cancelAnimationFrame(raf);
-    if(ctx){ const c=ctx; try{ master.gain.setTargetAtTime(0.0001,c.currentTime,0.15); }catch(e){}
-             setTimeout(()=>{ try{c.close()}catch(e){} }, 400); }
-    document.getElementById('fill').style.width='0%';
-    document.getElementById('pos').textContent='Mesure —';
+    running=false; setBtn(false); teardown();
+    document.getElementById('pos').textContent='Prêt';
     document.getElementById('chd').textContent='—';
   }
 
   function tick(){
     if(!running||!ctx) return;
-    const el = ctx.currentTime - startAt;
-    const total = 28*BAR;
-    const pct = Math.max(0,Math.min(1, el/total));
-    document.getElementById('fill').style.width=(pct*100)+'%';
-    const bar = Math.floor(el/BAR)+1;
-    const pos=document.getElementById('pos'), chd=document.getElementById('chd');
-    if(el<0){ pos.textContent='…'; chd.textContent='—'; }
-    else if(bar<=28){
-      pos.textContent=(bar<=12?'I · Le Seuil':'II · L’Appel')+' — mes. '+bar+'/28';
+    const pos = ctx.currentTime - pieceOrigin;
+    const bar = Math.floor(pos/BAR)+1;
+    const seek=document.getElementById('seek');
+    if(!dragging && pos>=0) seek.value = Math.min(TOTAL_BARS, Math.max(1,bar));
+    const rd=document.getElementById('pos'), chd=document.getElementById('chd');
+    if(pos<0){ rd.textContent='…'; chd.textContent='—'; }
+    else if(bar<=TOTAL_BARS){
+      rd.textContent=(bar<=12?'I · Le Seuil':'II · L’Appel')+' — mes. '+bar+'/'+TOTAL_BARS;
       chd.textContent=CH[chordAt(bar)].name;
-    } else {
-      pos.textContent='Fin — → La Marche'; chd.textContent='—';
-    }
+    } else { rd.textContent='Fin — → La Marche'; chd.textContent='—'; }
     raf=requestAnimationFrame(tick);
   }
 
@@ -395,7 +420,21 @@
     b.classList.toggle('stop',on);
   }
 
-  document.getElementById('play').addEventListener('click',()=> running?stop():play());
+  const seekEl=document.getElementById('seek');
+  document.getElementById('play').addEventListener('click',()=> running?stop():play(+seekEl.value));
+
+  // curseur de navigation : glisser pour choisir la mesure de départ
+  seekEl.addEventListener('input',()=>{
+    dragging=true;
+    const bar=+seekEl.value;
+    document.getElementById('pos').textContent='aller à — '+(bar<=12?'I · Le Seuil':'II · L’Appel')+' mes. '+bar;
+    document.getElementById('chd').textContent=CH[chordAt(bar)].name;
+  });
+  seekEl.addEventListener('change',()=>{
+    dragging=false;
+    if(running) play(+seekEl.value);   // en lecture : saute à la mesure choisie
+  });                                   // à l'arrêt : la lecture partira de cette mesure
+
   document.getElementById('vol').addEventListener('input',e=>{
     userVol=e.target.value/100;
     if(master && ctx && ctx.state==='running') master.gain.setTargetAtTime(userVol,ctx.currentTime,0.05);
