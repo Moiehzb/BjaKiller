@@ -13,7 +13,8 @@
       "Skill(claude-api)",
       "PowerShell(node \"C:\\\\Users\\\\PC1\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\D--CLAUDE-CODE-CS-CODE\\\\01c45904-f819-4ccf-955c-e8aae4bcb14c\\\\scratchpad\\\\parity-check.mjs\")",
       "Bash(python -c \"import mido; print\\('mido OK', mido.__version__\\)\")",
-      "Bash(python \"C:/Users/PC1/AppData/Local/Temp/claude/D--CLAUDE-CODE-CS-CODE/452493d3-9f1e-41b1-a80b-e9283c1d1bbd/scratchpad/midi_analyze.py\" \".midi\")"
+      "Bash(python \"C:/Users/PC1/AppData/Local/Temp/claude/D--CLAUDE-CODE-CS-CODE/452493d3-9f1e-41b1-a80b-e9283c1d1bbd/scratchpad/midi_analyze.py\" \".midi\")",
+      "PowerShell(Invoke-Item *)"
     ]
   },
   "hooks": {
