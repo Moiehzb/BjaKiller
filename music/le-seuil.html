@@ -485,10 +485,28 @@
         }
 
       } else {
-        // ---------- LE CLOÎTRE (pont lumineux : vamp Do majeur, la flûte respire) ----------
-        //  synthé tacet · guitare tacet · PERCU coupée · luth tacet — texture aérée : flûte + harpe + basse-pad
-        ev(T(bar,0), at=> harpRoll(c.harp, at, 0.5, 0.028));              // roulé large = presque un gliss (aérien)
-        ev(T(bar,3), at=> harpRoll(c.harp.slice(2), at, 0.3, 0.032));     // shimmer sur la 2e pulsation (6/8)
+        // ---------- LE CLOÎTRE — texture qui s'éclaircit sur 20 mes. ----------
+        // Base : harpe aérée (toujours). Couches supplémentaires s'ajoutent progressivement.
+        const pos = bar - 45;                                          // 0..19
+        const hv  = 0.44 + pos * 0.007;                               // crescendo très doux : 0.44 → 0.57
+        ev(T(bar,0), at=> harpRoll(c.harp, at, hv, 0.028));           // roulé large (aérien)
+        ev(T(bar,3), at=> harpRoll(c.harp.slice(2), at, hv*0.6, 0.032)); // shimmer 2e pulsation
+
+        // A' (mes. 49-52) : shimmer cristallin sur le temps intermédiaire (entre les deux pulsations)
+        if(bar>=49 && bar<=52)
+          ev(T(bar,1.5), at=> pluck('harp', c.harp[3], at+hum(), 0.18));
+
+        // B développement (mes. 53-56) : luth très discret en contre-temps (impaires seulement)
+        if(bar>=53 && bar<=56 && bar%2===1)
+          ev(T(bar,4.5), at=> luteNote(c.orn[1], at+hum(), 0.17));
+
+        // A retour (mes. 57-60) : luth plus régulier — accompagne le thème reconnu
+        if(bar>=57 && bar<=60)
+          ev(T(bar,4.5), at=> luteNote(c.orn[0], at+hum(), 0.21));
+
+        // Tag (mes. 61-64) : harpe haute plane seule (simplifie pour laisser la flûte se poser)
+        if(bar>=61 && bar%2===1)
+          ev(T(bar,2), at=> pluck('harp', c.harp[4], at+hum(), 0.22));
       }
     }
 

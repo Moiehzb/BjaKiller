@@ -12,9 +12,8 @@
 - **Banc de diagnostic** : `music/diagnostic.html` — joue chaque instrument isolément (+ tests « silence » et « sinus pur » pour écarter le matériel). À rouvrir dès qu'un son paraît buggé.
 - **Moteur** : Web Audio API, 100 % synthèse offline (aucun sample, aucun fetch). Marche en `file://`.
 - **Sections codées + validées à l'oreille** : **Le Seuil** (mes. 1-12), **L'Appel** (13-28), **La Marche** (29-44).
-- **Codé, à valider à l'oreille** : **Le Cloître** (45-64) — pont lumineux (vamp **Cadd9⇄Fmaj7**, Do majeur relatif), **flûte créée** ; percu/synthé/guitare/luth tacet. `TOTAL_BARS=64`.
+- **Codé + validé à l'oreille** : **Le Cloître** (45-64) — pont lumineux (vamp **Cadd9⇄Fmaj7**). Flûte : ✅ **mélodie AABA validée** (thème 4 mes. exposé 2×, développement apex C6, retour = reconnaissance). Accompagnement : ✅ **texture progressive** (harpe s'intensifie + shimmer A' + luth contra-temps en B + luth régulier retour thème + harpe haute tag).
 - **Reste à coder** : **L'Ascension** (65-92), **Le Retour** (93-120) + finalisation de la **boucle seamless**.
-- **Point de review en cours** : **Le Cloître** vient d'être codé + vérifié (syntaxe + logique : 560 events, fin à 128 s). **En attente : écoute utilisateur** (dosage flûte / vamp / basse-pad).
 - **Journal / points de sauvegarde** : voir **§8 (Journal)** tout en bas — mis à jour à **chaque étape stable** (le plus récent en haut). Les **valeurs exactes = le code** ; le Journal ne logue **pas** les micro-réglages.
 
 ---
@@ -115,7 +114,7 @@ Tout est dans un `<script>` unique (IIFE). Ordre : constantes → utilitaires (`
 
 ## 7. Prochaine étape
 
-**Le Cloître est codé** (mes. 45-64 : vamp Cadd9⇄Fmaj7, flûte créée, `TOTAL_BARS=64`) — **à valider à l'oreille** (dosages flûte/vamp/basse-pad). Ensuite : **L'Ascension** (climax, mes. 65-92 — retour Am, arrangement plein, thème + harmonies, **pas de luth**), puis **Le Retour** (outro, 93-120 — dé-empilement vers la texture d'ouverture, le luth revient, + **bouclage seamless** E7→Am).
+**Le Cloître est validé** (mes. 45-64 : vamp Cadd9⇄Fmaj7, flûte AABA + accompagnement progressif). Prochaine étape : **L'Ascension** (climax, mes. 65-92 — retour Am, arrangement plein, thème + harmonies, **pas de luth**), puis **Le Retour** (outro, 93-120 — dé-empilement vers texture d'ouverture, luth revient, + **bouclage seamless** E7→Am).
 
 Références analysées (dans `.midi/`, via parser maison — voir méthodologie) : **Gerudo Valley** (F♯m harmonique, cadence andalouse = ADN flamenco), **Corridors of Time** (loop hypnotique 2 accords), **Schala** (Fm, min-maj7/napolitain), **Terra** (Si maj penché sur le vi), **Pallet Town** (Sol maj diatonique, harmonie lente).
 
@@ -127,11 +126,11 @@ Références analysées (dans `.midi/`, via parser maison — voir méthodologie
 > **On NE logue PAS chaque micro-réglage.** Les valeurs exactes vivent dans le **code** (`le-seuil.html` fait foi). Une session de tweaks = **une** ligne consolidée (« guitare La Marche portée à X, validé »), pas dix.
 > Format : `AAAA-MM-JJ — ce qui change — pourquoi`. Le plus récent en haut.
 
-### 2026-07-04 — Le Cloître codé (mes. 45-64)
-- **Décision** : le pont = **vamp hypnotique Cadd9⇄Fmaj7** (I⇄IV de Do majeur relatif, façon Corridors) ; l'option « bascule franche » est écartée.
-- **Fait** : **flûte créée** (`fluteNote` : sinus+octave+triangle+souffle, vibrato retardé) ; elle **respire le thème** (Sol♯→Sol = éclaircie). Texture = flûte + harpe + basse-pad ; **percu/synthé/guitare/luth tacet**. `TOTAL_BARS=64`. Transition mes.44 (E7) → 45 (Cadd9) via Sol♯→Sol ; sortie mes.64 (Fmaj7) prépare le retour à Am.
-- **Vérifié** : syntaxe (`vm.Script`) + logique (`buildEvents` stubbé : 560 events, fin à 128 s, accords/notes valides).
-- **En attente** : **écoute utilisateur** (dosage flûte `L=vel*0.16`, vamp, basse-pad). Puis L'Ascension.
+### 2026-07-04 — Le Cloître validé (mes. 45-64)
+- **Flûte ✅ validée à l'oreille** : forme **AABA** sur 16 mes. Thème = 4 mes. (port E-G→La5 tenu, réponse Do-Ré-Mi, rebond Sol-La-Sol, Mi tenu). Exposé 2× (A+A') → développement apex C6 avec mordant (B) → retour thème reconnaissable (A). vel=0.92, entrée franche.
+- **Accompagnement ✅ validé** : texture progressive sur 20 mes. — harpe seule (45-48) → shimmer cristallin sur A' (49-52) → luth contra-temps impaires sur B (53-56) → luth régulier sur retour thème (57-60) → harpe haute plane sur tag (61-64). Léger crescendo harpe (vel 0.44→0.57).
+- **Transition ✅** : fondu 3 mesures (cloitrePad La3 à mes.43, Mi3+Mi4 à mes.44, Sol4+Do4 à mes.45).
+- **Prochaine étape** : L'Ascension (mes. 65-92).
 
 ### 2026-07-04 — La Marche validée → cap sur Le Cloître
 - **Guitare à La Marche : validée à l'oreille** (dosage `gain 0.12` + flammes `guitarFlurry`). Plus rien en attente sur les **mes. 1-44**.
