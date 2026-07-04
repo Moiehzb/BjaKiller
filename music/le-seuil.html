@@ -361,6 +361,13 @@
   function playFluteTag(startBar){
     FLUTE_TAG.forEach(([lb,e,d,note])=> ev(T(startBar+lb-1,e), at=> fluteNote(note, at, d*EIGHTH, 0.8)));
   }
+  // flûte en chorale sur L'Ascension : double le synthé (même mélodie, timbre différent)
+  function playThemeFlute(startBar, vel){
+    THEME.forEach(([lb,e,d,note])=> ev(T(startBar+lb-1,e), at=> fluteNote(note,at,d*EIGHTH,vel)));
+  }
+  function playThemeBFlute(startBar, vel){
+    THEME_B.forEach(([lb,e,d,note])=> ev(T(startBar+lb-1,e), at=> fluteNote(note,at,d*EIGHTH,vel)));
+  }
 
   // --- PERCUSSIONS légères : cajón (1 & 4) + palmas ------------
   function noiseBuf(){
@@ -590,6 +597,11 @@
     playFluteCloitre(45, FLUTE_CLOITRE_A, 0.92);
     playFluteCloitre(53, FLUTE_CLOITRE_B, 0.92);
     playFluteTag(61);
+
+    // FLÛTE en chorale sur L'Ascension — même mélodie que le synthé, monte en intensité
+    playThemeFlute(65,  0.58);   // entrée discrète (synthé dominant)
+    playThemeBFlute(73, 0.68);   // s'affirme
+    playThemeBFlute(81, 0.76);   // climax : les deux voix ensemble
 
     events.sort((a,b)=> a.t - b.t);
   }
