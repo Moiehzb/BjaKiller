@@ -542,7 +542,7 @@
         ev(T(bar,3), at=> palma(at+hum(), phase===4?0.35:0.52));
         ev(T(bar,5), at=> palma(at+hum(), phase===4?0.28:0.38));
         if(phase>=2) ev(T(bar,1), at=> palma(at+hum(), 0.30));
-        if(phase===3){ ev(T(bar,2), at=> palma(at+hum(), 0.27)); ev(T(bar,4), at=> palma(at+hum(), 0.27)); }
+        if(phase===3)  ev(T(bar,2), at=> palma(at+hum(), 0.24)); // un seul renfort au climax
 
       } else {
         // ---------- VI · LE RETOUR (outro, dé-empilement vers texture du Seuil) ----------
@@ -621,6 +621,28 @@
     master.connect(limiter); limiter.connect(ctx.destination);
   }
 
+  // pré-chauffe du cache KS + bruit — à appeler après build() et buildEvents()
+  // évite les CPU spikes (et grésillements) dus à la génération de buffers pendant la lecture
+  function warmCache(){
+    ['harp','guitar','lute'].forEach(k=>{
+      const inst=INST[k]; const noteSet=new Set();
+      Object.values(CH).forEach(c=>{
+        if(k==='harp')   c.harp.forEach(n=>noteSet.add(n));
+        if(k==='guitar') c.gtr.forEach(n=>{ noteSet.add(n); noteSet.add(up(n)); });
+        if(k==='lute')   c.orn.forEach(n=>noteSet.add(n));
+      });
+      noteSet.forEach(note=>{
+        const fr=f(note);
+        ks(fr,inst.ring,inst.bright,inst.decay,inst.damp);
+        if(k==='lute'){
+          ks(cents(fr,-7),inst.ring,inst.bright,inst.decay,inst.damp);
+          ks(cents(fr, 7),inst.ring,inst.bright,inst.decay,inst.damp);
+        }
+      });
+    });
+    noiseBuf(); // bruit pour cajon + palmas
+  }
+
   // boucle d'ordonnancement : ne programme que les ~120 ms à venir
   function schedulerLoop(){
     if(!ctx) return;
@@ -628,14 +650,15 @@
     const pos = now - pieceOrigin;                  // position courante (s) dans le morceau
     while(evIdx < events.length && events[evIdx].t < pos + LOOKAHEAD){
       const e = events[evIdx++];
-      e.fn(Math.max(pieceOrigin + e.t, now + 0.005));
+      // marge 12 ms (> hum max 8 ms) pour éviter les starts dans le passé = pop/click
+      e.fn(Math.max(pieceOrigin + e.t, now + 0.012));
     }
     if(pos >= TOTAL_BARS*BAR + 3){ play(1); return; } // jointure seamless → mes. 1
   }
 
   function play(fromBar){
     teardown();
-    build(); buildEvents();
+    build(); buildEvents(); warmCache();
     if(ctx.state!=='running'){ try{ ctx.resume(); }catch(e){} }
     const fromPos = Math.max(0, (fromBar||1) - 1) * BAR;
     evIdx = 0; while(evIdx < events.length && events[evIdx].t < fromPos - 1e-6) evIdx++;
