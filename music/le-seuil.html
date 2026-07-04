@@ -601,10 +601,10 @@
     playFluteTag(61);
 
     // FLÛTE en chorale sur L'Ascension — même mélodie que le synthé, monte en intensité
-    // test 1 : sans décalage
-    playThemeFlute(65,  1.40, 0.30);
-    playThemeBFlute(73, 1.40, 0.30);
-    playThemeBFlute(81, 1.40, 0.30);
+    // test 2 : décalage 80 ms, flûte plus discrète
+    playThemeFlute(65,  0.95, 0.30, 0.08);
+    playThemeBFlute(73, 0.95, 0.30, 0.08);
+    playThemeBFlute(81, 0.95, 0.30, 0.08);
 
     events.sort((a,b)=> a.t - b.t);
   }
