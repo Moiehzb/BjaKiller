@@ -14,6 +14,7 @@
 - **Sections codées + validées à l'oreille** : **Le Seuil** (mes. 1-12), **L'Appel** (13-28), **La Marche** (29-44).
 - **Reste à coder** : **Le Cloître** (45-64), **L'Ascension** (65-92), **Le Retour** (93-120) + finalisation de la **boucle seamless**.
 - **Point de review en cours** : on vient de **remonter la guitare** (elle était inaudible) — en attente de confirmation utilisateur sur le dosage à La Marche.
+- **Journal / points de sauvegarde** : voir **§8 (Journal)** tout en bas — mis à jour à **chaque étape stable** (le plus récent en haut). Les **valeurs exactes = le code** ; le Journal ne logue **pas** les micro-réglages.
 
 ---
 
@@ -116,3 +117,16 @@ Tout est dans un `<script>` unique (IIFE). Ordre : constantes → utilitaires (`
 **Le Cloître** (pont, mes. 45-64) : bascule **lumineuse** (Do majeur relatif ou vamp hypnotique Fmaj7⇄Cadd9 façon Corridors of Time), **le synthé se tait**, **coder la FLÛTE** qui porte le thème (respiration/contraste), **percu coupée**, texture aérée. Puis **L'Ascension** (climax) et **Le Retour** (outro + bouclage seamless E7→Am).
 
 Références analysées (dans `.midi/`, via parser maison — voir méthodologie) : **Gerudo Valley** (F♯m harmonique, cadence andalouse = ADN flamenco), **Corridors of Time** (loop hypnotique 2 accords), **Schala** (Fm, min-maj7/napolitain), **Terra** (Si maj penché sur le vi), **Pallet Town** (Sol maj diatonique, harmonie lente).
+
+---
+
+## 8. Journal (le plus récent en haut)
+
+> **Point de sauvegarde par étape.** On met à jour cette fiche (ce §, + §0 « en un coup d'œil » + §7 « prochaine étape ») à **chaque état stable** : section codée, mix validé, décision verrouillée — **avant de s'arrêter**.
+> **On NE logue PAS chaque micro-réglage.** Les valeurs exactes vivent dans le **code** (`le-seuil.html` fait foi). Une session de tweaks = **une** ligne consolidée (« guitare La Marche portée à X, validé »), pas dix.
+> Format : `AAAA-MM-JJ — ce qui change — pourquoi`. Le plus récent en haut.
+
+### 2026-07-04 — Ouverture du Journal (baseline)
+- **Fait & validé à l'oreille** : **Le Seuil** (mes. 1-12), **L'Appel** (13-28), **La Marche** (29-44). `TOTAL_BARS=44`.
+- **En attente utilisateur** : dosage de la **guitare à La Marche** — remontée `gain 0.092 → 0.12` + flammes doubles-croches (`guitarFlurry`) sur toute la section, car elle était passée sous le seuil d'audibilité (cf. §6.5).
+- **Prochaine étape** : **Le Cloître** (mes. 45-64) + coder la **flûte** (absente du code à ce jour).
