@@ -119,16 +119,18 @@
       const s=ctx.createBufferSource(); s.buffer=b; s.connect(master); s.start(); },
     drone(master){
       const t=ctx.currentTime;
-      const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=560; lp.Q.value=0.6;
-      const lfo=ctx.createOscillator(); lfo.frequency.value=0.06;
-      const lg=ctx.createGain(); lg.gain.value=170; lfo.connect(lg); lg.connect(lp.frequency); lfo.start(t);
+      const lp1=ctx.createBiquadFilter(); lp1.type='lowpass'; lp1.frequency.value=240; lp1.Q.value=0.4;
+      const lp2=ctx.createBiquadFilter(); lp2.type='lowpass'; lp2.frequency.value=430; lp2.Q.value=0.3;
+      const hp =ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=38;
+      const lfo=ctx.createOscillator(); lfo.frequency.value=0.05;
+      const lg=ctx.createGain(); lg.gain.value=55; lfo.connect(lg); lg.connect(lp1.frequency); lfo.start(t);
       const g=ctx.createGain(); g.gain.setValueAtTime(0.0001,t);
-      g.gain.exponentialRampToValueAtTime(0.5,t+2);
-      lp.connect(g); g.connect(master);
-      [['A1','sawtooth',0.85,-6],['A1','sawtooth',0.85,6],['A2','sawtooth',0.6,0],
-       ['E2','triangle',0.42,0],['A3','triangle',0.16,4]].forEach(([n,ty,a,det])=>{
+      g.gain.exponentialRampToValueAtTime(0.42,t+2.5);
+      lp1.connect(lp2); lp2.connect(hp); hp.connect(g); g.connect(master);
+      [['A1','triangle',0.6,-5],['A1','triangle',0.6,6],['A2','sine',0.42,0],['A3','triangle',0.12,4]]
+        .forEach(([n,ty,a,det])=>{
         const o=ctx.createOscillator(); o.type=ty; o.frequency.value=f(n); o.detune.value=det;
-        const og=ctx.createGain(); og.gain.value=a; o.connect(og); og.connect(lp); o.start(t);
+        const og=ctx.createGain(); og.gain.value=a; o.connect(og); og.connect(lp1); o.start(t);
       });
     },
     harp(master){ arp(['A3','C4','E4','B4','A5'],master,[0.5,2.0,0.45,0.9962,0.62,'highpass',180]); },
