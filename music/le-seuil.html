@@ -266,6 +266,24 @@
     oss.forEach(o=>{ o.start(t); o.stop(t+dur+0.12); }); vib.stop(t+dur+0.12); drift.stop(t+dur+0.12);
   }
 
+  // --- PAD de dissolution du synthé (bascule vers Le Cloître) : voix douce et sombre qui FADE jusqu'au silence
+  //     (au lieu de « tenir puis lâcher » — on ne doit plus percevoir le synthé disparaître)
+  function cloitrePad(note, t, dur, vel){
+    const fr=f(note);
+    const flt=ctx.createBiquadFilter(); flt.type='lowpass'; flt.frequency.value=900; flt.Q.value=0.4;
+    const g=ctx.createGain(), L=vel*0.09;
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.linearRampToValueAtTime(L, t+0.4);              // montée douce
+    g.gain.exponentialRampToValueAtTime(0.0001, t+dur);    // fade progressif jusqu'au silence
+    flt.connect(g);
+    const pan=ctx.createStereoPanner(); pan.pan.value=-0.03; g.connect(pan); pan.connect(dry);
+    const s=ctx.createGain(); s.gain.value=0.14; g.connect(s); s.connect(reverb);
+    [[fr,'triangle',0.5,-5],[fr,'sine',0.4,5],[fr*2,'sine',0.14,0]].forEach(([fq,ty,a,det])=>{
+      const o=ctx.createOscillator(); o.type=ty; o.frequency.value=fq; o.detune.value=det;
+      const og=ctx.createGain(); og.gain.value=a; o.connect(og); og.connect(flt); o.start(t); o.stop(t+dur+0.1);
+    });
+  }
+
   // thème principal (8 mes.) — [mesure locale 1..8, croche 0..5, durée(croches), note]
   const THEME = [
     [1,0,2,'A4'],[1,2,1,'C5'],[1,3,3,'E5'],          // La: A C E___
@@ -296,30 +314,30 @@
     THEME_B.forEach(([lb,e,d,note])=> ev(T(startBar+lb-1,e), at=> synthNote(note, at, d*EIGHTH, 0.92)));
   }
 
-  // MÉLODIE de la flûte au « Cloître » : NOUVELLE mélodie (pas le thème), calme et lumineuse MAIS avec du relief —
-  // rythmes variés (tenues + petits traits en doubles-croches + ornements), de VRAIS silences (respirations),
-  // et des entrées syncopées pour casser la prévisibilité. Vamp : mes. impaires = Cadd9, paires = Fmaj7.
-  // Phrase A (mes. 45-52) :
+  // MÉLODIE de la flûte au « Cloître » : équilibre unité/variété. Un MOTIF reconnaissable (le « port ») revient
+  // 3× (mes. 45, 49, 57) = « E-G rapides -> La5 tenu, puis redescend G-E » (arche courte, rythme court-court-long).
+  // ENTRE les rappels : variété (traits, mordant, apex C6, syncopes, silences) = le côté break. Vamp : impaires=Cadd9, paires=Fmaj7.
+  // Phrase A (mes. 45-52) : MOTIF (45-46) -> réponse (47-48) -> MOTIF (49-50) -> réponse variée (51-52)
   const FLUTE_CLOITRE_A = [
-    [1,0,0.5,'G5'],[1,0.5,0.5,'A5'],[1,1,2,'G5'],[1,3,3,'E5'],  // (Cadd9) petit ornement (2 dbl-croches) puis tenues
-    [2,0,3,'D5'],                                               // (Fmaj7) une tenue… puis SILENCE (respiration)
-    [3,0,2,'E5'],[3,2,1,'G5'],[3,3,3,'A5'],                     // (Cadd9) montée vers A5
-    [4,0,1,'A5'],[4,1,1,'G5'],[4,2,1,'F5'],[4,3,3,'E5'],        // (Fmaj7) petit trait descendant qui se pose (sauce)
-    [5,1,1,'C5'],[5,2,1,'D5'],[5,3,3,'E5'],                     // (Cadd9) entrée SYNCOPÉE (pickup C-D) -> Mi tenu
-    [6,0,4,'F5'],[6,4,2,'E5'],                                  // (Fmaj7) Fa tenu (chaud) -> Mi
-    [7,0,2,'D5'],[7,2,1,'C5'],[7,3,3,'G4'],                     // (Cadd9) descente calme vers le grave
-    [8,0,3,'A4'],                                               // (Fmaj7) La grave tenu… puis SILENCE (vraie pause)
+    [1,0,1,'E5'],[1,1,1,'G5'],[1,2,4,'A5'],              // (Cadd9) ♦ MOTIF : E-G rapides -> La5 tenu (le « port »)
+    [2,0,3,'G5'],[2,3,3,'E5'],                           // (Fmaj7) ♦ MOTIF : redescend G -> E (l'arche)
+    [3,0,3,'D5'],[3,3,3,'C5'],                           // (Cadd9) réponse : pas descendant calme
+    [4,0,4,'A4'],                                        // (Fmaj7) La grave tenu… puis SILENCE (respiration)
+    [5,0,1,'E5'],[5,1,1,'G5'],[5,2,4,'A5'],              // (Cadd9) ♦ MOTIF (rappel) — le port revient
+    [6,0,3,'G5'],[6,3,3,'E5'],                           // (Fmaj7) ♦ MOTIF
+    [7,0,1,'D5'],[7,1,1,'E5'],[7,2,1,'D5'],[7,3,3,'C5'], // (Cadd9) réponse variée : petit tour D-E-D -> C
+    [8,0,3,'A4'],                                        // (Fmaj7) La grave tenu… puis SILENCE (avant la phrase B)
   ];
-  // Phrase B (mes. 53-60) : développement — repart plus haut, ornement (mordant), apex doux C6, puis se pose.
+  // Phrase B (mes. 53-60) : DÉPART (le break : plus haut, mordant, apex C6) -> retour du MOTIF (57-58) = on rentre au port -> résolution
   const FLUTE_CLOITRE_B = [
-    [1,0,2,'E5'],[1,2,1,'G5'],[1,3,3,'A5'],                     // (Cadd9) repart plus haut
-    [2,0,2,'A5'],[2,2,0.5,'G5'],[2,2.5,0.5,'A5'],[2,3,3,'G5'],  // (Fmaj7) MORDANT (A-G-A rapide) puis Sol
-    [3,0,1,'E5'],[3,1,1,'G5'],[3,2,1,'B5'],[3,3,3,'C6'],        // (Cadd9) trait montant -> apex doux C6
-    [4,0,2,'A5'],[4,2,1,'G5'],[4,3,3,'F5'],                     // (Fmaj7) quitte le sommet, descend
-    [5,1,1,'E5'],[5,2,1,'D5'],[5,3,3,'C5'],                     // (Cadd9) re-entrée SYNCOPÉE, descend vers Do
-    [6,0,4,'A4'],[6,4,2,'C5'],                                  // (Fmaj7) La grave tenu -> Do
-    [7,0,1,'D5'],[7,1,1,'E5'],[7,2,1,'D5'],                     // (Cadd9) petit tour Ré-Mi-Ré… puis SILENCE
-    [8,0,6,'C5'],                                               // (Fmaj7) Do tenu = repos (prépare le tag)
+    [1,0,1,'A5'],[1,1,1,'G5'],[1,2,1,'A5'],[1,3,3,'B5'], // (Cadd9) départ : vague agitée qui monte vers Si5
+    [2,0,2,'C6'],[2,2,1,'A5'],[2,3,3,'G5'],              // (Fmaj7) apex doux C6, retombe
+    [3,0,1,'G5'],[3,1,0.5,'A5'],[3,1.5,0.5,'G5'],[3,2,1,'E5'],[3,3,3,'D5'], // (Cadd9) mordant + descente
+    [4,0,4,'C5'],[4,4,2,'D5'],                           // (Fmaj7) Do tenu, remonte vers Ré
+    [5,0,1,'E5'],[5,1,1,'G5'],[5,2,4,'A5'],              // (Cadd9) ♦ MOTIF (rappel final) — retour au port
+    [6,0,3,'G5'],[6,3,3,'E5'],                           // (Fmaj7) ♦ MOTIF
+    [7,0,2,'D5'],[7,2,1,'C5'],[7,3,3,'G4'],              // (Cadd9) résolution : se pose vers le grave
+    [8,0,6,'C5'],                                        // (Fmaj7) Do tenu = repos (prépare le tag)
   ];
   function playFluteCloitre(startBar, arr, vel){
     arr.forEach(([lb,e,d,note])=> ev(T(startBar+lb-1,e), at=> fluteNote(note, at, d*EIGHTH, vel)));
@@ -449,8 +467,9 @@
           // en pad doux sur ~2 mesures (Mi grave puis Sol, notes pivots vers Do) au lieu de se couper net.
           ev(T(bar,0),   at=> cajonBass(at+hum(), 0.5));                              // un dernier boom, doux
           ev(T(bar,3),   at=> harpRoll(['E4','Gs4','B4','D5','E5'], at, 0.5, 0.03));  // gliss ascendant (E7) = respiration
-          ev(T(bar,3),   at=> synthNote('E4', at, 8*EIGHTH, 0.4));                    // pad Mi grave qui fond dans le Cloître
-          ev(T(bar+1,0), at=> synthNote('G4', at, 6*EIGHTH, 0.3));                    // + Sol doux (quinte de Do), s'efface
+          ev(T(bar,3),   at=> cloitrePad('E4', at, 5.6, 0.8));                        // Mi (pivot) qui FADE sur ~3 mes.
+          ev(T(bar+1,0), at=> cloitrePad('G4', at, 5.0, 0.62));                       // + Sol, se dissout doucement
+          ev(T(bar+1,3), at=> cloitrePad('C4', at, 4.2, 0.5));                        // + Do (la lumière) — le pad s'efface en Do majeur
         }
 
       } else {
