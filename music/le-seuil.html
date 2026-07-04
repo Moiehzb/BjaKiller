@@ -59,14 +59,14 @@
       <circle cx="50" cy="50" r="6" fill="#c9a24b" stroke="none"/>
     </svg>
     <div class="kicker">Blackjack Academy · Lobby</div>
-    <h1>L'Appel</h1>
-    <div class="sub">Le Seuil &rarr; L'Appel &middot; mesures 1 à 28 &middot; 6/8 &middot; La mineur andalou</div>
+    <h1>La Marche</h1>
+    <div class="sub">Le Seuil &rarr; L'Appel &rarr; La Marche &middot; mesures 1 à 44 &middot; 6/8 &middot; La mineur andalou</div>
 
     <div class="ctrls">
       <button id="play">Franchir le seuil</button>
     </div>
 
-    <input type="range" id="seek" class="seek" min="1" max="28" step="1" value="1" aria-label="position de lecture">
+    <input type="range" id="seek" class="seek" min="1" max="44" step="1" value="1" aria-label="position de lecture">
     <div class="read"><span id="pos">Prêt</span><span class="chord" id="chd">—</span></div>
 
     <div class="vol">
@@ -75,9 +75,9 @@
     </div>
 
     <div class="note">
-      Le thème principal (synthé‑lead) entre à « L'Appel » (mes. 13), au‑dessus de la basse descendante
-      La–Sol–Fa–Mi — avec harpe, guitare en arrière‑plan, luth et percussions légères (cajón 1 &amp; 4 + palmas).
-      Thème énoncé deux fois, puis une courte conclusion ouvre vers « La Marche ».
+      Le thème (synthé‑lead) entre à « L'Appel » (mes. 13), puis revient <b>orné</b> à « La Marche » (mes. 29),
+      où la basse <b>pulse sur 1 &amp; 4</b> et la guitare lâche ses « flammes ». Glisse le curseur pour sauter de section.
+      Après la mes. 44, une courte conclusion ouvre vers « Le Cloître ».
     </div>
   </div>
 
@@ -99,7 +99,7 @@
 
   // --- ordonnanceur à anticipation (look-ahead) : évite le pic de calcul au démarrage
   let events=[], evIdx=0, pieceOrigin=0, schedTimer=0, dragging=false;
-  const LOOKAHEAD=0.12, TICKMS=25, TOTAL_BARS=28;
+  const LOOKAHEAD=0.12, TICKMS=25, TOTAL_BARS=44;
   function ev(t,fn){ events.push({t,fn}); }
 
   // --- note -> fréquence ---------------------------------------
@@ -107,6 +107,7 @@
   function f(n){ const o=+n.slice(-1), p=PC[n.slice(0,-1)]; return 440*Math.pow(2,((o+1)*12+p-69)/12); }
   const cents = (fr,c)=> fr*Math.pow(2,c/1200);
   const hum   = ()=> (Math.random()*2-1)*0.008;   // micro-décalage humain (±8ms)
+  const up    = n => n.slice(0,-1)+(+n.slice(-1)+1);   // monte une note d'une octave (A2->A3)
 
   // --- Karplus-Strong : génère un buffer de corde pincée -------
   function ks(freq, dur, bright, decay, damp){
@@ -165,6 +166,14 @@
     for(let e=0;e<6;e++){
       const n=voicing[pat[e]%voicing.length];
       pluck('guitar',n, tBase + e*EIGHTH + hum(), vel*(e===0?1:0.8));
+    }
+  }
+  // --- guitare RAPIDE : « flammes » flamenco (doubles-croches) — reste en arrière-plan
+  function guitarFlurry(voicing,tBase,vel){
+    const pat=[0,1,2,3,2,1,0,1,2,3,2,1];   // 12 doubles-croches, vague montante/descendante
+    for(let i=0;i<12;i++){
+      const n=voicing[pat[i]%voicing.length];
+      pluck('guitar',n, tBase + i*(EIGHTH/2) + hum(), vel*(i%3===0?1:0.7));
     }
   }
 
@@ -235,6 +244,21 @@
     THEME.forEach(([lb,e,d,note])=> ev(T(startBar+lb-1,e), at=> synthNote(note, at, d*EIGHTH, 0.9)));
   }
 
+  // thème VARIÉ pour « La Marche » : même ossature, plus fleuri (croches qui coulent)
+  const THEME_B = [
+    [1,0,1,'A4'],[1,1,1,'C5'],[1,2,1,'E5'],[1,3,2,'A5'],[1,5,1,'G5'],   // La: monte à A5 (accroche)
+    [2,0,2,'D5'],[2,2,1,'E5'],[2,3,2,'B4'],[2,5,1,'D5'],                // Sol
+    [3,0,2,'C5'],[3,2,1,'D5'],[3,3,2,'A4'],[3,5,1,'C5'],                // Fa
+    [4,0,2,'B4'],[4,2,1,'C5'],[4,3,3,'Gs4'],                            // Mi: G#___ (tension)
+    [5,0,1,'A4'],[5,1,1,'C5'],[5,2,1,'E5'],[5,3,3,'A5'],                // La: envol A5 (comme l'original)
+    [6,0,2,'G5'],[6,2,1,'A5'],[6,3,2,'D5'],[6,5,1,'E5'],                // Sol
+    [7,0,2,'E5'],[7,2,1,'F5'],[7,3,2,'C5'],[7,5,1,'D5'],                // Fa: F5 = maj7, couleur
+    [8,0,1,'B4'],[8,1,1,'Gs4'],[8,2,1,'A4'],[8,3,3,'A4'],               // Mi: résolution sur La
+  ];
+  function playThemeB(startBar){
+    THEME_B.forEach(([lb,e,d,note])=> ev(T(startBar+lb-1,e), at=> synthNote(note, at, d*EIGHTH, 0.92)));
+  }
+
   // --- PERCUSSIONS légères : cajón (1 & 4) + palmas ------------
   function noiseBuf(){
     if(_noise) return _noise;
@@ -281,16 +305,22 @@
   const ROOT = { Am:'A', G:'G', Fmaj7:'F', E7:'E' };   // fondamentale de la basse par accord
   const CELL = ['Am','G','Fmaj7','E7'];                // cellule andalouse (1 accord / mesure)
   const chordAt = b => CELL[(b-1)%4];                  // l'accord de n'importe quelle mesure
+  const sectionOf = b => b<=12?'I · Le Seuil' : b<=28?'II · L’Appel' : 'III · La Marche';
 
   // --- partition : construit la LISTE d'ÉVÉNEMENTS (temps relatifs) ---
   //     jouée ensuite par l'ordonnanceur (pas tout créé d'un coup = plus de grésillement)
   function buildEvents(){
     events = [];
-    for(let bar=1; bar<=28; bar++){
+    for(let bar=1; bar<=44; bar++){
       const cn = chordAt(bar), c = CH[cn];
 
-      // BASSE — toutes les mesures (descend La-Sol-Fa-Mi)
-      ev(T(bar,0), at=> bassNote(ROOT[cn], at, BAR, bar===1?1.4:0.12));
+      // BASSE (descend La-Sol-Fa-Mi) : tenue en I/II, re-articulée sur 1 & 4 en III (marche)
+      if(bar<=28){
+        ev(T(bar,0), at=> bassNote(ROOT[cn], at, BAR, bar===1?1.4:0.12));
+      } else {
+        ev(T(bar,0), at=> bassNote(ROOT[cn], at, 3*EIGHTH+0.15, 0.06));
+        ev(T(bar,3), at=> bassNote(ROOT[cn], at, 3*EIGHTH+0.15, 0.05));
+      }
 
       if(bar<=12){
         // ---------- LE SEUIL (intro qui s'ouvre) ----------
@@ -307,7 +337,7 @@
         if(bar===2) ev(T(bar,4), at=> luteNote('E5', at+hum(), 0.5));
         if(bar===4||bar===8||bar===12) c.orn.forEach((n,i)=> ev(T(bar,3+i), at=> luteNote(n, at+hum(), 0.6-i*0.08)));
 
-      } else {
+      } else if(bar<=28){
         // ---------- L'APPEL (thème synthé + percussions) ----------
         const stmt2 = bar>20;                            // 2e énonciation (21-28) = plus dense
         ev(T(bar,0), at=> harpRoll(c.harp, at, 0.46));   // harpe : soutien doux
@@ -318,15 +348,29 @@
         ev(T(bar,3), at=> palma(at+hum(), stmt2?0.5:0.36));
         if(stmt2) ev(T(bar,5), at=> palma(at+hum(), 0.3));
         if(bar%4===0) c.orn.forEach((n,i)=> ev(T(bar,4+i*0.5), at=> luteNote(n, at+hum(), 0.32-i*0.05)));
+
+      } else {
+        // ---------- LA MARCHE (variation A', plus d'élan) ----------
+        const stmt2 = bar>36;                            // 37-44 = « flammes » de guitare
+        ev(T(bar,0), at=> harpRoll(c.harp, at, 0.5));
+        ev(T(bar,3), at=> harpRoll(c.harp.slice(2), at, 0.32, 0.02));      // 2e roulé = mouvement
+        if(!stmt2) ev(T(bar,0), at=> guitarArp(c.gtr, at, 0.72));
+        else       ev(T(bar,0), at=> guitarFlurry(c.gtr.map(up), at, 0.5)); // doubles-croches (arrière-plan)
+        ev(T(bar,0), at=> cajonBass(at+hum(), 0.95));
+        ev(T(bar,3), at=> cajonSlap(at+hum(), 0.8));
+        ev(T(bar,3), at=> palma(at+hum(), 0.5));
+        ev(T(bar,5), at=> palma(at+hum(), stmt2?0.44:0.34));               // contretemps (lilt de marche)
+        if(stmt2) ev(T(bar,1), at=> palma(at+hum(), 0.3));                 // palmas plus denses au climax
+        if(bar%4===0) c.orn.forEach((n,i)=> ev(T(bar,4+i*0.5), at=> luteNote(n, at+hum(), 0.34-i*0.05)));
       }
     }
 
-    // MÉLODIE synthé-lead : le thème énoncé 2 fois (13-20, puis 21-28)
-    playTheme(13);
-    playTheme(21);
+    // MÉLODIE synthé-lead
+    playTheme(13);  playTheme(21);      // L'Appel : thème
+    playThemeB(29); playThemeB(37);     // La Marche : variation ornée
 
-    // --- courte conclusion après la mes. 28 (ouvre vers « La Marche ») ---
-    const rt = 28*BAR;
+    // --- courte conclusion après la mes. 44 (ouvre vers « Le Cloître ») ---
+    const rt = 44*BAR;
     ev(rt, at=> harpRoll(['A3','C4','E4','A4','C5'], at, 0.6, 0.024));
     ev(rt, at=> synthNote('A4', at, 1.4, 0.7));
     ev(rt, at=> bassNote('A', at, 2.8, 0.15));
@@ -408,7 +452,7 @@
     const rd=document.getElementById('pos'), chd=document.getElementById('chd');
     if(pos<0){ rd.textContent='…'; chd.textContent='—'; }
     else if(bar<=TOTAL_BARS){
-      rd.textContent=(bar<=12?'I · Le Seuil':'II · L’Appel')+' — mes. '+bar+'/'+TOTAL_BARS;
+      rd.textContent=sectionOf(bar)+' — mes. '+bar+'/'+TOTAL_BARS;
       chd.textContent=CH[chordAt(bar)].name;
     } else { rd.textContent='Fin — → La Marche'; chd.textContent='—'; }
     raf=requestAnimationFrame(tick);
@@ -427,7 +471,7 @@
   seekEl.addEventListener('input',()=>{
     dragging=true;
     const bar=+seekEl.value;
-    document.getElementById('pos').textContent='aller à — '+(bar<=12?'I · Le Seuil':'II · L’Appel')+' mes. '+bar;
+    document.getElementById('pos').textContent='aller à — '+sectionOf(bar)+' mes. '+bar;
     document.getElementById('chd').textContent=CH[chordAt(bar)].name;
   });
   seekEl.addEventListener('change',()=>{
