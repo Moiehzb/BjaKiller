@@ -131,7 +131,7 @@
     // harpe : brillante, longue résonance, aérienne (bien réverbérée = lointaine)
     harp:   { ring:2.0, bright:0.45, decay:0.9962, damp:0.62, type:'highpass', cut:180, q:0.5, gain:0.17, send:0.2,  pan:-0.18 },
     // guitare flamenco (nylon) : chaude, moyenne résonance — VOLONTAIREMENT en arrière-plan
-    guitar: { ring:1.7, bright:0.42, decay:0.9925, damp:0.66, type:'lowpass', cut:2400, q:0.7, gain:0.092, send:0.1,  pan:0.06 },
+    guitar: { ring:1.7, bright:0.42, decay:0.9925, damp:0.66, type:'lowpass', cut:2800, q:0.7, gain:0.12,  send:0.1,  pan:0.06 },
     // luth : délicat, court, brillant mais discret (double corde détunée)
     lute:   { ring:1.3, bright:0.5,  decay:0.9895, damp:0.55, type:'highpass', cut:300, q:0.5, gain:0.062, send:0.2,  pan:0.2 },
   };
@@ -354,8 +354,8 @@
         const stmt2 = bar>36;                            // 37-44 = « flammes » de guitare
         ev(T(bar,0), at=> harpRoll(c.harp, at, 0.5));
         ev(T(bar,3), at=> harpRoll(c.harp.slice(2), at, 0.32, 0.02));      // 2e roulé = mouvement
-        if(!stmt2) ev(T(bar,0), at=> guitarArp(c.gtr, at, 0.72));
-        else       ev(T(bar,0), at=> guitarFlurry(c.gtr.map(up), at, 0.5)); // doubles-croches (arrière-plan)
+        // « flammes » AUDIBLES sur toute La Marche (un peu plus fort au climax)
+        ev(T(bar,0), at=> guitarFlurry(c.gtr.map(up), at, stmt2?1.0:0.82));
         ev(T(bar,0), at=> cajonBass(at+hum(), 0.95));
         ev(T(bar,3), at=> cajonSlap(at+hum(), 0.8));
         ev(T(bar,3), at=> palma(at+hum(), 0.5));
