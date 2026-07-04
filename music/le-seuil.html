@@ -496,9 +496,19 @@
         if(bar>=49 && bar<=52)
           ev(T(bar,1.5), at=> pluck('harp', c.harp[3], at+hum(), 0.18));
 
+        // ► moment 1 : fin de A (mes. 48) — harpe seule sur le temps 2 (hors grille 6/8 habituelle)
+        //   = une note suspendue juste avant la reprise du thème → l'oreille "lève la tête"
+        if(bar===48)
+          ev(T(bar,2), at=> pluck('harp', c.harp[4], at+hum(), 0.24));
+
         // B développement (mes. 53-56) : luth très discret en contre-temps (impaires seulement)
         if(bar>=53 && bar<=56 && bar%2===1)
           ev(T(bar,4.5), at=> luteNote(c.orn[1], at+hum(), 0.17));
+
+        // ► moment 2 : fin du développement (mes. 56) — luth sur le temps 1 (anticipation)
+        //   = arrive tôt, comme pressé d'annoncer le retour du thème à la mesure suivante
+        if(bar===56)
+          ev(T(bar,1), at=> luteNote(c.orn[0], at+hum(), 0.21));
 
         // A retour (mes. 57-60) : luth plus régulier — accompagne le thème reconnu
         if(bar>=57 && bar<=60)
