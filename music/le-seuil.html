@@ -59,14 +59,14 @@
       <circle cx="50" cy="50" r="6" fill="#c9a24b" stroke="none"/>
     </svg>
     <div class="kicker">Blackjack Academy · Lobby</div>
-    <h1>La Marche</h1>
-    <div class="sub">Le Seuil &rarr; L'Appel &rarr; La Marche &middot; mesures 1 à 44 &middot; 6/8 &middot; La mineur andalou</div>
+    <h1>Le Cloître</h1>
+    <div class="sub">Le Seuil &rarr; L'Appel &rarr; La Marche &rarr; Le Cloître &middot; mesures 1 à 64 &middot; 6/8 &middot; La mineur andalou (pont en Do majeur)</div>
 
     <div class="ctrls">
       <button id="play">Franchir le seuil</button>
     </div>
 
-    <input type="range" id="seek" class="seek" min="1" max="44" step="1" value="1" aria-label="position de lecture">
+    <input type="range" id="seek" class="seek" min="1" max="64" step="1" value="1" aria-label="position de lecture">
     <div class="read"><span id="pos">Prêt</span><span class="chord" id="chd">—</span></div>
 
     <div class="vol">
@@ -75,9 +75,10 @@
     </div>
 
     <div class="note">
-      Le thème (synthé‑lead) entre à « L'Appel » (mes. 13), puis revient <b>orné</b> à « La Marche » (mes. 29),
-      où la basse <b>pulse sur 1 &amp; 4</b> et la guitare lâche ses « flammes ». Glisse le curseur pour sauter de section.
-      Après la mes. 44, une courte conclusion ouvre vers « Le Cloître ».
+      Le thème (synthé‑lead) entre à « L'Appel » (mes. 13), puis revient <b>orné</b> à « La Marche » (mes. 29).
+      À « Le Cloître » (mes. 45) le plafond s'ouvre : bascule lumineuse en <b>Do majeur</b> (vamp Fmaj7&#8644;Cadd9),
+      le synthé se tait et la <b>flûte</b> respire le thème, <b>sans percussion</b>. Glisse le curseur pour sauter de section.
+      Après la mes. 64, une ouverture rappelle « La mineur » vers « L'Ascension ».
     </div>
   </div>
 
@@ -99,7 +100,7 @@
 
   // --- ordonnanceur à anticipation (look-ahead) : évite le pic de calcul au démarrage
   let events=[], evIdx=0, pieceOrigin=0, schedTimer=0, dragging=false;
-  const LOOKAHEAD=0.12, TICKMS=25, TOTAL_BARS=44;
+  const LOOKAHEAD=0.12, TICKMS=25, TOTAL_BARS=64;
   function ev(t,fn){ events.push({t,fn}); }
 
   // --- note -> fréquence ---------------------------------------
@@ -229,6 +230,49 @@
     oss.forEach(o=>{ o.start(t); o.stop(t+dur+0.1); }); vib.stop(t+dur+0.1);
   }
 
+  // --- FLÛTE (voix soufflée, tenue) : porte le thème au « Cloître » quand le synthé se tait
+  function fluteNote(note, t, dur, vel){
+    const fr=f(note), out=ctx.createGain();
+    // corps : fondamentale sinus dominante + octave douce + soupçon de triangle (rondeur)
+    const mix=ctx.createGain(), oss=[];
+    [['sine',fr,0,0.5],['triangle',fr,0,0.12],['sine',fr*2,0,0.13],['sine',fr*3,0,0.045]]
+      .forEach(([ty,fq,det,a])=>{
+        const o=ctx.createOscillator(); o.type=ty; o.frequency.value=fq; o.detune.value=det;
+        const og=ctx.createGain(); og.gain.value=a; o.connect(og); og.connect(mix); oss.push(o);
+      });
+    // vibrato retardé (le souffle qui « chante »)
+    const vib=ctx.createOscillator(); vib.frequency.value=5.0;
+    const vibg=ctx.createGain(); vibg.gain.setValueAtTime(0,t); vibg.gain.linearRampToValueAtTime(4,t+0.45);
+    vib.connect(vibg); oss.forEach(o=> vibg.connect(o.detune)); vib.start(t);
+    // filtre doux (rondeur, s'ouvre un peu à l'attaque)
+    const flt=ctx.createBiquadFilter(); flt.type='lowpass'; flt.Q.value=0.7;
+    flt.frequency.setValueAtTime(1100,t);
+    flt.frequency.linearRampToValueAtTime(2600,t+0.09);
+    flt.frequency.exponentialRampToValueAtTime(1900,t+Math.min(Math.max(dur,0.2),0.7));
+    // enveloppe tonale : attaque douce, tenue, release aérien
+    const ampT=ctx.createGain(), L=vel*0.16;
+    ampT.gain.setValueAtTime(0.0001,t);
+    ampT.gain.linearRampToValueAtTime(L,t+0.07);
+    ampT.gain.setValueAtTime(L,t+Math.max(0.1,dur-0.12));
+    ampT.gain.linearRampToValueAtTime(0.0001,t+dur+0.06);
+    mix.connect(flt); flt.connect(ampT); ampT.connect(out);
+    // souffle : bruit passe-haut, petit « chiff » d'attaque puis fond léger
+    const nz=ctx.createBufferSource(); nz.buffer=noiseBuf(); nz.loop=true;
+    const nhp=ctx.createBiquadFilter(); nhp.type='highpass'; nhp.frequency.value=1900;
+    const ampN=ctx.createGain();
+    ampN.gain.setValueAtTime(0.0001,t);
+    ampN.gain.linearRampToValueAtTime(L*0.42,t+0.03);
+    ampN.gain.exponentialRampToValueAtTime(L*0.10,t+0.16);
+    ampN.gain.setValueAtTime(L*0.10,t+Math.max(0.2,dur-0.12));
+    ampN.gain.linearRampToValueAtTime(0.0001,t+dur+0.06);
+    nz.connect(nhp); nhp.connect(ampN); ampN.connect(out);
+    // sortie + réverbe (aérien)
+    const pan=ctx.createStereoPanner(); pan.pan.value=0.03; out.connect(pan); pan.connect(dry);
+    const s=ctx.createGain(); s.gain.value=0.22; pan.connect(s); s.connect(reverb);
+    oss.forEach(o=>{ o.start(t); o.stop(t+dur+0.12); });
+    vib.stop(t+dur+0.12); nz.start(t); nz.stop(t+dur+0.12);
+  }
+
   // thème principal (8 mes.) — [mesure locale 1..8, croche 0..5, durée(croches), note]
   const THEME = [
     [1,0,2,'A4'],[1,2,1,'C5'],[1,3,3,'E5'],          // La: A C E___
@@ -257,6 +301,33 @@
   ];
   function playThemeB(startBar){
     THEME_B.forEach(([lb,e,d,note])=> ev(T(startBar+lb-1,e), at=> synthNote(note, at, d*EIGHTH, 0.92)));
+  }
+
+  // thème porté par la FLÛTE au « Cloître » : ossature du thème, Sol♯ -> Sol (on quitte la sensible
+  // andalouse pour la lumière de Do majeur), plus aéré. Les notes pentatoniques rendent des couleurs
+  // Cmaj9 / Fmaj7♯11 sous le vamp Cadd9⇄Fmaj7.
+  const FLUTE_CLOITRE = [
+    [1,0,2,'A4'],[1,2,1,'C5'],[1,3,3,'E5'],              // (Cadd9)  A C E___
+    [2,0,3,'D5'],[2,3,3,'B4'],                           // (Fmaj7)  D___ B___  (B = ♯11 lydien, flotte)
+    [3,0,3,'C5'],[3,3,3,'A4'],                           // (Cadd9)  C___ A___
+    [4,0,3,'B4'],[4,3,3,'G4'],                           // (Fmaj7)  B___ G___  (Sol naturel : plus de tension)
+    [5,0,1,'A4'],[5,1,1,'C5'],[5,2,1,'E5'],[5,3,3,'A5'], // (Cadd9)  envol à l'octave A5
+    [6,0,3,'G5'],[6,3,3,'D5'],                           // (Fmaj7)  G___ D___
+    [7,0,3,'E5'],[7,3,3,'C5'],                           // (Cadd9)  E___ C___
+    [8,0,3,'G4'],[8,3,3,'A4'],                           // (Fmaj7)  résolution douce Sol->La
+  ];
+  function playFluteCloitre(startBar, vel){
+    FLUTE_CLOITRE.forEach(([lb,e,d,note])=> ev(T(startBar+lb-1,e), at=> fluteNote(note, at, d*EIGHTH, vel)));
+  }
+  // 61-64 : la flûte redescend et s'apaise (respiration finale du pont, prépare le retour à La mineur)
+  const FLUTE_TAG = [
+    [1,0,3,'E5'],[1,3,3,'D5'],                           // (Cadd9)
+    [2,0,4,'C5'],                                        // (Fmaj7)  longue tenue
+    [3,0,3,'B4'],[3,3,3,'A4'],                           // (Cadd9)
+    [4,0,6,'A4'],                                        // (Fmaj7)  La tenu = ramène le i (Am) de L'Ascension
+  ];
+  function playFluteTag(startBar){
+    FLUTE_TAG.forEach(([lb,e,d,note])=> ev(T(startBar+lb-1,e), at=> fluteNote(note, at, d*EIGHTH, 0.8)));
   }
 
   // --- PERCUSSIONS légères : cajón (1 & 4) + palmas ------------
@@ -300,26 +371,30 @@
     G:    { name:'G',        gtr:['G2','D3','G3','B3'],  harp:['G3','B3','D4','G4','B4'],  orn:['D5','B4','G4'] },
     Fmaj7:{ name:'Fmaj7',    gtr:['F2','C3','A3','C4'],  harp:['A3','C4','E4','F4','A4'],  orn:['E5','C5','A4'] },
     E7:   { name:'E7(♭9)',   gtr:['E2','B2','Gs3','D4'], harp:['Gs3','B3','D4','E4','Gs4'],orn:['E5','B4','Gs4'] },
+    Cadd9:{ name:'Cadd9',    gtr:['C3','G3','C4','E4'],  harp:['C4','E4','G4','D5','G5'],  orn:['G5','E5','C5'] },
   };
   const SEQ = ['Am','G','Fmaj7','E7','Am','G','Fmaj7','E7','Am','G','Fmaj7','E7'];
-  const ROOT = { Am:'A', G:'G', Fmaj7:'F', E7:'E' };   // fondamentale de la basse par accord
+  const ROOT = { Am:'A', G:'G', Fmaj7:'F', E7:'E', Cadd9:'C' };   // fondamentale de la basse par accord
   const CELL = ['Am','G','Fmaj7','E7'];                // cellule andalouse (1 accord / mesure)
-  const chordAt = b => CELL[(b-1)%4];                  // l'accord de n'importe quelle mesure
-  const sectionOf = b => b<=12?'I · Le Seuil' : b<=28?'II · L’Appel' : 'III · La Marche';
+  const chordAt = b => CELL[(b-1)%4];                  // l'accord de n'importe quelle mesure (sections andalouses)
+  const VAMP = ['Cadd9','Fmaj7'];                      // Le Cloître : I⇄IV de Do majeur (relatif, lumineux)
+  const cloitreChord = b => VAMP[(b-45)%2];            // 45=Cadd9, 46=Fmaj7, 47=Cadd9, …
+  const chordKeyAt = b => (b>=45 && b<=64) ? cloitreChord(b) : chordAt(b);   // clé d'accord réelle (Cloître + affichage)
+  const sectionOf = b => b<=12?'I · Le Seuil' : b<=28?'II · L’Appel' : b<=44?'III · La Marche' : 'IV · Le Cloître';
 
   // --- partition : construit la LISTE d'ÉVÉNEMENTS (temps relatifs) ---
   //     jouée ensuite par l'ordonnanceur (pas tout créé d'un coup = plus de grésillement)
   function buildEvents(){
     events = [];
-    for(let bar=1; bar<=44; bar++){
-      const cn = chordAt(bar), c = CH[cn];
+    for(let bar=1; bar<=64; bar++){
+      const cn = (bar>=45 && bar<=64) ? cloitreChord(bar) : chordAt(bar), c = CH[cn];
 
-      // BASSE (descend La-Sol-Fa-Mi) : tenue en I/II, re-articulée sur 1 & 4 en III (marche)
-      if(bar<=28){
-        ev(T(bar,0), at=> bassNote(ROOT[cn], at, BAR, bar===1?1.4:0.12));
-      } else {
+      // BASSE : tenue (pad) en Seuil/Appel/Cloître ; re-articulée sur 1 & 4 en La Marche
+      if(bar>=29 && bar<=44){
         ev(T(bar,0), at=> bassNote(ROOT[cn], at, 3*EIGHTH+0.15, 0.06));
         ev(T(bar,3), at=> bassNote(ROOT[cn], at, 3*EIGHTH+0.15, 0.05));
+      } else {
+        ev(T(bar,0), at=> bassNote(ROOT[cn], at, BAR, bar===1?1.4 : bar>=45?0.55 : 0.12));
       }
 
       if(bar<=12){
@@ -349,7 +424,7 @@
         if(stmt2) ev(T(bar,5), at=> palma(at+hum(), 0.3));
         if(bar%4===0) c.orn.forEach((n,i)=> ev(T(bar,4+i*0.5), at=> luteNote(n, at+hum(), 0.32-i*0.05)));
 
-      } else {
+      } else if(bar<=44){
         // ---------- LA MARCHE (variation A', plus d'élan) ----------
         const stmt2 = bar>36;                            // 37-44 = « flammes » de guitare
         ev(T(bar,0), at=> harpRoll(c.harp, at, 0.5));
@@ -362,6 +437,12 @@
         ev(T(bar,5), at=> palma(at+hum(), stmt2?0.44:0.34));               // contretemps (lilt de marche)
         if(stmt2) ev(T(bar,1), at=> palma(at+hum(), 0.3));                 // palmas plus denses au climax
         if(bar%4===0) c.orn.forEach((n,i)=> ev(T(bar,4+i*0.5), at=> luteNote(n, at+hum(), 0.34-i*0.05)));
+
+      } else {
+        // ---------- LE CLOÎTRE (pont lumineux : vamp Do majeur, la flûte respire) ----------
+        //  synthé tacet · guitare tacet · PERCU coupée · luth tacet — texture aérée : flûte + harpe + basse-pad
+        ev(T(bar,0), at=> harpRoll(c.harp, at, 0.5, 0.028));              // roulé large = presque un gliss (aérien)
+        ev(T(bar,3), at=> harpRoll(c.harp.slice(2), at, 0.3, 0.032));     // shimmer sur la 2e pulsation (6/8)
       }
     }
 
@@ -369,12 +450,16 @@
     playTheme(13);  playTheme(21);      // L'Appel : thème
     playThemeB(29); playThemeB(37);     // La Marche : variation ornée
 
-    // --- courte conclusion après la mes. 44 (ouvre vers « Le Cloître ») ---
-    const rt = 44*BAR;
-    ev(rt, at=> harpRoll(['A3','C4','E4','A4','C5'], at, 0.6, 0.024));
-    ev(rt, at=> synthNote('A4', at, 1.4, 0.7));
-    ev(rt, at=> bassNote('A', at, 2.8, 0.15));
-    ev(rt, at=> cajonBass(at, 0.6));
+    // MÉLODIE flûte (Le Cloître) : le thème respiré dans la lumière de Do majeur
+    playFluteCloitre(45, 0.85);         // 1re respiration
+    playFluteCloitre(53, 0.95);         // 2e respiration, un peu plus présente
+    playFluteTag(61);                   // 61-64 : la flûte redescend vers le retour
+
+    // --- courte ouverture vers « L'Ascension » (retour à La mineur) après la mes. 64 ---
+    const rt = 64*BAR;
+    ev(rt, at=> harpRoll(['A3','C4','E4','A4','C5'], at, 0.55, 0.024));
+    ev(rt, at=> fluteNote('A4', at, 1.7, 0.7));    // la flûte tient un dernier La (ramène le i)
+    ev(rt, at=> bassNote('A', at, 2.8, 0.4));
 
     events.sort((a,b)=> a.t - b.t);
   }
@@ -453,8 +538,8 @@
     if(pos<0){ rd.textContent='…'; chd.textContent='—'; }
     else if(bar<=TOTAL_BARS){
       rd.textContent=sectionOf(bar)+' — mes. '+bar+'/'+TOTAL_BARS;
-      chd.textContent=CH[chordAt(bar)].name;
-    } else { rd.textContent='Fin — → La Marche'; chd.textContent='—'; }
+      chd.textContent=CH[chordKeyAt(bar)].name;
+    } else { rd.textContent='Fin — → L’Ascension'; chd.textContent='—'; }
     raf=requestAnimationFrame(tick);
   }
 
@@ -472,7 +557,7 @@
     dragging=true;
     const bar=+seekEl.value;
     document.getElementById('pos').textContent='aller à — '+sectionOf(bar)+' mes. '+bar;
-    document.getElementById('chd').textContent=CH[chordAt(bar)].name;
+    document.getElementById('chd').textContent=CH[chordKeyAt(bar)].name;
   });
   seekEl.addEventListener('change',()=>{
     dragging=false;

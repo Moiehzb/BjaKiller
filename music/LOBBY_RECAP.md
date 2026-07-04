@@ -12,8 +12,9 @@
 - **Banc de diagnostic** : `music/diagnostic.html` — joue chaque instrument isolément (+ tests « silence » et « sinus pur » pour écarter le matériel). À rouvrir dès qu'un son paraît buggé.
 - **Moteur** : Web Audio API, 100 % synthèse offline (aucun sample, aucun fetch). Marche en `file://`.
 - **Sections codées + validées à l'oreille** : **Le Seuil** (mes. 1-12), **L'Appel** (13-28), **La Marche** (29-44).
-- **Reste à coder** : **Le Cloître** (45-64), **L'Ascension** (65-92), **Le Retour** (93-120) + finalisation de la **boucle seamless**.
-- **Point de review en cours** : on vient de **remonter la guitare** (elle était inaudible) — en attente de confirmation utilisateur sur le dosage à La Marche.
+- **Codé, à valider à l'oreille** : **Le Cloître** (45-64) — pont lumineux (vamp **Cadd9⇄Fmaj7**, Do majeur relatif), **flûte créée** ; percu/synthé/guitare/luth tacet. `TOTAL_BARS=64`.
+- **Reste à coder** : **L'Ascension** (65-92), **Le Retour** (93-120) + finalisation de la **boucle seamless**.
+- **Point de review en cours** : **Le Cloître** vient d'être codé + vérifié (syntaxe + logique : 560 events, fin à 128 s). **En attente : écoute utilisateur** (dosage flûte / vamp / basse-pad).
 - **Journal / points de sauvegarde** : voir **§8 (Journal)** tout en bas — mis à jour à **chaque étape stable** (le plus récent en haut). Les **valeurs exactes = le code** ; le Journal ne logue **pas** les micro-réglages.
 
 ---
@@ -54,7 +55,7 @@ App **Blackjack Academy I** — DA « Académie Secrète des Compteurs », **dar
 | **Le Seuil** (intro) | 1–12 | 0:00–0:24 | Seuil/atmosphère. Basse + harpe lointaine + guitare (arrière-plan, entre mes.5) + luth (ornements). Pas de percu. S'ouvre progressivement. |
 | **L'Appel** (thème A) | 13–28 | 0:24–0:56 | Le **synthé-lead** pose le thème. Percu entre (cajón 1&4 + palmas). Thème énoncé 2× (13-20, 21-28). |
 | **La Marche** (var. A') | 29–44 | 0:56–1:28 | Plus d'élan. Thème **orné** (THEME_B). **Basse pulse sur 1&4**. **Guitare « flammes »** (doubles-croches). |
-| **Le Cloître** (pont) | 45–64 | 1:28–2:08 | **Contraste lumineux** : bascule vers Do majeur relatif OU vamp hypnotique Fmaj7⇄Cadd9 (façon Corridors). **Synthé se tait, la FLÛTE porte le thème** (respiration). Percu coupée. |
+| **Le Cloître** (pont) | 45–64 | 1:28–2:08 | **Contraste lumineux** : ✅ **vamp hypnotique Cadd9⇄Fmaj7** (I⇄IV de Do majeur relatif, façon Corridors) — décidé. **Synthé se tait, la FLÛTE porte le thème** (respiration, Sol♯→Sol). Percu/guitare/luth coupés. |
 | **L'Ascension** (climax) | 65–92 | 2:08–3:04 | Retour Am, arrangement **plein**, thème complet + harmonies, pic par les couches. **Pas de luth** (anti-saturation). |
 | **Le Retour** (outro) | 93–120 | 3:04–4:00 | **Dé-empilement** jusqu'à la texture d'ouverture (luth revient ici). Mes. 120 (E7) → mes. 1 (Am) = jointure invisible. |
 
@@ -82,7 +83,7 @@ C'est **accrocheur à la longue** (earworm après plusieurs écoutes), validé �
 | **Guitare flamenco** | texture/arrière-plan **audible** (pas subliminale) | `gain = 0.12` (cut 2800) | KS. Arpèges 6/8 ; **« flammes » doubles-croches** à La Marche (`guitarFlurry`, octave supérieure). Reste sous le lead. |
 | **Harpe** | vernis (arpèges roulés, gliss) | `gain = 0.17` | KS, registre haut, réverbérée = « lointaine ». |
 | **Luth** | texture **discrète** des extrémités sobres (Seuil + Retour), **jamais au climax** | `gain = 0.062` | KS, double corde détunée. |
-| **Flûte** | **porte le thème au Cloître** quand le synthé se tait | **PAS ENCORE CODÉE** | voix soutenue = reprend la fonction du lead sans encombrer le registre pincé. |
+| **Flûte** | **porte le thème au Cloître** quand le synthé se tait | `fluteNote`, `L = vel*0.16`, send 0.22 | ✅ codée : sinus dominant + octave/triangle, vibrato retardé, **souffle** (bruit HP + « chiff » d'attaque). Voix soutenue = fonction de lead. Sol♯→Sol (lumière). |
 | **Percu légère** | cajón (grave 1, claque 4) + palmas | vel ~0.9 / 0.7 / 0.4 | palmas ternaires ; un peu plus vivantes à La Marche. |
 | **Réverbe** | petite salle | `wet = 0.32`, IR 1.8 s | ⚠️ garder modeste (cf. §6). |
 
@@ -90,13 +91,13 @@ C'est **accrocheur à la longue** (earworm après plusieurs écoutes), validé �
 
 ## 5. Architecture du code (`le-seuil.html`)
 
-Tout est dans un `<script>` unique (IIFE). Ordre : constantes → utilitaires (`f` note→Hz, `ks` Karplus-Strong) → instruments (`pluck`, `luteNote`, `harpRoll`, `guitarArp`, `guitarFlurry`, `bassNote`, `synthNote`+`THEME`/`THEME_B`, `cajonBass`/`cajonSlap`/`palma`) → accords (`CH`, `ROOT`, `CELL`, `chordAt`, `sectionOf`) → **`buildEvents()`** (la partition, en temps relatifs) → transport.
+Tout est dans un `<script>` unique (IIFE). Ordre : constantes → utilitaires (`f` note→Hz, `ks` Karplus-Strong) → instruments (`pluck`, `luteNote`, `harpRoll`, `guitarArp`, `guitarFlurry`, `bassNote`, `synthNote`+`THEME`/`THEME_B`, `fluteNote`+`FLUTE_CLOITRE`/`FLUTE_TAG`, `cajonBass`/`cajonSlap`/`palma`) → accords (`CH`, `ROOT`, `CELL`, `chordAt`, `VAMP`/`cloitreChord`/`chordKeyAt`, `sectionOf`) → **`buildEvents()`** (la partition, en temps relatifs) → transport.
 
 **Points d'architecture importants (ne pas casser)** :
 - **La partition est une LISTE D'ÉVÉNEMENTS** `{t, fn}` (temps relatif au début), construite par `buildEvents()`. `T(bar,e)` = temps **relatif** `(bar-1)*BAR + e*EIGHTH`.
 - **Ordonnanceur look-ahead** (`schedulerLoop`, `setInterval` 25 ms, fenêtre 120 ms) : ne programme que le proche futur. **Indispensable** — l'ancien « tout créer d'un coup » faisait grésiller le démarrage.
 - **Curseur de navigation** (`#seek`, mesures 1→`TOTAL_BARS`) : `play(fromBar)` positionne `pieceOrigin` ; on peut sauter n'importe où. Un **AudioContext neuf est créé à chaque play/seek** (`teardown()` ferme l'ancien).
-- `TOTAL_BARS` = 44 pour l'instant (à passer à 120 quand tout sera codé).
+- `TOTAL_BARS` = 64 (Cloître inclus ; à passer à 120 quand L'Ascension + Le Retour seront codés). Le Cloître n'utilise **pas** `chordAt` (cellule andalouse) mais `cloitreChord` (vamp) ; l'affichage passe par `chordKeyAt`.
 - Cordes = **Karplus-Strong** (`ks()` génère un buffer, mis en cache). Réverbe = **IR généré** (bruit adouci passe-bas, décroissance rapide).
 - Après chaque édition : **vérifier la syntaxe** (extraire le `<script>`, `node --check` via `vm.Script`).
 
@@ -114,7 +115,7 @@ Tout est dans un `<script>` unique (IIFE). Ordre : constantes → utilitaires (`
 
 ## 7. Prochaine étape
 
-**Le Cloître** (pont, mes. 45-64) : bascule **lumineuse** (Do majeur relatif ou vamp hypnotique Fmaj7⇄Cadd9 façon Corridors of Time), **le synthé se tait**, **coder la FLÛTE** qui porte le thème (respiration/contraste), **percu coupée**, texture aérée. Puis **L'Ascension** (climax) et **Le Retour** (outro + bouclage seamless E7→Am).
+**Le Cloître est codé** (mes. 45-64 : vamp Cadd9⇄Fmaj7, flûte créée, `TOTAL_BARS=64`) — **à valider à l'oreille** (dosages flûte/vamp/basse-pad). Ensuite : **L'Ascension** (climax, mes. 65-92 — retour Am, arrangement plein, thème + harmonies, **pas de luth**), puis **Le Retour** (outro, 93-120 — dé-empilement vers la texture d'ouverture, le luth revient, + **bouclage seamless** E7→Am).
 
 Références analysées (dans `.midi/`, via parser maison — voir méthodologie) : **Gerudo Valley** (F♯m harmonique, cadence andalouse = ADN flamenco), **Corridors of Time** (loop hypnotique 2 accords), **Schala** (Fm, min-maj7/napolitain), **Terra** (Si maj penché sur le vi), **Pallet Town** (Sol maj diatonique, harmonie lente).
 
@@ -125,6 +126,16 @@ Références analysées (dans `.midi/`, via parser maison — voir méthodologie
 > **Point de sauvegarde par étape.** On met à jour cette fiche (ce §, + §0 « en un coup d'œil » + §7 « prochaine étape ») à **chaque état stable** : section codée, mix validé, décision verrouillée — **avant de s'arrêter**.
 > **On NE logue PAS chaque micro-réglage.** Les valeurs exactes vivent dans le **code** (`le-seuil.html` fait foi). Une session de tweaks = **une** ligne consolidée (« guitare La Marche portée à X, validé »), pas dix.
 > Format : `AAAA-MM-JJ — ce qui change — pourquoi`. Le plus récent en haut.
+
+### 2026-07-04 — Le Cloître codé (mes. 45-64)
+- **Décision** : le pont = **vamp hypnotique Cadd9⇄Fmaj7** (I⇄IV de Do majeur relatif, façon Corridors) ; l'option « bascule franche » est écartée.
+- **Fait** : **flûte créée** (`fluteNote` : sinus+octave+triangle+souffle, vibrato retardé) ; elle **respire le thème** (Sol♯→Sol = éclaircie). Texture = flûte + harpe + basse-pad ; **percu/synthé/guitare/luth tacet**. `TOTAL_BARS=64`. Transition mes.44 (E7) → 45 (Cadd9) via Sol♯→Sol ; sortie mes.64 (Fmaj7) prépare le retour à Am.
+- **Vérifié** : syntaxe (`vm.Script`) + logique (`buildEvents` stubbé : 560 events, fin à 128 s, accords/notes valides).
+- **En attente** : **écoute utilisateur** (dosage flûte `L=vel*0.16`, vamp, basse-pad). Puis L'Ascension.
+
+### 2026-07-04 — La Marche validée → cap sur Le Cloître
+- **Guitare à La Marche : validée à l'oreille** (dosage `gain 0.12` + flammes `guitarFlurry`). Plus rien en attente sur les **mes. 1-44**.
+- **En cours** : **Le Cloître** (mes. 45-64) — pont lumineux, le synthé se tait, **flûte à créer**, percu coupée. Choix harmonique à trancher (vamp Fmaj7⇄Cadd9 vs bascule Do majeur relatif).
 
 ### 2026-07-04 — Ouverture du Journal (baseline)
 - **Fait & validé à l'oreille** : **Le Seuil** (mes. 1-12), **L'Appel** (13-28), **La Marche** (29-44). `TOTAL_BARS=44`.
