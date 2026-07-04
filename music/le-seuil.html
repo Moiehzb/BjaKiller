@@ -364,11 +364,11 @@
     FLUTE_TAG.forEach(([lb,e,d,note])=> ev(T(startBar+lb-1,e), at=> fluteNote(note, at, d*EIGHTH, 0.8)));
   }
   // flûte en chorale sur L'Ascension : double le synthé (même mélodie, timbre différent)
-  function playThemeFlute(startBar, vel, pan){
-    THEME.forEach(([lb,e,d,note])=> ev(T(startBar+lb-1,e), at=> fluteNote(note,at,d*EIGHTH,vel,pan)));
+  function playThemeFlute(startBar, vel, pan, delay=0){
+    THEME.forEach(([lb,e,d,note])=> ev(T(startBar+lb-1,e)+delay, at=> fluteNote(note,at,d*EIGHTH,vel,pan)));
   }
-  function playThemeBFlute(startBar, vel, pan){
-    THEME_B.forEach(([lb,e,d,note])=> ev(T(startBar+lb-1,e), at=> fluteNote(note,at,d*EIGHTH,vel,pan)));
+  function playThemeBFlute(startBar, vel, pan, delay=0){
+    THEME_B.forEach(([lb,e,d,note])=> ev(T(startBar+lb-1,e)+delay, at=> fluteNote(note,at,d*EIGHTH,vel,pan)));
   }
 
   // --- PERCUSSIONS légères : cajón (1 & 4) + palmas ------------
@@ -601,10 +601,10 @@
     playFluteTag(61);
 
     // FLÛTE en chorale sur L'Ascension — même mélodie que le synthé, monte en intensité
-    // canon : flûte démarre 2 bars après le synthé, panne droite pour séparer les voix
-    playThemeFlute(67,  1.40, 0.30);   // synth 65, flute 67 (+2 bars)
-    playThemeBFlute(75, 1.40, 0.30);   // synth 73, flute 75 (+2 bars)
-    playThemeBFlute(83, 1.40, 0.30);   // synth 81, flute 83 (+2 bars, termine sur la transition)
+    // canon serré : flûte décalée de 80 ms après le synthé, pan droite pour séparer les voix
+    playThemeFlute(65,  1.40, 0.30, 0.08);
+    playThemeBFlute(73, 1.40, 0.30, 0.08);
+    playThemeBFlute(81, 1.40, 0.30, 0.08);
 
     events.sort((a,b)=> a.t - b.t);
   }
