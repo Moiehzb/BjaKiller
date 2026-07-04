@@ -74,7 +74,7 @@
     </div>
 
     <div class="note">
-      Drone (La, pédale flamenco) · harpe lointaine · guitare en arrière-plan · luth en ornements.
+      Basse chaude descendante (La–Sol–Fa–Mi) · harpe lointaine · guitare en arrière-plan · luth en ornements.
       Le synthé‑lead n'entre qu'à « L'Appel » (mes. 13) — ici une résolution en La mineur signale ce seuil.
     </div>
   </div>
@@ -161,32 +161,24 @@
     }
   }
 
-  // --- drone : pédale de La analogique (nappe) -----------------
-  function startDrone(t){
-    // pédale de La : nappe CHAUDE et DOUCE (triangle + sinus, filtre bas) — jamais buzzy/bruitée
-    const lp1=ctx.createBiquadFilter(); lp1.type='lowpass';  lp1.frequency.value=240; lp1.Q.value=0.4;
-    const lp2=ctx.createBiquadFilter(); lp2.type='lowpass';  lp2.frequency.value=430; lp2.Q.value=0.3;
-    const hp =ctx.createBiquadFilter(); hp.type='highpass';  hp.frequency.value=38;   // coupe le sub-boueux
-    const lfo=ctx.createOscillator(); lfo.frequency.value=0.05;
-    const lg=ctx.createGain(); lg.gain.value=55; lfo.connect(lg); lg.connect(lp1.frequency); lfo.start(t);
-    const g=ctx.createGain();
-    g.gain.setValueAtTime(0.0001,t);
-    g.gain.exponentialRampToValueAtTime(0.13, t+3.8);       // swell doux (niveau réduit)
-    lp1.connect(lp2); lp2.connect(hp); hp.connect(g); g.connect(dry);
-    const s=ctx.createGain(); s.gain.value=0.03; g.connect(s); s.connect(reverb);
-    // léger frémissement d'amplitude (respiration)
-    const amp=ctx.createOscillator(); amp.frequency.value=0.11;
-    const ag=ctx.createGain(); ag.gain.value=0.012; amp.connect(ag); ag.connect(g.gain); amp.start(t);
-    // octaves de La UNIQUEMENT (ondes douces, léger désaccord = chaleur analogique)
-    const voices=[['A1','triangle',0.6,-5],['A1','triangle',0.6,6],
-                  ['A2','sine',0.42,0],['A3','triangle',0.12,4]];
-    voices.forEach(([n,ty,a,det])=>{
+  // --- basse : note tenue CHAUDE qui suit la fondamentale ------
+  //     (remplace l'ancien bourdon statique — maintenant elle DESCEND La-Sol-Fa-Mi)
+  function bassNote(root, t, dur, atk){
+    const lp1=ctx.createBiquadFilter(); lp1.type='lowpass'; lp1.frequency.value=250; lp1.Q.value=0.4;
+    const lp2=ctx.createBiquadFilter(); lp2.type='lowpass'; lp2.frequency.value=430; lp2.Q.value=0.3;
+    const g=ctx.createGain(), lvl=0.12;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(lvl, t+(atk||0.12));      // attaque douce = pad, pas pluck
+    g.gain.setValueAtTime(lvl, t+dur*0.82);
+    g.gain.linearRampToValueAtTime(0.0001, t+dur+0.12);      // release qui chevauche l'accord suivant
+    lp1.connect(lp2); lp2.connect(g); g.connect(dry);
+    const s=ctx.createGain(); s.gain.value=0.04; g.connect(s); s.connect(reverb);
+    // octaves de la fondamentale (ondes douces, léger désaccord = chaleur analogique)
+    [[root+'1','sine',0.5,0],[root+'2','triangle',0.55,-4],
+     [root+'2','triangle',0.55,5],[root+'3','sine',0.16,0]].forEach(([n,ty,a,det])=>{
       const o=ctx.createOscillator(); o.type=ty; o.frequency.value=f(n); o.detune.value=det;
-      const og=ctx.createGain(); og.gain.value=a; o.connect(og); og.connect(lp1); o.start(t);
-      droneRefs.push(o);
+      const og=ctx.createGain(); og.gain.value=a; o.connect(og); og.connect(lp1); o.start(t); o.stop(t+dur+0.25);
     });
-    droneRefs.push(lfo,amp);
-    droneGain=g; return g;
   }
 
   // --- position temporelle (mesure 1-indexée, croche 0..5) -----
@@ -200,15 +192,17 @@
     E7:   { name:'E7(♭9)',   gtr:['E2','B2','Gs3','D4'], harp:['Gs3','B3','D4','E4','Gs4'],orn:['E5','B4','Gs4'] },
   };
   const SEQ = ['Am','G','Fmaj7','E7','Am','G','Fmaj7','E7','Am','G','Fmaj7','E7'];
+  const ROOT = { Am:'A', G:'G', Fmaj7:'F', E7:'E' };   // fondamentale de la basse par accord
 
   // --- partition : « Le Seuil » (12 mes.) ----------------------
   function schedule(){
-    startDrone(startAt);
-
     for(let bar=1; bar<=12; bar++){
       const c = CH[SEQ[bar-1]];
       // phase 1 (1-2): quasi vide  | 2 (3-4): harpe  | 3 (5-8): +guitare  | 4 (9-12): plein-doux
       const phase = bar<=2?1 : bar<=4?2 : bar<=8?3 : 4;
+
+      // BASSE — note tenue chaude sur la fondamentale (descend La-Sol-Fa-Mi à chaque mesure)
+      bassNote(ROOT[SEQ[bar-1]], T(bar,0), BAR, bar===1?1.4:0.12);
 
       // HARPE — roulé d'ouverture de mesure
       if(phase===1){
@@ -236,13 +230,8 @@
     ['A2','E3','A3','C4'].forEach((n,i)=> pluck('guitar', n, rt+i*0.02, 0.6));
     luteNote('A5', rt+0.05, 0.5);
 
-    // fondu PROPRE du drone + arrêt RÉEL des oscillateurs (sinon la nappe tourne à l'infini)
-    if(droneGain){
-      droneGain.gain.cancelScheduledValues(rt);
-      droneGain.gain.setValueAtTime(0.17, rt);
-      droneGain.gain.linearRampToValueAtTime(0.0001, rt+3.2);
-    }
-    droneRefs.forEach(o=>{ try{ o.stop(rt+3.4); }catch(e){} });
+    // basse finale : La tenu qui s'éteint doucement
+    bassNote('A', rt, 2.8, 0.15);
   }
 
   // --- réverbe (IR généré) -------------------------------------
