@@ -58,6 +58,12 @@ Langues livrées : **FR, EN, ES, DE**. Moteur maison, **zéro dépendance**, dan
 - Mode casino : lire `casinoStepConfigRef.current` pour decks/pen, pas `rankUsedRef`
 - Achievements mid-casino → queue `pendingAchievementsRef`, flush dans `goBack()`
 
+## Musique
+Musiques **codées à la main** en Web Audio API (fichiers `.html` autonomes dans `music/`, ouverts dans le navigateur — pas de générateur).
+- **État du lobby + fiche technique verrouillée** (source de vérité pour reprendre le morceau) : `music/LOBBY_RECAP.md`
+- **Méthode générique réutilisable** (référence → compo codée, portable) : `music/METHODE_COMPOSITION.md`
+- Fichier du lobby : `music/le-seuil.html` · banc de test d'isolation : `music/diagnostic.html`
+
 ## Gestion du TODO
 `TODO.md` = liste des tâches en cours et backlog.
 - Si tu demandes à l'utilisateur de faire quelque chose manuellement → l'ajouter dans `TODO.md`

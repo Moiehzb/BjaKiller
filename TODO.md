@@ -6,7 +6,8 @@
 ## 🎯 Feedback utilisateur — à implémenter
 
 ### Musique 8-bit
-- [ ] **Musiques 8-bit** : créer les tracks pour l'app — style Zelda OoT Gerudo Valley pour l'accueil/menus, style Kirby Title Screen pour le gameplay. Approche : composer une mélodie via Beepbox.co, étoffer avec Suno.ai ou Gemini. Prévoir : lobby loop, game loop, jingle victoire, jingle défaite.
+- [ ] **Musiques (faites main en Web Audio API)** — approche définitive : on **code** les morceaux (méthode : `music/METHODE_COMPOSITION.md`). Générateurs (Beepbox/Suno/Gemini) **abandonnés**. Prévoir : lobby loop (en cours), game loop, jingle victoire, jingle défaite.
+  - **Lobby « Le Seuil »** — La mineur andalou, 6/8, 4 min / 120 mes. **Codé + validé** : Le Seuil (1-12), L'Appel (13-28), La Marche (29-44). **Reste** : Le Cloître (45-64, coder la flûte), L'Ascension, Le Retour + boucle seamless. État complet → **`music/LOBBY_RECAP.md`**. Fichier : `music/le-seuil.html`.
 
 ### UX
 - [ ] **Après le tuto → ouvrir directement le mode Training** : à la sortie du tutoriel, envoyer le joueur droit dans Training (ou au minimum un CTA "Commence ici" bien visible) au lieu de le lâcher devant le lobby (mur d'options).
