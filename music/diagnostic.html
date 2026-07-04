@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagnostic audio — Le Seuil</title>
+<style>
+  body{ background:#0d0a1a; color:#e8dcc0; font-family:Georgia,serif; max-width:640px;
+        margin:0 auto; padding:28px 22px; line-height:1.5 }
+  h1{ font-size:22px; color:#c9a24b; letter-spacing:.05em }
+  p.intro{ color:#b9a8d8; font-size:14px }
+  .row{ display:flex; align-items:center; gap:12px; margin:8px 0; padding:10px 12px;
+        background:#161027; border:1px solid rgba(201,162,75,.2); border-radius:8px }
+  .row b{ display:block; color:#e8dcc0; font-size:15px }
+  .row small{ color:#8f83ad; font-size:12.5px }
+  button{ flex:0 0 auto; background:linear-gradient(180deg,#d8a657,#c9a24b); color:#0d0a1a;
+          border:none; border-radius:7px; padding:10px 16px; font-size:13px; font-weight:bold;
+          cursor:pointer; font-family:Georgia,serif; min-width:96px }
+  button:hover{ filter:brightness(1.08) }
+  .hw{ border-color:rgba(95,179,163,.55) }
+  .hw button{ background:linear-gradient(180deg,#6fc9b6,#5fb3a3) }
+  #status{ margin-top:18px; padding:12px; background:#1e1638; border-radius:8px;
+           color:#c9a24b; font-size:14px; min-height:20px; text-align:center }
+  .txt{ flex:1 }
+  .vol{ margin:14px 0; color:#b9a8d8; font-size:13px }
+  input[type=range]{ width:200px; accent-color:#c9a24b; vertical-align:middle }
+</style>
+</head>
+<body>
+  <h1>Diagnostic audio — localiser le bruit blanc</h1>
+  <p class="intro">Clique chaque bouton l'un après l'autre et note <b>lesquels</b> produisent le bruit blanc.
+  Commence par les deux boutons <span style="color:#5fb3a3">turquoise</span> : ils testent ton <b>matériel/navigateur</b>, pas ma musique.</p>
+
+  <div class="vol">Volume du test : <input type="range" id="vol" min="0" max="100" value="55"></div>
+
+  <div class="row hw">
+    <div class="txt"><b>1 · Silence (contexte actif 5 s)</b>
+      <small>Le moteur audio tourne mais ne joue RIEN. Tu dois entendre le silence total. Si tu entends du bruit → c'est ton PC/casque, pas le code.</small></div>
+    <button data-t="silence">Tester</button>
+  </div>
+
+  <div class="row hw">
+    <div class="txt"><b>2 · Sinus pur 440 Hz (3 s)</b>
+      <small>Un « la » parfaitement lisse. Si du bruit blanc l'accompagne → c'est ton matériel (souvent : casque Bluetooth, ou carte son).</small></div>
+    <button data-t="sine">Tester</button>
+  </div>
+
+  <div class="row">
+    <div class="txt"><b>3 · Bruit blanc de RÉFÉRENCE (2 s)</b>
+      <small>Ceci EST du vrai bruit blanc, exprès. Compare : est-ce que ça ressemble à ce que tu entends de parasite ?</small></div>
+    <button data-t="noise">Tester</button>
+  </div>
+
+  <div class="row">
+    <div class="txt"><b>4 · Drone seul (6 s)</b>
+      <small>La nappe de La (l'élément qui tourne en continu). Mon principal suspect.</small></div>
+    <button data-t="drone">Tester</button>
+  </div>
+
+  <div class="row">
+    <div class="txt"><b>5 · Harpe seule (5 s)</b>
+      <small>Quelques cordes pincées (Karplus-Strong), sans réverbe.</small></div>
+    <button data-t="harp">Tester</button>
+  </div>
+
+  <div class="row">
+    <div class="txt"><b>6 · Guitare seule (5 s)</b><small>Idem, timbre guitare.</small></div>
+    <button data-t="guitar">Tester</button>
+  </div>
+
+  <div class="row">
+    <div class="txt"><b>7 · Luth seul (5 s)</b><small>Idem, timbre luth (double corde).</small></div>
+    <button data-t="lute">Tester</button>
+  </div>
+
+  <div class="row">
+    <div class="txt"><b>8 · Réverbe seule (5 s)</b>
+      <small>Une seule note passée à 100 % dans la réverbe. Teste si la réverbe elle-même bruite.</small></div>
+    <button data-t="reverb">Tester</button>
+  </div>
+
+  <div id="status">Prêt.</div>
+
+<script>
+(() => {
+  let ctx=null, timer=0, vol=0.55;
+  const PC={C:0,Cs:1,D:2,Ds:3,E:4,F:5,Fs:6,G:7,Gs:8,A:9,As:10,B:11};
+  const f=n=>{ const o=+n.slice(-1),p=PC[n.slice(0,-1)]; return 440*Math.pow(2,((o+1)*12+p-69)/12); };
+
+  function ks(freq,dur,bright,decay,damp){
+    const sr=ctx.sampleRate,N=Math.max(2,Math.round(sr/freq)),len=Math.floor(dur*sr);
+    const buf=ctx.createBuffer(1,len,sr),y=buf.getChannelData(0); let prev=0;
+    for(let i=0;i<N;i++){let w=Math.random()*2-1; w=bright*w+(1-bright)*prev; prev=w; y[i]=w;}
+    for(let i=N;i<len;i++){ y[i]=decay*(damp*(y[i-N]+y[i-N+1])/2+(1-damp)*y[i-N]); }
+    let mx=1e-6; for(let i=0;i<len;i++) mx=Math.max(mx,Math.abs(y[i]));
+    for(let i=0;i<len;i++) y[i]/=mx;
+    return buf;
+  }
+  function pluckDry(freq,t,master,g0,ring,bright,decay,damp,type,cut){
+    const s=ctx.createBufferSource(); s.buffer=ks(freq,ring,bright,decay,damp);
+    const flt=ctx.createBiquadFilter(); flt.type=type; flt.frequency.value=cut;
+    const g=ctx.createGain();
+    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(g0,t+0.004);
+    g.gain.setValueAtTime(g0,t+ring*0.7); g.gain.linearRampToValueAtTime(0.0001,t+ring);
+    s.connect(flt); flt.connect(g); g.connect(master);
+    s.start(t); s.stop(t+ring+0.05); return g;
+  }
+  const arp=(notes,master,cfg)=> notes.forEach((n,i)=>
+    pluckDry(f(n), ctx.currentTime+0.1+i*0.5, master, ...cfg));
+
+  const TESTS = {
+    silence(master){ /* rien */ },
+    sine(master){ const o=ctx.createOscillator(); o.type='sine'; o.frequency.value=440;
+      const g=ctx.createGain(); g.gain.value=0.0001;
+      g.gain.exponentialRampToValueAtTime(0.5,ctx.currentTime+0.05);
+      o.connect(g); g.connect(master); o.start(); o.stop(ctx.currentTime+3); },
+    noise(master){ const sr=ctx.sampleRate,b=ctx.createBuffer(1,sr*2,sr),d=b.getChannelData(0);
+      for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*0.35;
+      const s=ctx.createBufferSource(); s.buffer=b; s.connect(master); s.start(); },
+    drone(master){
+      const t=ctx.currentTime;
+      const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=560; lp.Q.value=0.6;
+      const lfo=ctx.createOscillator(); lfo.frequency.value=0.06;
+      const lg=ctx.createGain(); lg.gain.value=170; lfo.connect(lg); lg.connect(lp.frequency); lfo.start(t);
+      const g=ctx.createGain(); g.gain.setValueAtTime(0.0001,t);
+      g.gain.exponentialRampToValueAtTime(0.5,t+2);
+      lp.connect(g); g.connect(master);
+      [['A1','sawtooth',0.85,-6],['A1','sawtooth',0.85,6],['A2','sawtooth',0.6,0],
+       ['E2','triangle',0.42,0],['A3','triangle',0.16,4]].forEach(([n,ty,a,det])=>{
+        const o=ctx.createOscillator(); o.type=ty; o.frequency.value=f(n); o.detune.value=det;
+        const og=ctx.createGain(); og.gain.value=a; o.connect(og); og.connect(lp); o.start(t);
+      });
+    },
+    harp(master){ arp(['A3','C4','E4','B4','A5'],master,[0.5,2.0,0.45,0.9962,0.62,'highpass',180]); },
+    guitar(master){ arp(['A2','E3','A3','C4','E4'],master,[0.4,1.7,0.42,0.9925,0.66,'lowpass',2400]); },
+    lute(master){ arp(['E5','C5','A4','E4'],master,[0.35,1.3,0.5,0.9895,0.55,'highpass',300]); },
+    reverb(master){
+      const sr=ctx.sampleRate,len=Math.floor(sr*1.8),ir=ctx.createBuffer(2,len,sr);
+      for(let ch=0;ch<2;ch++){const dd=ir.getChannelData(ch);let lp=0;
+        for(let i=0;i<len;i++){lp+=0.22*((Math.random()*2-1)-lp); dd[i]=lp*Math.pow(1-i/len,3.2);}}
+      const cv=ctx.createConvolver(); cv.buffer=ir; cv.connect(master);
+      pluckDry(f('A3'),ctx.currentTime+0.1,cv,0.8,2.0,0.45,0.9962,0.62,'highpass',180);
+    },
+  };
+  const DUR={silence:5,sine:3.3,noise:2.2,drone:6,harp:5,guitar:5,lute:5,reverb:5};
+
+  function stop(){ if(ctx){ const c=ctx; ctx=null; try{c.close()}catch(e){} } clearTimeout(timer); }
+  function run(name){
+    stop();
+    ctx=new (window.AudioContext||window.webkitAudioContext)();
+    const master=ctx.createGain(); master.gain.value=vol; master.connect(ctx.destination);
+    document.getElementById('status').textContent='▶ Test '+name+' — écoute…  (sr='+ctx.sampleRate+' Hz)';
+    TESTS[name](master);
+    timer=setTimeout(()=>{ stop(); document.getElementById('status').textContent='■ Fini : '+name+'. Bruit blanc présent ? note-le.'; }, DUR[name]*1000);
+  }
+  document.querySelectorAll('button[data-t]').forEach(b=>
+    b.addEventListener('click',()=>run(b.dataset.t)));
+  document.getElementById('vol').addEventListener('input',e=>{ vol=e.target.value/100; });
+})();
+</script>
+</body>
+</html>
