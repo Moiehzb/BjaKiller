@@ -6,14 +6,9 @@
 ## 🎯 Feedback utilisateur — à implémenter
 
 ### Musique
-- [x] **Lobby « Le Seuil »** — ✅ **TERMINÉ ET VALIDÉ** (120 mes., boucle seamless). Fichier : `music/le-seuil.html`. État complet → `music/LOBBY_RECAP.md`.
-- [ ] **Mettre la musique du lobby au propre dans LMMS** — MIDI généré (`music/le-seuil.mid`, 8 tracks GM), importé dans LMMS avec GeneralUser GS, **son mauvais**. À faire :
-  - Trouver un meilleur SF2 pour la **flûte** (GeneralUser insuffisant)
-  - Ajuster le mix de chaque track (volumes, reverb)
-  - Exporter en OGG pour l'app React
-  - Script de génération MIDI : `music/generate-midi.js` (node music/generate-midi.js → music/le-seuil.mid)
-  - Tracks : Synth Lead (ch0 prog81), Flûte (ch1 prog73), Harpe (ch2 prog46), Guitare (ch3 prog24), Luth (ch4 prog24), Basse (ch5 prog32), Percussions (ch9)
-- [ ] **Autres morceaux à composer** : game loop, jingle victoire, jingle défaite (même méthode Web Audio — `music/METHODE_COMPOSITION.md`).
+- [x] **Lobby « Le Seuil »** — ✅ composé (Web Audio, 120 mes., boucle seamless) `music/le-seuil.html` + **mixé et validé dans LMMS** (session 05/07/2026). Projet : `music/Lobby.mmpz` (backup `Lobby.backup.mmpz`). Synth recréé en TripleOscillator natif (les SF2 ne filtrent pas), percu cajón/palmas, basse orgue, flûte reverb, luth. Détails → mémoire `project-music-pipeline-furnace.md` + `LOBBY_RECAP.md` §8.
+- [ ] **Intégrer la musique du lobby dans le jeu** — exporter le projet LMMS en **OGG** (LMMS : File → Export), placer le fichier dans l'app React, le jouer **en boucle** dans le lobby (`<audio loop>` ou Web Audio), **démarrage au 1er clic** (règle navigateur). Vérifier la couture de boucle (fondu si la reverb de fin coupe).
+- [ ] **Autres morceaux à composer** : game loop, jingle victoire, jingle défaite. ⚠️ **Nouvelle méthode : composer DIRECT dans LMMS** (MIDI + instruments natifs/SF2), plus de prévisualisation Web Audio — cf. `music/METHODE_COMPOSITION.md`.
 
 ### UX
 - [ ] **Après le tuto → ouvrir directement le mode Training** : à la sortie du tutoriel, envoyer le joueur droit dans Training (ou au minimum un CTA "Commence ici" bien visible) au lieu de le lâcher devant le lobby (mur d'options).

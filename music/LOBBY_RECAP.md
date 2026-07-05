@@ -14,7 +14,7 @@
 - **Sections codées + validées à l'oreille** : **Le Seuil** (mes. 1-12), **L'Appel** (13-28), **La Marche** (29-44).
 - **Codé + validé à l'oreille** : **Le Cloître** (45-64) — pont lumineux (vamp **Cadd9⇄Fmaj7**). Flûte : ✅ **mélodie AABA validée**. Accompagnement : ✅ **texture progressive** + 2 moments hors-grille (harpe beat 2 mes.48, luth beat 1 mes.56).
 - **Codé, à valider à l'oreille** : **L'Ascension** (65-92) + **Le Retour** (93-120) + **boucle seamless** (mes. 120 E7 → mes. 1 Am via `play(1)`). `TOTAL_BARS=120`.
-- **Reste** : validation à l'oreille + éventuels ajustements de mix.
+- **Rendu final ✅** : mix **LMMS** terminé et validé → `music/Lobby.mmpz`. **Reste** : export OGG + intégration in-game (voir §9 + `TODO.md`).
 - **Journal / points de sauvegarde** : voir **§8 (Journal)** tout en bas — mis à jour à **chaque étape stable** (le plus récent en haut). Les **valeurs exactes = le code** ; le Journal ne logue **pas** les micro-réglages.
 
 ---
@@ -115,7 +115,7 @@ Tout est dans un `<script>` unique (IIFE). Ordre : constantes → utilitaires (`
 
 ## 7. Prochaine étape
 
-**✅ MORCEAU TERMINÉ ET VALIDÉ.** 120 mesures, boucle seamless (E7→Am). Prochaine étape : intégrer dans l'app React (voir §9).
+**✅ MORCEAU COMPOSÉ, MIXÉ (LMMS) ET VALIDÉ.** 120 mesures, boucle seamless (E7→Am). Rendu final = projet LMMS `music/Lobby.mmpz` (know-how + valeurs → mémoire `project-music-pipeline-furnace.md`). **Prochaine étape : exporter en OGG depuis LMMS + intégrer dans l'app React (voir §9, option B).**
 
 Références analysées (dans `.midi/`, via parser maison — voir méthodologie) : **Gerudo Valley** (F♯m harmonique, cadence andalouse = ADN flamenco), **Corridors of Time** (loop hypnotique 2 accords), **Schala** (Fm, min-maj7/napolitain), **Terra** (Si maj penché sur le vi), **Pallet Town** (Sol maj diatonique, harmonie lente).
 
@@ -126,6 +126,13 @@ Références analysées (dans `.midi/`, via parser maison — voir méthodologie
 > **Point de sauvegarde par étape.** On met à jour cette fiche (ce §, + §0 « en un coup d'œil » + §7 « prochaine étape ») à **chaque état stable** : section codée, mix validé, décision verrouillée — **avant de s'arrêter**.
 > **On NE logue PAS chaque micro-réglage.** Les valeurs exactes vivent dans le **code** (`le-seuil.html` fait foi). Une session de tweaks = **une** ligne consolidée (« guitare La Marche portée à X, validé »), pas dix.
 > Format : `AAAA-MM-JJ — ce qui change — pourquoi`. Le plus récent en haut.
+
+### 2026-07-05 (soir) — Mix LMMS terminé et validé ✅ (rendu final)
+- **Rendu final = LMMS**, pas le Web Audio. MIDI (`generate-midi.js`) importé dans **`music/Lobby.mmpz`** (backup `Lobby.backup.mmpz`) ; **on édite le .mmp directement** (jamais réimporter le MIDI → écraserait le mix). Valeurs exactes = le fichier ; know-how + pièges = mémoire `project-music-pipeline-furnace.md`.
+- **Synth** recréé en **TripleOscillator natif** (2 saw ±10c + tri + sub, filtre LP résonant + env) car le **sf2player ne gère NI filtre NI enveloppe**. **Percu** kit GM → **cajón (congas) + palmas**. **Basse** → **orgue Drawbar** (sustain). **Flûte** : fin de note adoucie par **reverb interne** (release impossible). **Luth** : vélocité des NOTES (fader insuffisant), Cloître ajusté, croche mes.56 retirée.
+- **Volumes finaux** : Synth 10 · Guitare 80 · Basse 100 · Flûte 80 · Luth 180 · Harpe 100 · Percu 92.
+- **Leçon** : prochains morceaux → **direct dans LMMS**, plus de prévisualisation Web Audio (cf. `METHODE_COMPOSITION.md`).
+- **Prochaine étape** : export OGG + intégration in-game.
 
 ### 2026-07-05 — Morceau validé à l'oreille, intégration app à faire
 - **Lobby ✅ terminé** : boucle validée, flûte dans l'Ascension retirée (tests concluants = pas nécessaire). Bouton toggle flûte (Le Cloître) conservé dans le player de démo.
@@ -156,6 +163,8 @@ Références analysées (dans `.midi/`, via parser maison — voir méthodologie
 ---
 
 ## 9. Intégration dans l'app React — options
+
+> **MàJ 2026-07-05 : le rendu final est désormais le projet LMMS `music/Lobby.mmpz` (plus le Web Audio).** Chemin retenu = **option B** : exporter en **OGG** depuis LMMS (File → Export) puis le jouer dans l'app. Les options ci-dessous datent d'avant le passage à LMMS ; l'option A (Web Audio dans React) n'est plus le plan.
 
 Le morceau est terminé en `music/le-seuil.html` (Web Audio pur). Il faut maintenant le faire jouer dans l'app. Trois options, classées par effort :
 

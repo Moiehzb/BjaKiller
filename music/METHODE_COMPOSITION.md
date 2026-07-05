@@ -8,6 +8,16 @@
 
 ---
 
+## ⚠️ Retour d'expérience — désormais, on rend DANS LMMS (maj 2026-07-05)
+
+Sur le lobby de Blackjack Academy, on a composé en **Web Audio** (`.html`) **puis** re-fait le rendu dans **LMMS** — ce **double travail** (re-import MIDI + re-mixage complet) était évitable. **Décision pour les prochains morceaux : composer directement dans LMMS**, sans prévisualisation Web Audio.
+- MIDI généré par script (cf. `generate-midi.js`) → importé dans LMMS.
+- **Synthés = instruments NATIFS LMMS** (TripleOscillator : filtre + enveloppes fonctionnent). **Acoustiques = SoundFonts** — mais ⚠️ le **sf2player n'a NI filtre NI enveloppe** (utiliser sa reverb interne, ou un effet de `<fxchain>`).
+- Tout le reste de cette méthode **reste valable** (analyse de réfs, fiche technique, motif/texture, hiérarchie de mix) — seul l'**outil de rendu** change. Les recettes « Cheatsheet Web Audio » ne servent que si on refait un jour du synthé maison hors LMMS.
+- Détails du pipeline LMMS : mémoire `project-music-pipeline-furnace.md`.
+
+---
+
 ## Les 6 principes cardinaux (non-négociables)
 
 1. **Des données, pas des impressions.** On analyse les références en extrayant des **chiffres réels** (tonalité, tempo, accords, densité), pas des souvenirs vagues (« ça fait planant »). Voir Phase 1.
@@ -26,7 +36,7 @@
 - [ ] **Cible émotionnelle**, incluant ce qu'il faut **ÉVITER** (« mystérieux **mais pas triste** » est plus utile que « mystérieux »).
 - [ ] **Contrainte d'usage** (ex. un morceau de lobby **boucle** → ne doit pas fatiguer ; un jingle victoire dure 3 s → doit claquer). Ça oriente structure et durée.
 - [ ] **Direction artistique / palette instrumentale** demandée.
-- [ ] **Cible technique** : par défaut, **Web Audio API dans un fichier `.html` autonome** (zéro install, contrôle total au sample près, écoute en 10 s, marche en `file://`). Portage vers un tracker (Furnace…) seulement plus tard, si édition manuelle voulue.
+- [ ] **Cible technique** : **composer directement dans LMMS** (MIDI généré par script + instruments **natifs** pour les synthés, **SoundFonts** pour les acoustiques). *(La prévisualisation Web Audio `.html` — utilisée sur le lobby — est abandonnée : c'était du double travail. Cf. le retour d'expérience en tête.)*
 - [ ] Rassembler les **références** (idéalement des fichiers MIDI — analysables ; sinon des noms de morceaux + descriptions).
 
 ---
