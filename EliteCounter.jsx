@@ -3,7 +3,7 @@ import { Play, Pause, X, ChevronRight, ChevronLeft, Eye, EyeOff, AlertTriangle, 
 import TutorialOverlay from './EliteCounterTutorial.jsx';
 import { makeT, DEFAULT_LANG, getLanguage } from './i18n';
 import { LanguageSelectScreen, LanguageModal, Flag } from './LanguageSelect.jsx';
-import { initAudio, setMuted, playCorrect, playWrong, playChip, playRankUp, playAchievement, playClick, playCountdown, playGo, playCardFlip } from './src/sounds.js';
+import { initAudio, setMuted, playCorrect, playWrong, playChip, playRankUp, playAchievement, playClick, playCountdown, playGo, playCardFlip, playVictory, playDefeat } from './src/sounds.js';
 import { fadeInLobbyMusic, fadeOutLobbyMusic, setMusicMuted, setMusicVolume } from './src/music.js';
 import { setHapticsEnabled, vibrateWin, vibrateLose, vibrateTap } from './src/haptics.js';
 
@@ -1918,9 +1918,9 @@ export default function EliteCounter() {
     const newCurCardsSum = correct ? (save.curStreakCardsSum || 0) + cardsUsed : 0;
     const beatsBest = correct && newStreak > (save.bestStreak || 0);
 
-    // ── Answer sound (streak richness grows with combo) ──────────
-    if (correct) snd(() => playCorrect(newStreak));
-    else snd(playWrong);
+    // ── Answer sound : jingles victoire / défaite (.ogg) ─────────
+    if (correct) snd(playVictory);
+    else snd(playDefeat);
     // ── Retour haptique (gated indépendamment du son) ────────────
     if (correct) vibrateWin(); else vibrateLose();
     const newBestStreak = beatsBest ? newStreak : (save.bestStreak || 0);

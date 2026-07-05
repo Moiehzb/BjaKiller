@@ -1,7 +1,12 @@
 // ─── Elite Counter Sound Engine ───────────────────────────────
-// Web Audio API only — zero deps, zero external files.
+// Web Audio API (sons UI synthétisés) + deux jingles fichiers (.ogg).
 // No frequency above ~500 Hz — nothing should sound shrill.
 // Slight random jitter per call prevents listener fatigue.
+
+// Jingles victoire / défaite — fichiers audio importés (Vite les bundle et
+// les copie dans la WebView Capacitor). Rejoués à chaque bonne/mauvaise réponse.
+import victoryUrl from '../music/Victoire_jingle.ogg';
+import defeatUrl from '../music/Defaite_jingle.ogg';
 
 let _ctx = null;
 let _muted = false;
@@ -193,6 +198,21 @@ export const playGo = () => {
     osc(ctx, 440, 'sine', 0.09, t + 0.06, 0.26);
   } catch {}
 };
+
+// ─── Jingles (fichiers audio) ─────────────────────────────────
+// On recrée un Audio à chaque lecture pour autoriser le rejeu rapide même si
+// le précédent n'est pas fini. Respecte le mute global (setMuted).
+const JINGLE_VOL = 0.8;
+const playFile = (url) => {
+  if (_muted) return;
+  try {
+    const a = new Audio(url);
+    a.volume = JINGLE_VOL;
+    a.play().catch(() => {});
+  } catch {}
+};
+export const playVictory = () => playFile(victoryUrl);
+export const playDefeat  = () => playFile(defeatUrl);
 
 export const initAudio = () => {
   try { ac(); } catch {}
