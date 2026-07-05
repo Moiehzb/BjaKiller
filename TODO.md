@@ -6,12 +6,7 @@
 ## 🎯 Feedback utilisateur — à implémenter
 
 ### Musique
-- [x] **Lobby « Le Seuil »** — ✅ composé (Web Audio, 120 mes., boucle seamless) `music/le-seuil.html` + **mixé et validé dans LMMS** (session 05/07/2026). Projet : `music/Lobby.mmpz` (backup `Lobby.backup.mmpz`). Synth recréé en TripleOscillator natif (les SF2 ne filtrent pas), percu cajón/palmas, basse orgue, flûte reverb, luth. Détails → mémoire `project-music-pipeline-furnace.md` + `LOBBY_RECAP.md` §8.
-- [x] **Intégrer la musique du lobby dans le jeu** — ✅ (session 05/07/2026). Fichier `public/music/le_hall.ogg` (mix LMMS). Module `src/music.js` : lecture **Web Audio** (`AudioBufferSourceNode.loop`, pas `<audio loop>`) → boucle échantillon-exact + **rognage du silence en tête/queue** (corrige le « blanc » de boucle). Démarrage différé au 1er geste, coupé en partie (`nav === 'game'`), lié au toggle son. **Volume réglable** (GainNode) : `save.musicVolume` (défaut 0.35) + slider dans le Scriptorium (clé i18n `settings.music` ajoutée aux 14 locales).
 - [ ] **Autres morceaux à composer** : game loop, jingle victoire, jingle défaite. ⚠️ **Nouvelle méthode : composer DIRECT dans LMMS** (MIDI + instruments natifs/SF2), plus de prévisualisation Web Audio — cf. `music/METHODE_COMPOSITION.md`.
-
-### UX
-- [x] **Après le tuto → ouvrir directement le mode Training** — ✅ (05/07/2026) : `onComplete` du tuto first-launch fait `setNav('mode-training')` en plus de `tutorialDone`. (Le skip laisse au lobby, tout débloqué.)
 
 ---
 
@@ -29,6 +24,12 @@
 - [ ] App 2 séparée : mode table réaliste style Card Counter Lite
 
 ## ✅ Fait
+
+- [x] **Musique du lobby intégrée + tuto→Training — session 05/07/2026**
+  - **Compo** : « Le Seuil » composé (Web Audio, 120 mes., boucle seamless) `music/le-seuil.html` puis **mixé et validé dans LMMS** (`music/Lobby.mmpz`, backup `Lobby.backup.mmpz`). Synth TripleOscillator natif (les SF2 ne filtrent pas), percu cajón/palmas, basse orgue, flûte reverb, luth. Détails → mémoire `project-music-pipeline-furnace.md` + `LOBBY_RECAP.md` §8.
+  - **Intégration** : export OGG → `public/music/le_hall.ogg`. Module `src/music.js` : lecture **Web Audio** (`AudioBufferSourceNode.loop`, pas `<audio loop>`) → boucle échantillon-exact + **rognage du silence en tête/queue** (corrige le « blanc » de boucle). Démarrage différé au 1er geste, coupée en partie (`nav === 'game'`), liée au toggle son.
+  - **Volume réglable** (GainNode) : `save.musicVolume` (défaut 0.35) + slider dans le Scriptorium (icône `Music`, %). Clé i18n `settings.music` ajoutée aux 14 locales.
+  - **Tuto → Training** : `onComplete` du tuto first-launch fait `setNav('mode-training')` en plus de `tutorialDone` (le skip laisse au lobby, tout débloqué).
 
 - [x] **Refonte DA « Académie Secrète des Compteurs » + rebranding Blackjack Academy I — session 02/07/2026**
   - **Palette** : objet `G` refait (fonds violets profonds `#0d0a1a`/`#13102a`/`#1a1535`, or `#c9a24b`, ambre `#d4813a`, teal `#2dd4bf`, textes parchemin/lavande) — appliqué à EliteCounter.jsx + miroirs Tutorial/LanguageSelect + index.html.
