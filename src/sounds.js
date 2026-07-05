@@ -33,13 +33,13 @@ const osc = (ctx, freq, type, vol, t0, dur, freqEnd) => {
 
 // ─── Public API ───────────────────────────────────────────────
 
-// Generic UI click — warm, low, nearly subliminal
+// Generic UI click — warm, low, present
 export const playClick = () => {
   try {
     const ctx = ac();
     const t = ctx.currentTime;
-    osc(ctx, rnd(310, 0.1), 'sine', 0.10, t, 0.022);
-    osc(ctx, rnd(180, 0.1), 'sine', 0.05, t, 0.030);
+    osc(ctx, rnd(310, 0.1), 'sine', 0.22, t, 0.026);
+    osc(ctx, rnd(180, 0.1), 'sine', 0.12, t, 0.034);
   } catch {}
 };
 
@@ -62,8 +62,8 @@ export const playMenuOk = () => {
   try {
     const ctx = ac();
     const t = ctx.currentTime;
-    osc(ctx, 330, 'sine', 0.14, t,        0.065);
-    osc(ctx, 440, 'sine', 0.14, t + 0.08, 0.065);
+    osc(ctx, 330, 'sine', 0.22, t,        0.070);
+    osc(ctx, 440, 'sine', 0.22, t + 0.08, 0.070);
   } catch {}
 };
 
@@ -77,29 +77,35 @@ export const playWrong = () => {
   } catch {}
 };
 
-// Old grimoire page turn — filtered noise burst, quick and light
+// Old grimoire page turn — filtered noise sweep + paper flutter + landing
 export const playCardFlip = () => {
   try {
     const ctx = ac();
     const t = ctx.currentTime;
-    const dur = 0.07;
+    const dur = rnd(0.11, 0.08);
     const frames = Math.ceil(dur * ctx.sampleRate);
 
-    // White noise → bandpass 220-360 Hz = papery mid texture
+    // White noise buffer, shaped by an amplitude ramp (paper unrolling)
     const buf = ctx.createBuffer(1, frames, ctx.sampleRate);
     const data = buf.getChannelData(0);
-    for (let i = 0; i < frames; i++) data[i] = Math.random() * 2 - 1;
+    for (let i = 0; i < frames; i++) {
+      const env = Math.sin((i / frames) * Math.PI); // swells then fades = swish
+      data[i] = (Math.random() * 2 - 1) * env;
+    }
 
     const src = ctx.createBufferSource();
     src.buffer = buf;
 
+    // Bandpass swept upward = the "shhhk" of a page arcing over
     const bpf = ctx.createBiquadFilter();
     bpf.type = 'bandpass';
-    bpf.frequency.value = 280;
-    bpf.Q.value = 0.55;
+    bpf.frequency.setValueAtTime(rnd(240, 0.1), t);
+    bpf.frequency.exponentialRampToValueAtTime(rnd(520, 0.1), t + dur);
+    bpf.Q.value = 0.7;
 
     const gain = ctx.createGain();
-    gain.gain.setValueAtTime(0.24, t);
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.linearRampToValueAtTime(0.34, t + dur * 0.4);
     gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
 
     src.connect(bpf);
@@ -108,8 +114,8 @@ export const playCardFlip = () => {
     src.start(t);
     src.stop(t + dur + 0.02);
 
-    // Subtle landing thud
-    osc(ctx, rnd(78, 0.08), 'sine', 0.07, t + 0.04, 0.055, 44);
+    // Landing thud — the page settling against the others
+    osc(ctx, rnd(76, 0.08), 'sine', 0.10, t + dur * 0.7, 0.07, 42);
   } catch {}
 };
 

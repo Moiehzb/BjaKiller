@@ -3,7 +3,7 @@ import { Play, Pause, X, ChevronRight, ChevronLeft, Eye, EyeOff, AlertTriangle, 
 import TutorialOverlay from './EliteCounterTutorial.jsx';
 import { makeT, DEFAULT_LANG, getLanguage } from './i18n';
 import { LanguageSelectScreen, LanguageModal, Flag } from './LanguageSelect.jsx';
-import { initAudio, setMuted, playCorrect, playWrong, playChip, playRankUp, playAchievement, playClick, playCountdown, playGo } from './src/sounds.js';
+import { initAudio, setMuted, playCorrect, playWrong, playChip, playRankUp, playAchievement, playClick, playCountdown, playGo, playCardFlip } from './src/sounds.js';
 import { playLobbyMusic, stopLobbyMusic, setMusicMuted, setMusicVolume } from './src/music.js';
 
 // ─── Constants ────────────────────────────────────────────────────
@@ -1486,6 +1486,7 @@ export default function EliteCounter() {
       for (let i = 0; i < currentIndex; i++) c += deck[i].value;
       setRunningCount(c);
       setCardFlash(true);
+      snd(playCardFlip);
       setTimeout(() => setCardFlash(false), 110);
     }
   }, [currentIndex, deck]);
