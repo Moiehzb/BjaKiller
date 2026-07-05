@@ -1,9 +1,9 @@
 // ─── Blackjack Academy I — Lobby background music ─────────────
 // Loue le morceau du lobby « Le Seuil » (mix LMMS exporté en OGG).
-// Fichier attendu : public/music/lobby.ogg  → servi à /music/lobby.ogg
+// Fichier attendu : public/music/le_hall.ogg  → servi à /music/le_hall.ogg
 // Démarrage différé au 1er geste utilisateur (règle autoplay navigateur).
 
-const SRC = '/music/lobby.ogg';
+const SRC = '/music/le_hall.ogg';
 const VOL = 0.55; // sous les SFX in-game, présence sans écraser l'UI
 
 let _audio = null;
