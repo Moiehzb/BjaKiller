@@ -5,7 +5,7 @@ import { makeT, DEFAULT_LANG, getLanguage } from './i18n';
 import { LanguageSelectScreen, LanguageModal, Flag } from './LanguageSelect.jsx';
 import { initAudio, setMuted, playCorrect, playWrong, playChip, playRankUp, playAchievement, playClick, playCountdown, playGo, playCardFlip } from './src/sounds.js';
 import { fadeInLobbyMusic, fadeOutLobbyMusic, setMusicMuted, setMusicVolume } from './src/music.js';
-import { setHapticsEnabled, vibrateWin, vibrateLose } from './src/haptics.js';
+import { setHapticsEnabled, vibrateWin, vibrateLose, vibrateTap } from './src/haptics.js';
 
 // ─── Constants ────────────────────────────────────────────────────
 const CARD_VALUES = {
@@ -1428,6 +1428,24 @@ export default function EliteCounter() {
 
   // ── Retour haptique (vibration mobile) ─────────────────────────
   useEffect(() => { setHapticsEnabled(save?.hapticsEnabled !== false); }, [save?.hapticsEnabled]);
+
+  // Tap léger sur tout élément cliquable (boutons, cartes de mode, drapeau…).
+  // Délégation globale : on remonte le DOM et on déclenche si le curseur est
+  // "pointer". Hors partie (le jeu a déjà ses propres retours win/lose).
+  useEffect(() => {
+    const onTap = (e) => {
+      if (nav === 'game') return;
+      let el = e.target;
+      for (let i = 0; el && i < 6; i++, el = el.parentElement) {
+        if (el.nodeType !== 1) continue;
+        const tag = el.tagName;
+        if (tag === 'BUTTON' || el.getAttribute('role') === 'button') { vibrateTap(); return; }
+        try { if (getComputedStyle(el).cursor === 'pointer') { vibrateTap(); return; } } catch {}
+      }
+    };
+    document.addEventListener('pointerdown', onTap, true);
+    return () => document.removeEventListener('pointerdown', onTap, true);
+  }, [nav]);
 
   // ── Musique du lobby ───────────────────────────────────────────
   // Boucle en continu sur tous les écrans de menu. En partie, elle ne s'arrête

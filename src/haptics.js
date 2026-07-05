@@ -22,6 +22,13 @@ const webVib = (pattern) => {
   } catch {}
 };
 
+// Tap léger — chaque appui sur un bouton du menu. Discret, non fatigant.
+export const vibrateTap = () => {
+  if (!_enabled) return;
+  if (NATIVE) { Haptics.impact({ style: ImpactStyle.Light }).catch(() => {}); }
+  else webVib(10);
+};
+
 // Victoire (bonne réponse) — un tap court et net, satisfaisant.
 export const vibrateWin = () => {
   if (!_enabled) return;
