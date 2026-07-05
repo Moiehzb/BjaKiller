@@ -209,6 +209,7 @@ const en = {
     title: 'Scriptorium',
     sound: 'Sound',
     music: "Music",
+    haptics: "Vibration",
     devRankTitle: 'Dev · set rank',
     devRankHint: 'Pick a rank directly, skipping the Initiation.',
     reset: 'Erase your progress',

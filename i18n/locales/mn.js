@@ -209,6 +209,7 @@ const mn = {
     title: 'Скрипториум',
     sound: 'Дуу',
     music: "Хөгжим",
+    haptics: "Чичиргээ",
     devRankTitle: 'Dev · зэрэг тохируулах',
     devRankHint: 'Элсэлтийг алгасан шууд зэрэг сонгоно уу.',
     reset: 'Явцаа устгах',

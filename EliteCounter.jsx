@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Play, Pause, X, ChevronRight, ChevronLeft, Eye, EyeOff, AlertTriangle, Globe, Volume2, VolumeX, Music, BookOpen, DoorOpen, Flame, CalendarDays, Sparkles, Award, Gem, BarChart3, ScrollText, Lock, KeyRound } from 'lucide-react';
+import { Play, Pause, X, ChevronRight, ChevronLeft, Eye, EyeOff, AlertTriangle, Globe, Volume2, VolumeX, Music, Vibrate, BookOpen, DoorOpen, Flame, CalendarDays, Sparkles, Award, Gem, BarChart3, ScrollText, Lock, KeyRound } from 'lucide-react';
 import TutorialOverlay from './EliteCounterTutorial.jsx';
 import { makeT, DEFAULT_LANG, getLanguage } from './i18n';
 import { LanguageSelectScreen, LanguageModal, Flag } from './LanguageSelect.jsx';
 import { initAudio, setMuted, playCorrect, playWrong, playChip, playRankUp, playAchievement, playClick, playCountdown, playGo, playCardFlip } from './src/sounds.js';
 import { fadeInLobbyMusic, fadeOutLobbyMusic, setMusicMuted, setMusicVolume } from './src/music.js';
+import { setHapticsEnabled, vibrateWin, vibrateLose } from './src/haptics.js';
 
 // ─── Constants ────────────────────────────────────────────────────
 const CARD_VALUES = {
@@ -1263,6 +1264,7 @@ const DEFAULT_SAVE = {
   trainingDone: false,   // unlocks Ranked after first training card
   rankedDone: false,     // unlocks Casino Killer after first ranked game
   soundEnabled: true,
+  hapticsEnabled: true,  // vibrations sur victoire/défaite (mobile)
   musicVolume: 0.35,     // volume de la musique du lobby (0..1)
 
   // Config Training (persistée entre sessions)
@@ -1405,6 +1407,9 @@ export default function EliteCounter() {
     setMusicMuted(!on);
   }, [save?.soundEnabled]);
   const snd = (fn) => { if (soundEnabledRef.current) fn(); };
+
+  // ── Retour haptique (vibration mobile) ─────────────────────────
+  useEffect(() => { setHapticsEnabled(save?.hapticsEnabled !== false); }, [save?.hapticsEnabled]);
 
   // ── Musique du lobby ───────────────────────────────────────────
   // Boucle en continu sur tous les écrans de menu. En partie, elle ne s'arrête
@@ -1878,6 +1883,8 @@ export default function EliteCounter() {
     // ── Answer sound (streak richness grows with combo) ──────────
     if (correct) snd(() => playCorrect(newStreak));
     else snd(playWrong);
+    // ── Retour haptique (gated indépendamment du son) ────────────
+    if (correct) vibrateWin(); else vibrateLose();
     const newBestStreak = beatsBest ? newStreak : (save.bestStreak || 0);
     const newBestStreakAvgSpc = beatsBest ? (newCurSpcSum / newStreak) : save.bestStreakAvgSpc;
     const newBestStreakCards = beatsBest ? newCurCardsSum : save.bestStreakCards;
@@ -2857,6 +2864,18 @@ export default function EliteCounter() {
                   onChange={e => patchSave({ musicVolume: Number(e.target.value) / 100 })}
                   style={{ width: '100%', accentColor: G.gold, cursor: save.soundEnabled === false ? 'default' : 'pointer' }}
                 />
+              </div>
+              {/* Vibrations haptiques (mobile) */}
+              <div style={{ padding: '14px 0', borderBottom: `1px solid ${G.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: G.textPrimary, fontSize: 13 }}>
+                  <Vibrate size={15} color={save.hapticsEnabled !== false ? G.gold : G.textSecondary} />
+                  <span>{t('settings.haptics')}</span>
+                </div>
+                <button
+                  onClick={() => { const on = save.hapticsEnabled === false; patchSave({ hapticsEnabled: on }); if (on) vibrateWin(); }}
+                  style={{ padding: '6px 14px', background: save.hapticsEnabled !== false ? 'rgba(201,162,75,.15)' : 'rgba(255,255,255,.05)', border: `1px solid ${save.hapticsEnabled !== false ? G.borderGold : G.border}`, borderRadius: 6, color: save.hapticsEnabled !== false ? G.gold : G.textSecondary, cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>
+                  {save.hapticsEnabled !== false ? 'ON' : 'OFF'}
+                </button>
               </div>
               {/* Dev · définir le rang sans passer par le placement */}
               <div style={{ padding: '14px 0', borderBottom: `1px solid ${G.border}` }}>

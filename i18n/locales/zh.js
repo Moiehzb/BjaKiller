@@ -209,6 +209,7 @@ const zh = {
     title: '典籍室',
     sound: '音效',
     music: "音乐",
+    haptics: "振动",
     devRankTitle: 'Dev · 设置段位',
     devRankHint: '直接选择段位，跳过入会考核。',
     reset: '清除进度',

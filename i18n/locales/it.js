@@ -209,6 +209,7 @@ const it = {
     title: 'Scriptorium',
     sound: 'Audio',
     music: "Musica",
+    haptics: "Vibrazione",
     devRankTitle: 'Dev · imposta rango',
     devRankHint: "Scegli un rango direttamente, saltando l'Iniziazione.",
     reset: 'Cancella i tuoi progressi',

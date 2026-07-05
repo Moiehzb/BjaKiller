@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ChevronRight, ChevronLeft, Check, Play, BookOpen, DoorOpen, Flame, Lock } from 'lucide-react';
 import { makeT, DEFAULT_LANG } from './i18n';
 import { initAudio, playClick, playCorrect, playMenuOk, playWrong, playChip, playGo, playCardFlip } from './src/sounds.js';
+import { vibrateWin, vibrateLose } from './src/haptics.js';
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // Design tokens — exact mirror of EliteCounter.jsx
@@ -421,9 +422,11 @@ const HiLoQuizStep = ({ onNext, onBack, t }) => {
 
     if (correct) {
       playMenuOk();
+      vibrateWin();
       timerRef.current = setTimeout(advanceNext, 960);
     } else {
       playWrong();
+      vibrateLose();
     }
   };
 
@@ -641,10 +644,12 @@ const CountQuizStep = ({ onNext, onBack, t }) => {
   const validate = () => {
     if (guess === COUNT_ANSWER) {
       playCorrect(0);
+      vibrateWin();
       setFeedback('correct');
       setPhase('done');
     } else {
       playWrong();
+      vibrateLose();
       const next = attempts + 1;
       setAttempts(next);
       setShowVals(true);

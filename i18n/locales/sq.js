@@ -209,6 +209,7 @@ const sq = {
     title: 'Skriptorium',
     sound: 'Zë',
     music: "Muzika",
+    haptics: "Dridhje",
     devRankTitle: 'Dev · vendos rang',
     devRankHint: 'Zgjidhni drejtpërsëdrejti një rang, duke anashkaluar Iniciimin.',
     reset: 'Fshi progresin tuaj',

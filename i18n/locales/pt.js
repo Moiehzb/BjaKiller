@@ -209,6 +209,7 @@ const pt = {
     title: 'Scriptorium',
     sound: 'Som',
     music: "Música",
+    haptics: "Vibração",
     devRankTitle: 'Dev · definir rank',
     devRankHint: 'Escolha um rank diretamente, ignorando a Iniciação.',
     reset: 'Apagar seu progresso',

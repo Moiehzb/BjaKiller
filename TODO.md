@@ -3,19 +3,12 @@
 > Ce fichier est maintenu automatiquement par Claude.
 > Mis à jour quand une tâche est assignée ou complétée.
 
-## 🎯 Feedback utilisateur — à implémenter
-
-### Musique
-- [ ] **Autres morceaux à composer** : game loop, jingle victoire, jingle défaite. ⚠️ **Nouvelle méthode : composer DIRECT dans LMMS** (MIDI + instruments natifs/SF2), plus de prévisualisation Web Audio — cf. `music/METHODE_COMPOSITION.md`.
-
----
-
 ## 🛠️ Features en attente (backlog)
 
 - [ ] Brancher l'achat des skins support (4,99 €/skin) sur un vrai paiement — aujourd'hui le clic "4,99 €" débloque directement en localStorage (démo). Voir aussi le paywall en fin de roadmap.
 - [x] **Sons in-app** — flip de carte, bonne/mauvaise réponse, victoire/défaite, achat/équipement de skin, clics UI + toggle son dans les réglages. ✅ Fait.
 - [ ] Transformer l'app en APK Android (build mobile installable)
-- [ ] **Vibration (haptique)** sur bonne/mauvaise réponse — gratuit et satisfaisant sur mobile (à lier au toggle son/retour).
+- [x] **Vibration (haptique)** sur bonne (tap court) / mauvaise (double buzz) réponse — jeu + tuto, toggle dédié dans le Scriptorium (`save.hapticsEnabled`). ✅ Fait.
 
 ## 🔮 Fin de roadmap — ne jamais mentionner quand on demande quoi faire
 

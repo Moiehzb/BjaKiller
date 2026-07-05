@@ -209,6 +209,7 @@ const ja = {
     title: '典籍室',
     sound: '音',
     music: "音楽",
+    haptics: "振動",
     devRankTitle: 'Dev · ランク設定',
     devRankHint: '入門をスキップして直接ランクを選択。',
     reset: '進捗を消去する',
