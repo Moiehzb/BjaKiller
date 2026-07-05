@@ -22,7 +22,7 @@ const G = {
 // CSS — injecté via <style> comme dans le fichier principal
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const tutCss = `
-  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap');
+  /* Polices en local (public/fonts/fonts.css via index.html) — pas d'@import internet */
 
   .tov { position:fixed; inset:0; z-index:200; background:radial-gradient(ellipse at top,#1a1535,${G.bgDeep} 72%); overflow-y:auto; font-family:'EB Garamond',serif; color:${G.textPrimary}; -webkit-font-smoothing:antialiased; }
   .tov-wrap { max-width:480px; margin:0 auto; padding:0 16px 56px; min-height:100vh; display:flex; flex-direction:column; }

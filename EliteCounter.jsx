@@ -725,8 +725,7 @@ const G = {
 };
 
 const css = `
-  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap');
-  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Righteous&family=Special+Elite&display=swap');
+  /* Polices chargées en local via public/fonts/fonts.css (référencé dans index.html) — pas d'@import internet (app hors-ligne) */
   * { box-sizing: border-box; }
   .r { background:${G.bgDeep}; min-height:100vh; font-family:'EB Garamond',serif; font-size:15px; color:${G.textPrimary}; -webkit-font-smoothing:antialiased; }
   .serif { font-family:'Cinzel',serif; }

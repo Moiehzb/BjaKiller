@@ -1,0 +1,8 @@
+{
+  "appId": "com.blackjackacademy.app",
+  "appName": "Blackjack Academy I",
+  "webDir": "dist",
+  "android": {
+    "backgroundColor": "#0d0a1aff"
+  }
+}
