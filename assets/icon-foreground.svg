@@ -19,7 +19,7 @@
   </defs>
 
   <!-- CARTE (légèrement inclinée) — agrandie pour mieux remplir l'icône/splash -->
-  <g transform="translate(512 512) scale(1.42) translate(-512 -512) rotate(-7 512 512)" filter="url(#soft)">
+  <g transform="translate(512 512) scale(1.72) translate(-512 -512) rotate(-7 512 512)" filter="url(#soft)">
     <rect x="299" y="214" width="426" height="596" rx="36" fill="url(#parch)" stroke="url(#gold)" stroke-width="14"/>
     <rect x="325" y="240" width="374" height="544" rx="24" fill="none" stroke="url(#gold)" stroke-width="4" opacity="0.75"/>
 

@@ -31,21 +31,46 @@ export const vibrateTap = () => {
   else webVib(6);
 };
 
-// Victoire (bonne réponse) — un tap court et net, satisfaisant.
-export const vibrateWin = () => {
-  if (!_enabled) return;
-  if (NATIVE) { Haptics.impact({ style: ImpactStyle.Light }).catch(() => {}); }
-  else webVib(12);
+// Sur natif, on joue une suite d'impacts calés dans le temps (le pattern
+// web [on,off,…] n'existe pas). schedule = [{ at(ms), style }].
+const nativeSequence = (schedule) => {
+  for (const s of schedule) {
+    setTimeout(() => { Haptics.impact({ style: s.style }).catch(() => {}); }, s.at);
+  }
 };
 
-// Défaite (mauvaise réponse) — distinct de la victoire, mais doux.
+// Victoire — calée sur le jingle (Victoire_jingle.ogg / victory.mid) :
+// arpège montant à ~0/153/307 ms, résolution appuyée à 460 ms, écho doux 537 ms.
+export const vibrateWin = () => {
+  if (!_enabled) return;
+  if (NATIVE) {
+    nativeSequence([
+      { at: 0,   style: ImpactStyle.Light },
+      { at: 153, style: ImpactStyle.Light },
+      { at: 307, style: ImpactStyle.Light },
+      { at: 460, style: ImpactStyle.Medium }, // résolution
+      { at: 537, style: ImpactStyle.Light },  // écho de triade
+    ]);
+  } else {
+    // [on,off,on,off,…] — mêmes onsets que le jingle.
+    webVib([10, 143, 10, 144, 10, 143, 18, 59, 8]);
+  }
+};
+
+// Défaite — calée sur le jingle (Defaite_jingle.ogg / defeat.mid) :
+// chute descendante à ~0/238/477 ms puis accord grave tenu à 758 ms.
 export const vibrateLose = () => {
   if (!_enabled) return;
   if (NATIVE) {
-    Haptics.impact({ style: ImpactStyle.Medium }).catch(() => {
-      Haptics.vibrate({ duration: 45 }).catch(() => {});
-    });
-  } else webVib([18, 40, 25]);
+    nativeSequence([
+      { at: 0,   style: ImpactStyle.Light },
+      { at: 238, style: ImpactStyle.Light },
+      { at: 477, style: ImpactStyle.Light },
+      { at: 758, style: ImpactStyle.Medium }, // accord grave tenu
+    ]);
+  } else {
+    webVib([12, 226, 12, 227, 12, 269, 35]);
+  }
 };
 
 // Coupe une vibration en cours (ex. au démontage).

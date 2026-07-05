@@ -548,25 +548,19 @@ const RANKS_DEF = [
 // Comme le nom affiché EST déjà le français, on montre l'anglais aux joueurs FR
 // (sinon le sous-titre serait identique au nom) et la langue courante ailleurs.
 const RANK_TL = {
-  Cuivre:     { en: 'Copper',     es: 'Cobre',      de: 'Kupfer' },
-  Argent:     { en: 'Silver',     es: 'Plata',      de: 'Silber' },
-  Or:         { en: 'Gold',       es: 'Oro',        de: 'Gold' },
-  Émeraude:   { en: 'Emerald',    es: 'Esmeralda',  de: 'Smaragd' },
-  Saphir:     { en: 'Sapphire',   es: 'Zafiro',     de: 'Saphir' },
-  Adamantium: { en: 'Adamantium', es: 'Adamantita', de: 'Adamantium' },
+  Cuivre:     { en: 'Copper',   de: 'Kupfer',  es: 'Cobre',      it: 'Rame',       pt: 'Cobre',   ru: 'Медь',      ar: 'نحاس',        hi: 'तांबा',    ja: '銅',         ko: '구리',      zh: '铜',     mn: 'Зэс',      sq: 'Bakër' },
+  Argent:     { en: 'Silver',   de: 'Silber',  es: 'Plata',      it: 'Argento',    pt: 'Prata',   ru: 'Серебро',   ar: 'فضة',         hi: 'चांदी',    ja: '銀',         ko: '은',        zh: '银',     mn: 'Мөнгө',    sq: 'Argjend' },
+  Or:         { en: 'Gold',     de: 'Gold',    es: 'Oro',        it: 'Oro',        pt: 'Ouro',    ru: 'Золото',    ar: 'ذهب',         hi: 'सोना',     ja: '金',         ko: '금',        zh: '金',     mn: 'Алт',      sq: 'Ar' },
+  Émeraude:   { en: 'Emerald',  de: 'Smaragd', es: 'Esmeralda',  it: 'Smeraldo',   pt: 'Esmeralda', ru: 'Изумруд', ar: 'زمرد',        hi: 'पन्ना',    ja: 'エメラルド', ko: '에메랄드', zh: '祖母绿', mn: 'Маргад',   sq: 'Smerald' },
+  Saphir:     { en: 'Sapphire', de: 'Saphir',  es: 'Zafiro',     it: 'Zaffiro',    pt: 'Safira',  ru: 'Сапфир',    ar: 'ياقوت أزرق',  hi: 'नीलम',     ja: 'サファイア', ko: '사파이어', zh: '蓝宝石', mn: 'Индранил', sq: 'Safir' },
+  Adamantium: { en: 'Adamantium', de: 'Adamantium', es: 'Adamantita', it: 'Adamantio', pt: 'Adamantium', ru: 'Адамантий', ar: 'أدامانتيوم', hi: 'एडामेंटियम', ja: 'アダマンチウム', ko: '아다만티움', zh: '精金', mn: 'Адамантиум', sq: 'Adamantium' },
 };
+// Sous-titre du rang dans la langue sélectionnée. En français, le nom affiché
+// EST déjà le français → pas de sous-titre. Repli : rien si langue non traduite.
 const rankTranscription = (name, lang) => {
-  const row = RANK_TL[name];
-  if (!row) return '';
-  const w = lang === 'fr' ? row.en : (row[lang] || row.en);
+  if (!lang || lang === 'fr') return '';
+  const w = RANK_TL[name]?.[lang];
   return w && w !== name ? w : '';
-};
-
-// Nom du rang dans la langue sélectionnée. Repli sur le nom français d'origine
-// (langues sans traduction, ou fr). On n'affiche plus de sous-titre étranger.
-const localizedRankName = (name, lang) => {
-  if (!lang || lang === 'fr') return name;
-  return RANK_TL[name]?.[lang] || name;
 };
 
 // ─── SUB-RANK SYSTEM ─────────────────────────────────────────────
@@ -1511,7 +1505,7 @@ export default function EliteCounter() {
   const curRankCfg = getRankConfig(save?.rankId || 1, curSubRank);
   // "Cuivre I", "Adamantium III", … — nom de rang + chiffre romain du sous-rang
   const rankLabel = (rankId = save?.rankId || 1, subRank = curSubRank) =>
-    `${localizedRankName(RANKS_DEF[rankId - 1]?.name || '', lang)} ${subRankRoman(subRank)}`;
+    `${RANKS_DEF[rankId - 1]?.name || ''} ${subRankRoman(subRank)}`;
   // Palier final absolu = Master III (plus de progression possible)
   const isMaxTier = (save?.rankId === 6) && (curSubRank === SUB_RANKS);
 
@@ -2148,7 +2142,7 @@ export default function EliteCounter() {
         <div className="logo">BLACKJACK ACADEMY I</div>
         {!minimal && (
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <div className="pill" style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }} onClick={() => { snd(playClick); setShowRankLadder(true); }}><RankSigil color={displayRank.color} size={13} /> {localizedRankName(displayRank.name, lang)}</div>
+            <div className="pill" style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }} onClick={() => { snd(playClick); setShowRankLadder(true); }}><RankSigil color={displayRank.color} size={13} /> {displayRank.name}</div>
             <div className="pill" style={{ display: 'flex', alignItems: 'center', gap: 5 }}><Coin size={13} /> {save.coins}</div>
           </div>
         )}
@@ -2208,6 +2202,9 @@ export default function EliteCounter() {
                   {t('lobby.currentRank')}
                 </div>
                 <div style={{ fontFamily: 'Cinzel, serif', fontSize: 17, fontWeight: 700 }}>{rankLabel()}</div>
+                {rankTranscription(rank.name, lang) && (
+                  <div style={{ fontFamily: 'EB Garamond, serif', fontStyle: 'italic', fontSize: 12, color: G.textSecondary, marginTop: -1, marginBottom: 1 }}>{rankTranscription(rank.name, lang)}</div>
+                )}
                 {!isMaster && (
                   <>
                     <div className="mmrtrack">
@@ -2483,7 +2480,10 @@ export default function EliteCounter() {
                     <RankSigil color={rk.color} size={30} dim={!isReached && !isCurrent} />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                        <div style={{ fontFamily: 'Cinzel, serif', fontSize: 16, fontWeight: 700, color: rk.color }}>{localizedRankName(rk.name, lang)}</div>
+                        <div style={{ fontFamily: 'Cinzel, serif', fontSize: 16, fontWeight: 700, color: rk.color }}>{rk.name}</div>
+                        {rankTranscription(rk.name, lang) && (
+                          <div style={{ fontFamily: 'EB Garamond, serif', fontStyle: 'italic', fontSize: 11.5, color: G.textSecondary }}>· {rankTranscription(rk.name, lang)}</div>
+                        )}
                         <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: statusColor, border: `1px solid ${statusColor}`, borderRadius: 20, padding: '1px 7px' }}>{status}</div>
                       </div>
                       <div style={{ fontSize: 11, color: G.textSecondary, marginBottom: 8 }}>{t('rankLadder.tiers')}</div>
@@ -2832,7 +2832,10 @@ export default function EliteCounter() {
                     <RankSigil color={displayRank.color} size={32} />
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 3 }}>
-                        {localizedRankName(displayRank.name, lang)}
+                        {displayRank.name}
+                        {rankTranscription(displayRank.name, lang) && (
+                          <span style={{ fontFamily: 'EB Garamond, serif', fontStyle: 'italic', fontSize: 12, fontWeight: 400, color: G.textSecondary }}> · {rankTranscription(displayRank.name, lang)}</span>
+                        )}
                       </div>
                       {placementOngoing ? (
                         <div style={{ fontSize: 11, color: G.gold, marginTop: 3 }}>{t('stats.placementInProgress')}</div>

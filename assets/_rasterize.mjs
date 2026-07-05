@@ -20,7 +20,7 @@ await sharp(bgPng).composite([{ input: fgPng }]).png().toFile(dir + 'logo.png');
 
 // 3) splash 2732px : fond violet centré + carte plus petite
 const splashBg = await sharp(bg).resize(2732, 2732).png().toBuffer();
-const fgSmall = await sharp(fg).resize(2050, 2050).png().toBuffer();
+const fgSmall = await sharp(fg).resize(2350, 2350).png().toBuffer();
 await sharp(splashBg)
   .composite([{ input: fgSmall, gravity: 'center' }])
   .png().toFile(dir + 'splash.png');
