@@ -5,9 +5,6 @@
 
 ## 🛠️ Features en attente (backlog)
 
-### Prochaine grande étape — packaging mobile
-- [ ] **Transformer l'app en APK Android** (build mobile installable). ⚠️ Décide de la techno de paiement : sur le Play Store, les biens numériques doivent passer par **Play Billing** → à faire *avant* de brancher un vrai paiement.
-
 ### Monétisation (dépend de l'APK)
 - [ ] Brancher l'achat des artefacts « Le Marchand » (4,99 €/artefact) sur un **vrai paiement** — aujourd'hui le clic "4,99 €" débloque directement en localStorage (démo). Techno = **Play Billing** si APK Android, sinon Stripe/StoreKit selon la plateforme finale.
 
@@ -20,6 +17,11 @@
 
 ## ✅ Fait
 
+- [x] **APK Android — session 05/07/2026** : app packagée en APK installable via **Capacitor 6**.
+  - **App rendue 100 % hors-ligne** : Tailwind (compilateur CDN auto-hébergé `public/vendor/tailwind.js`) + 5 polices (Cinzel, EB Garamond, Share Tech Mono, Righteous, Special Elite) en local (`public/fonts/`, 16 woff2). `@import` internet retirés (EliteCounter/Tutorial/LanguageSelect). Vite `base:'./'`.
+  - **Chaîne de build portable** (sans Android Studio) dans `D:\android-build-tools` : JDK 17 Temurin + SDK Android (platform-34, build-tools 34, adb). Licences acceptées via fichiers.
+  - **Build** : `build-apk.ps1` (ou `npm run android:apk`) → `Blackjack-Academy.apk` (~9 Mo) à la racine. appId `com.blackjackacademy.app`.
+  - ⚠️ APK *debug* non signé (usage perso). Pour Play Store : keystore + signature + Play Billing pour les artefacts payants.
 - [x] **Sons in-app** — flip de carte, bonne/mauvaise réponse, victoire/défaite, achat/équipement de skin, clics UI + toggle son dans les réglages.
 - [x] **Vibration (haptique)** sur bonne (tap court) / mauvaise (double buzz) réponse — jeu + tuto, toggle dédié dans le Scriptorium (`save.hapticsEnabled`).
 - [x] **Musique du lobby intégrée + tuto→Training — session 05/07/2026**
