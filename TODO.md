@@ -7,10 +7,12 @@
 
 ### Musique
 - [x] **Lobby « Le Seuil »** — ✅ **TERMINÉ ET VALIDÉ** (120 mes., boucle seamless). Fichier : `music/le-seuil.html`. État complet → `music/LOBBY_RECAP.md`.
-- [ ] **Intégrer la musique du lobby dans l'app React** — 3 options, voir `music/LOBBY_RECAP.md` §9 pour le détail :
-  - **(A) Recommandé — Intégrer le Web Audio directement dans React** : refactoriser le script de `le-seuil.html` en module JS utilisable dans l'app. Son identique, 0 fichier audio, offline. ~2-4h.
-  - **(B) Rapide — Enregistrer et embedder** : jouer le HTML, capturer en MP3/OGG (OBS ou équivalent), mettre dans `public/`. Simple mais ~4 MB.
-  - **(C) Furnace** : recomposer dans le tracker Furnace (chiptune/FM), exporter audio. Son stylisé différent, projet à part entière. Voir mémoire `project-music-pipeline-furnace.md`.
+- [ ] **Mettre la musique du lobby au propre dans LMMS** — MIDI généré (`music/le-seuil.mid`, 8 tracks GM), importé dans LMMS avec GeneralUser GS, **son mauvais**. À faire :
+  - Trouver un meilleur SF2 pour la **flûte** (GeneralUser insuffisant)
+  - Ajuster le mix de chaque track (volumes, reverb)
+  - Exporter en OGG pour l'app React
+  - Script de génération MIDI : `music/generate-midi.js` (node music/generate-midi.js → music/le-seuil.mid)
+  - Tracks : Synth Lead (ch0 prog81), Flûte (ch1 prog73), Harpe (ch2 prog46), Guitare (ch3 prog24), Luth (ch4 prog24), Basse (ch5 prog32), Percussions (ch9)
 - [ ] **Autres morceaux à composer** : game loop, jingle victoire, jingle défaite (même méthode Web Audio — `music/METHODE_COMPOSITION.md`).
 
 ### UX
