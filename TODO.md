@@ -5,6 +5,12 @@
 
 ## 🛠️ Features en attente (backlog)
 
+### ⏳ En attente d'un retour de l'utilisateur (après test de l'APK sur son Android)
+- [ ] **Réglage du volume** : boost posé « à l'aveugle » (SFX ×2.5 = `MASTER` dans `src/sounds.js`, musique ×1.9 = `BOOST` dans `src/music.js`). À ajuster selon son ressenti sur mobile.
+- [ ] **Langue de la transcription des rangs** : actuellement anglais pour les FR (Copper/Silver/…). Confirmer ou changer (rien en FR ? autre ?). Table `RANK_TL` dans `EliteCounter.jsx`.
+- [ ] **Débogage USB** : proposé pour installer les MàJ en 3 s via `adb install -r` (voir [[project-android-apk]]) au lieu de retransférer le fichier. Pas encore activé côté téléphone.
+- [ ] L'utilisateur avait annoncé « plusieurs changements » — d'autres retours possibles après ce lot.
+
 ### Monétisation (dépend de l'APK)
 - [ ] Brancher l'achat des artefacts « Le Marchand » (4,99 €/artefact) sur un **vrai paiement** — aujourd'hui le clic "4,99 €" débloque directement en localStorage (démo). Techno = **Play Billing** si APK Android, sinon Stripe/StoreKit selon la plateforme finale.
 
