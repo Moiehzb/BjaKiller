@@ -17,6 +17,12 @@
 
 ## ✅ Fait
 
+- [x] **Retours post-install APK — session 06/07/2026**
+  - **Musique coupée en arrière-plan** : `music.js` suspend l'AudioContext sur `visibilitychange` (la WebView Android gardait la boucle active), reprise au retour au 1er plan.
+  - **Volume général monté** : bus master + limiteur (DynamicsCompressor anti-clipping) — SFX ×2.5 (`sounds.js`), musique ×1.9 (`music.js`).
+  - **Vibrations réparées** : `navigator.vibrate` ignoré par la WebView → passage au plugin natif `@capacitor/haptics` (impact/notification), repli web conservé.
+  - **Transcription des rangs** : petit sous-titre traduit sous Cuivre/Argent/… (localisé ; FR→anglais car le nom est déjà FR). Lobby + ladder + stats. Table `RANK_TL` + `rankTranscription()`.
+  - **Nouvelle icône d'app** : « carte + œil du compteur » (as de pique parchemin incliné, œil doré à pupille pique). Sources SVG dans `assets/`, rasterisées via sharp, densités + splash générés par `@capacitor/assets`.
 - [x] **APK Android — session 05/07/2026** : app packagée en APK installable via **Capacitor 6**.
   - **App rendue 100 % hors-ligne** : Tailwind (compilateur CDN auto-hébergé `public/vendor/tailwind.js`) + 5 polices (Cinzel, EB Garamond, Share Tech Mono, Righteous, Special Elite) en local (`public/fonts/`, 16 woff2). `@import` internet retirés (EliteCounter/Tutorial/LanguageSelect). Vite `base:'./'`.
   - **Chaîne de build portable** (sans Android Studio) dans `D:\android-build-tools` : JDK 17 Temurin + SDK Android (platform-34, build-tools 34, adb). Licences acceptées via fichiers.

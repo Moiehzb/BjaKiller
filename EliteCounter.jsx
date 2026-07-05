@@ -543,6 +543,25 @@ const RANKS_DEF = [
   { id: 6, name: 'Adamantium', color: '#9b59b6', decks: 8, penetration: 85, secPerCard: 0.45, mmrPerWin: 20, mmrPerLoss: -15, mmrToPromo: null, desc: '8 decks · 0.45s/carte — Rang final' },
 ];
 
+// Les noms de rangs restent en français (noms propres, identiques partout).
+// Un petit sous-titre traduit aide les joueurs non francophones à situer le rang.
+// Comme le nom affiché EST déjà le français, on montre l'anglais aux joueurs FR
+// (sinon le sous-titre serait identique au nom) et la langue courante ailleurs.
+const RANK_TL = {
+  Cuivre:     { en: 'Copper',     es: 'Cobre',      de: 'Kupfer' },
+  Argent:     { en: 'Silver',     es: 'Plata',      de: 'Silber' },
+  Or:         { en: 'Gold',       es: 'Oro',        de: 'Gold' },
+  Émeraude:   { en: 'Emerald',    es: 'Esmeralda',  de: 'Smaragd' },
+  Saphir:     { en: 'Sapphire',   es: 'Zafiro',     de: 'Saphir' },
+  Adamantium: { en: 'Adamantium', es: 'Adamantita', de: 'Adamantium' },
+};
+const rankTranscription = (name, lang) => {
+  const row = RANK_TL[name];
+  if (!row) return '';
+  const w = lang === 'fr' ? row.en : (row[lang] || row.en);
+  return w && w !== name ? w : '';
+};
+
 // ─── SUB-RANK SYSTEM ─────────────────────────────────────────────
 // Chaque rang (Cuivre…Adamantium) a 3 sous-rangs (I, II, III) = 18 paliers.
 // Pénétration par sous-rang : I=60%, II=70%, III=80% (identique pour tous les rangs).
@@ -2163,6 +2182,9 @@ export default function EliteCounter() {
                   {t('lobby.currentRank')}
                 </div>
                 <div style={{ fontFamily: 'Cinzel, serif', fontSize: 17, fontWeight: 700 }}>{rankLabel()}</div>
+                {rankTranscription(rank.name, lang) && (
+                  <div style={{ fontFamily: 'EB Garamond, serif', fontStyle: 'italic', fontSize: 12, color: G.textSecondary, marginTop: -1, marginBottom: 1 }}>{rankTranscription(rank.name, lang)}</div>
+                )}
                 {!isMaster && (
                   <>
                     <div className="mmrtrack">
@@ -2439,6 +2461,9 @@ export default function EliteCounter() {
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                         <div style={{ fontFamily: 'Cinzel, serif', fontSize: 16, fontWeight: 700, color: rk.color }}>{rk.name}</div>
+                        {rankTranscription(rk.name, lang) && (
+                          <div style={{ fontFamily: 'EB Garamond, serif', fontStyle: 'italic', fontSize: 11.5, color: G.textSecondary }}>· {rankTranscription(rk.name, lang)}</div>
+                        )}
                         <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: statusColor, border: `1px solid ${statusColor}`, borderRadius: 20, padding: '1px 7px' }}>{status}</div>
                       </div>
                       <div style={{ fontSize: 11, color: G.textSecondary, marginBottom: 8 }}>{t('rankLadder.tiers')}</div>
@@ -2786,7 +2811,12 @@ export default function EliteCounter() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                     <RankSigil color={displayRank.color} size={32} />
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 3 }}>{displayRank.name}</div>
+                      <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 3 }}>
+                        {displayRank.name}
+                        {rankTranscription(displayRank.name, lang) && (
+                          <span style={{ fontFamily: 'EB Garamond, serif', fontStyle: 'italic', fontSize: 12, fontWeight: 400, color: G.textSecondary }}> · {rankTranscription(displayRank.name, lang)}</span>
+                        )}
+                      </div>
                       {placementOngoing ? (
                         <div style={{ fontSize: 11, color: G.gold, marginTop: 3 }}>{t('stats.placementInProgress')}</div>
                       ) : displayRank.id < 6 && (

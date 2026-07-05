@@ -5,6 +5,9 @@
 
 let _ctx = null;
 let _muted = false;
+let _master = null;
+
+const MASTER = 2.5; // volume général plus fort (mobile) ; un limiteur évite la saturation
 
 export const setMuted = (v) => { _muted = v; };
 
@@ -15,13 +18,32 @@ const ac = () => {
   return _ctx;
 };
 
+// Bus de sortie commun : makeup gain fort + limiteur (compresseur agressif) pour
+// pousser le volume sans clipping. Tous les sons s'y connectent au lieu de
+// `ctx.destination`.
+const master = (ctx) => {
+  if (!_master) {
+    const lim = ctx.createDynamicsCompressor();
+    lim.threshold.value = -4;
+    lim.knee.value = 4;
+    lim.ratio.value = 12;
+    lim.attack.value = 0.002;
+    lim.release.value = 0.12;
+    _master = ctx.createGain();
+    _master.gain.value = MASTER;
+    _master.connect(lim);
+    lim.connect(ctx.destination);
+  }
+  return _master;
+};
+
 const rnd = (base, pct = 0.06) => base * (1 + (Math.random() - 0.5) * 2 * pct);
 
 const osc = (ctx, freq, type, vol, t0, dur, freqEnd) => {
   const o = ctx.createOscillator();
   const g = ctx.createGain();
   o.connect(g);
-  g.connect(ctx.destination);
+  g.connect(master(ctx));
   o.type = type;
   o.frequency.setValueAtTime(freq, t0);
   if (freqEnd != null) o.frequency.exponentialRampToValueAtTime(freqEnd, t0 + dur);
@@ -110,7 +132,7 @@ export const playCardFlip = () => {
 
     src.connect(bpf);
     bpf.connect(gain);
-    gain.connect(ctx.destination);
+    gain.connect(master(ctx));
     src.start(t);
     src.stop(t + dur + 0.02);
 

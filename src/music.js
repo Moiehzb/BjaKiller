@@ -9,6 +9,7 @@
 
 const SRC = '/music/le_hall.ogg';
 const DEFAULT_VOL = 0.35; // linéaire, discret sous les SFX
+const BOOST = 1.9;        // gain global (mobile plus fort) — un limiteur évite la saturation
 
 let _ctx = null;
 let _buffer = null;
@@ -29,9 +30,18 @@ const ctx = () => {
 
 const gain = () => {
   if (!_gain) {
-    _gain = ctx().createGain();
-    _gain.gain.value = _muted ? 0 : _volume;
-    _gain.connect(ctx().destination);
+    const c = ctx();
+    _gain = c.createGain();
+    _gain.gain.value = (_muted || _ducked) ? 0 : _volume * BOOST;
+    // Limiteur en sortie : on peut pousser le gain sans risquer le clipping.
+    const lim = c.createDynamicsCompressor();
+    lim.threshold.value = -3;
+    lim.knee.value = 4;
+    lim.ratio.value = 12;
+    lim.attack.value = 0.003;
+    lim.release.value = 0.15;
+    _gain.connect(lim);
+    lim.connect(c.destination);
   }
   return _gain;
 };
@@ -94,7 +104,7 @@ const armGesture = () => {
 const applyGain = () => {
   if (!_gain) return;
   _gain.gain.cancelScheduledValues(ctx().currentTime);
-  _gain.gain.value = (_muted || _ducked) ? 0 : _volume;
+  _gain.gain.value = (_muted || _ducked) ? 0 : _volume * BOOST;
 };
 
 export const playLobbyMusic = () => {
@@ -120,7 +130,7 @@ export const fadeInLobbyMusic = (sec = 1.2) => {
     const g = _gain.gain;
     g.cancelScheduledValues(now);
     g.setValueAtTime(Math.max(0.0001, g.value), now);
-    g.linearRampToValueAtTime(_volume, now + sec);
+    g.linearRampToValueAtTime(_volume * BOOST, now + sec);
   };
   if (c.state === 'running') load().then(run);
   else armGesture(); // 1er lancement : démarrera au geste utilisateur
@@ -158,3 +168,17 @@ export const setMusicVolume = (v) => {
   _volume = Math.max(0, Math.min(1, Number(v) || 0));
   applyGain();
 };
+
+// Quand l'app passe en arrière-plan (bouton Accueil, changement d'app), la
+// WebView Android garde sinon la boucle audio active. On suspend le contexte
+// (position figée) et on le relance au retour au premier plan.
+if (typeof document !== 'undefined') {
+  document.addEventListener('visibilitychange', () => {
+    if (!_ctx) return;
+    if (document.hidden) {
+      try { _ctx.suspend(); } catch {}
+    } else if (_wantPlaying && !_muted) {
+      try { _ctx.resume(); } catch {}
+    }
+  });
+}
