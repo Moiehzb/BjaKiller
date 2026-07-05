@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Play, Pause, X, ChevronRight, ChevronLeft, Eye, EyeOff, AlertTriangle, Globe, Volume2, VolumeX, BookOpen, DoorOpen, Flame, CalendarDays, Sparkles, Award, Gem, BarChart3, ScrollText, Lock, KeyRound } from 'lucide-react';
+import { Play, Pause, X, ChevronRight, ChevronLeft, Eye, EyeOff, AlertTriangle, Globe, Volume2, VolumeX, Music, BookOpen, DoorOpen, Flame, CalendarDays, Sparkles, Award, Gem, BarChart3, ScrollText, Lock, KeyRound } from 'lucide-react';
 import TutorialOverlay from './EliteCounterTutorial.jsx';
 import { makeT, DEFAULT_LANG, getLanguage } from './i18n';
 import { LanguageSelectScreen, LanguageModal, Flag } from './LanguageSelect.jsx';
 import { initAudio, setMuted, playCorrect, playWrong, playChip, playRankUp, playAchievement, playClick, playCountdown, playGo } from './src/sounds.js';
-import { playLobbyMusic, stopLobbyMusic, setMusicMuted } from './src/music.js';
+import { playLobbyMusic, stopLobbyMusic, setMusicMuted, setMusicVolume } from './src/music.js';
 
 // ─── Constants ────────────────────────────────────────────────────
 const CARD_VALUES = {
@@ -1263,6 +1263,7 @@ const DEFAULT_SAVE = {
   trainingDone: false,   // unlocks Ranked after first training card
   rankedDone: false,     // unlocks Casino Killer after first ranked game
   soundEnabled: true,
+  musicVolume: 0.35,     // volume de la musique du lobby (0..1)
 
   // Config Training (persistée entre sessions)
   trainDecks: 1,
@@ -1411,6 +1412,7 @@ export default function EliteCounter() {
     if (nav === 'game') stopLobbyMusic();
     else playLobbyMusic();
   }, [nav]);
+  useEffect(() => { setMusicVolume(save?.musicVolume ?? 0.35); }, [save?.musicVolume]);
 
 
   // patch peut être un objet, ou une fonction (prev) => patch quand le nouveau
@@ -2063,7 +2065,7 @@ export default function EliteCounter() {
   if (!save.tutorialDone) {
     return <TutorialOverlay
       t={t}
-      onComplete={() => patchSave({ tutorialDone: true })}
+      onComplete={() => { patchSave({ tutorialDone: true }); setNav('mode-training'); }}
       onSkip={() => patchSave({ tutorialDone: true, trainingDone: true, rankedDone: true })}
     />;
   }
@@ -2833,6 +2835,25 @@ export default function EliteCounter() {
                   style={{ padding: '6px 14px', background: save.soundEnabled !== false ? 'rgba(201,162,75,.15)' : 'rgba(255,255,255,.05)', border: `1px solid ${save.soundEnabled !== false ? G.borderGold : G.border}`, borderRadius: 6, color: save.soundEnabled !== false ? G.gold : G.textSecondary, cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>
                   {save.soundEnabled !== false ? 'ON' : 'OFF'}
                 </button>
+              </div>
+              {/* Volume de la musique du lobby */}
+              <div style={{ padding: '14px 0', borderBottom: `1px solid ${G.border}`, opacity: save.soundEnabled !== false ? 1 : 0.45 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: G.textPrimary, fontSize: 13 }}>
+                    <Music size={15} color={G.gold} />
+                    <span>{t('settings.music')}</span>
+                  </div>
+                  <span style={{ color: G.textSecondary, fontSize: 12, fontVariantNumeric: 'tabular-nums' }}>
+                    {Math.round((save.musicVolume ?? 0.35) * 100)}%
+                  </span>
+                </div>
+                <input
+                  type="range" min={0} max={100} step={1}
+                  value={Math.round((save.musicVolume ?? 0.35) * 100)}
+                  disabled={save.soundEnabled === false}
+                  onChange={e => patchSave({ musicVolume: Number(e.target.value) / 100 })}
+                  style={{ width: '100%', accentColor: G.gold, cursor: save.soundEnabled === false ? 'default' : 'pointer' }}
+                />
               </div>
               {/* Dev · définir le rang sans passer par le placement */}
               <div style={{ padding: '14px 0', borderBottom: `1px solid ${G.border}` }}>

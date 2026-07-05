@@ -233,6 +233,7 @@ const ru = {
   settings: {
     title: 'Скрипторий',
     sound: 'Звук',
+    music: "Музыка",
     devRankTitle: 'Dev · установить ранг',
     devRankHint: 'Выберите ранг напрямую, минуя Посвящение.',
     reset: 'Удалить прогресс',

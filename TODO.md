@@ -7,11 +7,11 @@
 
 ### Musique
 - [x] **Lobby « Le Seuil »** — ✅ composé (Web Audio, 120 mes., boucle seamless) `music/le-seuil.html` + **mixé et validé dans LMMS** (session 05/07/2026). Projet : `music/Lobby.mmpz` (backup `Lobby.backup.mmpz`). Synth recréé en TripleOscillator natif (les SF2 ne filtrent pas), percu cajón/palmas, basse orgue, flûte reverb, luth. Détails → mémoire `project-music-pipeline-furnace.md` + `LOBBY_RECAP.md` §8.
-- [~] **Intégrer la musique du lobby dans le jeu** — ⚙️ **Code branché** (session 05/07/2026) : module `src/music.js` (`<audio loop>`, démarrage différé au 1er geste, coupé en partie, lié au toggle son) importé dans `EliteCounter.jsx`. Joue sur tous les écrans de menu (`nav !== 'game'`), s'arrête en `game`. **⚠️ Reste à TOI** : exporter `music/Lobby.mmpz` en **OGG** (LMMS : File → Export, format OGG Vorbis) et déposer le fichier sous le nom **`lobby.ogg`** dans **`public/music/`** (voir `public/music/README.txt`). Rien d'autre à coder. Ensuite : vérifier la couture de boucle (fondu si la reverb de fin coupe).
+- [x] **Intégrer la musique du lobby dans le jeu** — ✅ (session 05/07/2026). Fichier `public/music/le_hall.ogg` (mix LMMS). Module `src/music.js` : lecture **Web Audio** (`AudioBufferSourceNode.loop`, pas `<audio loop>`) → boucle échantillon-exact + **rognage du silence en tête/queue** (corrige le « blanc » de boucle). Démarrage différé au 1er geste, coupé en partie (`nav === 'game'`), lié au toggle son. **Volume réglable** (GainNode) : `save.musicVolume` (défaut 0.35) + slider dans le Scriptorium (clé i18n `settings.music` ajoutée aux 14 locales).
 - [ ] **Autres morceaux à composer** : game loop, jingle victoire, jingle défaite. ⚠️ **Nouvelle méthode : composer DIRECT dans LMMS** (MIDI + instruments natifs/SF2), plus de prévisualisation Web Audio — cf. `music/METHODE_COMPOSITION.md`.
 
 ### UX
-- [ ] **Après le tuto → ouvrir directement le mode Training** : à la sortie du tutoriel, envoyer le joueur droit dans Training (ou au minimum un CTA "Commence ici" bien visible) au lieu de le lâcher devant le lobby (mur d'options).
+- [x] **Après le tuto → ouvrir directement le mode Training** — ✅ (05/07/2026) : `onComplete` du tuto first-launch fait `setNav('mode-training')` en plus de `tutorialDone`. (Le skip laisse au lobby, tout débloqué.)
 
 ---
 

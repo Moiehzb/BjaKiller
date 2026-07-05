@@ -210,6 +210,7 @@ const de = {
   settings: {
     title: 'Skriptorium',
     sound: 'Klang',
+    music: "Musik",
     devRankTitle: 'Dev · Rang festlegen',
     devRankHint: 'Wähle einen Rang direkt, ohne die Initiation.',
     reset: 'Fortschritt tilgen',

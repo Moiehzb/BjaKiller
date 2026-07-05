@@ -208,6 +208,7 @@ const hi = {
   settings: {
     title: 'लिपिकागार',
     sound: 'ध्वनि',
+    music: "संगीत",
     devRankTitle: 'Dev · रैंक सेट करें',
     devRankHint: 'दीक्षा को छोड़कर सीधे रैंक चुनें।',
     reset: 'अपनी प्रगति मिटाएं',

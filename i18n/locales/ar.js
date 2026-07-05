@@ -207,6 +207,7 @@ const ar = {
   settings: {
     title: 'السكريبتوريوم',
     sound: 'الصوت',
+    music: "الموسيقى",
     devRankTitle: 'Dev · تعيين الرتبة',
     devRankHint: 'اختر رتبة مباشرة، متجاوزاً التأهيل.',
     reset: 'حذف تقدمك',

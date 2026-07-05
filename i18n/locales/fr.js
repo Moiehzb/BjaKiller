@@ -208,6 +208,7 @@ const fr = {
   settings: {
     title: 'Scriptorium',
     sound: 'Sons',
+    music: "Musique",
     devRankTitle: 'Dev · définir le rang',
     devRankHint: 'Choisis un rang directement, sans passer par l’Initiation.',
     reset: 'Effacer la progression',

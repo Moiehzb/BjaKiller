@@ -208,6 +208,7 @@ const en = {
   settings: {
     title: 'Scriptorium',
     sound: 'Sound',
+    music: "Music",
     devRankTitle: 'Dev · set rank',
     devRankHint: 'Pick a rank directly, skipping the Initiation.',
     reset: 'Erase your progress',

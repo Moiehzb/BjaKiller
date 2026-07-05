@@ -208,6 +208,7 @@ const ko = {
   settings: {
     title: '필경실',
     sound: '소리',
+    music: "음악",
     devRankTitle: 'Dev · 랭크 설정',
     devRankHint: '입문을 건너뛰고 직접 랭크를 선택.',
     reset: '진행 상황 삭제',
