@@ -2032,7 +2032,7 @@
         </pattern>
       </track>
       <track solo="0" type="0" name="Lute" muted="0">
-        <instrumenttrack fxch="0" usemasterpitch="1" vol="165" pitch="0" pitchrange="2" pan="35" basenote="57">
+        <instrumenttrack fxch="0" usemasterpitch="1" vol="200" pitch="0" pitchrange="2" pan="35" basenote="57">
           <instrument name="sf2player">
             <sf2player src="D:/ax2/Musiques/GeneralUser-GS/GeneralUser-GS.sf2" patch="24" gain="1" chorusNum="3" reverbOn="0" chorusLevel="2" chorusOn="0" chorusSpeed="0.3" chorusDepth="8" reverbLevel="0.9" bank="0" reverbWidth="0.5" reverbRoomSize="0.2" reverbDamping="0"/>
           </instrument>
@@ -2055,49 +2055,49 @@
           <note key="56" vol="72" pos="168" len="48" pan="0"/>
         </pattern>
         <pattern steps="12" type="1" pos="960" name="Lute" muted="0">
-          <note key="64" vol="100" pos="120" len="48" pan="0"/>
-          <note key="59" vol="86" pos="144" len="48" pan="0"/>
-          <note key="56" vol="72" pos="168" len="48" pan="0"/>
+          <note key="64" vol="200" pos="120" len="48" pan="0"/>
+          <note key="59" vol="200" pos="144" len="48" pan="0"/>
+          <note key="56" vol="187" pos="168" len="48" pan="0"/>
         </pattern>
         <pattern steps="12" type="1" pos="1536" name="Lute" muted="0">
-          <note key="64" vol="100" pos="120" len="48" pan="0"/>
-          <note key="59" vol="86" pos="144" len="48" pan="0"/>
-          <note key="56" vol="72" pos="168" len="48" pan="0"/>
+          <note key="64" vol="200" pos="120" len="48" pan="0"/>
+          <note key="59" vol="200" pos="144" len="48" pan="0"/>
+          <note key="56" vol="187" pos="168" len="48" pan="0"/>
         </pattern>
         <pattern steps="12" type="1" pos="2112" name="Lute" muted="0">
-          <note key="64" vol="59" pos="144" len="48" pan="0"/>
-          <note key="59" vol="50" pos="156" len="48" pan="0"/>
-          <note key="56" vol="39" pos="168" len="48" pan="0"/>
+          <note key="64" vol="153" pos="144" len="48" pan="0"/>
+          <note key="59" vol="130" pos="156" len="48" pan="0"/>
+          <note key="56" vol="101" pos="168" len="48" pan="0"/>
         </pattern>
         <pattern steps="12" type="1" pos="2688" name="Lute" muted="0">
-          <note key="64" vol="59" pos="144" len="48" pan="0"/>
-          <note key="59" vol="50" pos="156" len="48" pan="0"/>
-          <note key="56" vol="39" pos="168" len="48" pan="0"/>
+          <note key="64" vol="153" pos="144" len="48" pan="0"/>
+          <note key="59" vol="130" pos="156" len="48" pan="0"/>
+          <note key="56" vol="101" pos="168" len="48" pan="0"/>
         </pattern>
         <pattern steps="12" type="1" pos="3264" name="Lute" muted="0">
-          <note key="64" vol="59" pos="144" len="48" pan="0"/>
-          <note key="59" vol="50" pos="156" len="48" pan="0"/>
-          <note key="56" vol="39" pos="168" len="48" pan="0"/>
+          <note key="64" vol="153" pos="144" len="48" pan="0"/>
+          <note key="59" vol="130" pos="156" len="48" pan="0"/>
+          <note key="56" vol="101" pos="168" len="48" pan="0"/>
         </pattern>
         <pattern steps="12" type="1" pos="3840" name="Lute" muted="0">
-          <note key="64" vol="59" pos="144" len="48" pan="0"/>
-          <note key="59" vol="50" pos="156" len="48" pan="0"/>
-          <note key="56" vol="39" pos="168" len="48" pan="0"/>
+          <note key="64" vol="153" pos="144" len="48" pan="0"/>
+          <note key="59" vol="130" pos="156" len="48" pan="0"/>
+          <note key="56" vol="101" pos="168" len="48" pan="0"/>
         </pattern>
         <pattern steps="12" type="1" pos="4416" name="Lute" muted="0">
-          <note key="64" vol="64" pos="144" len="48" pan="0"/>
-          <note key="59" vol="53" pos="156" len="48" pan="0"/>
-          <note key="56" vol="44" pos="168" len="48" pan="0"/>
+          <note key="64" vol="166" pos="144" len="48" pan="0"/>
+          <note key="59" vol="138" pos="156" len="48" pan="0"/>
+          <note key="56" vol="114" pos="168" len="48" pan="0"/>
         </pattern>
         <pattern steps="12" type="1" pos="4992" name="Lute" muted="0">
-          <note key="64" vol="64" pos="144" len="48" pan="0"/>
-          <note key="59" vol="53" pos="156" len="48" pan="0"/>
-          <note key="56" vol="44" pos="168" len="48" pan="0"/>
+          <note key="64" vol="166" pos="144" len="48" pan="0"/>
+          <note key="59" vol="138" pos="156" len="48" pan="0"/>
+          <note key="56" vol="114" pos="168" len="48" pan="0"/>
         </pattern>
         <pattern steps="12" type="1" pos="5568" name="Lute" muted="0">
-          <note key="64" vol="64" pos="144" len="48" pan="0"/>
-          <note key="59" vol="53" pos="156" len="48" pan="0"/>
-          <note key="56" vol="44" pos="168" len="48" pan="0"/>
+          <note key="64" vol="166" pos="144" len="48" pan="0"/>
+          <note key="59" vol="138" pos="156" len="48" pan="0"/>
+          <note key="56" vol="114" pos="168" len="48" pan="0"/>
         </pattern>
         <pattern steps="12" type="1" pos="7488" name="Lute" muted="0">
           <note key="64" vol="39" pos="108" len="48" pan="0"/>
