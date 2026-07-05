@@ -5,19 +5,23 @@
 
 ## 🛠️ Features en attente (backlog)
 
-- [ ] Brancher l'achat des skins support (4,99 €/skin) sur un vrai paiement — aujourd'hui le clic "4,99 €" débloque directement en localStorage (démo). Voir aussi le paywall en fin de roadmap.
-- [x] **Sons in-app** — flip de carte, bonne/mauvaise réponse, victoire/défaite, achat/équipement de skin, clics UI + toggle son dans les réglages. ✅ Fait.
-- [ ] Transformer l'app en APK Android (build mobile installable)
-- [x] **Vibration (haptique)** sur bonne (tap court) / mauvaise (double buzz) réponse — jeu + tuto, toggle dédié dans le Scriptorium (`save.hapticsEnabled`). ✅ Fait.
+### Prochaine grande étape — packaging mobile
+- [ ] **Transformer l'app en APK Android** (build mobile installable). ⚠️ Décide de la techno de paiement : sur le Play Store, les biens numériques doivent passer par **Play Billing** → à faire *avant* de brancher un vrai paiement.
+
+### Monétisation (dépend de l'APK)
+- [ ] Brancher l'achat des artefacts « Le Marchand » (4,99 €/artefact) sur un **vrai paiement** — aujourd'hui le clic "4,99 €" débloque directement en localStorage (démo). Techno = **Play Billing** si APK Android, sinon Stripe/StoreKit selon la plateforme finale.
+
+### Avant publication
+- [ ] Supprimer le code admin `adminmagueule` avant publication
 
 ## 🔮 Fin de roadmap — ne jamais mentionner quand on demande quoi faire
 
-- [ ] Supprimer le code admin `adminmagueule` avant publication
-- [ ] Paywall / système d'achat réel (StoreKit / Play Billing) pour les artefacts payants « Le Marchand » (4,99 €/artefact)
 - [ ] App 2 séparée : mode table réaliste style Card Counter Lite
 
 ## ✅ Fait
 
+- [x] **Sons in-app** — flip de carte, bonne/mauvaise réponse, victoire/défaite, achat/équipement de skin, clics UI + toggle son dans les réglages.
+- [x] **Vibration (haptique)** sur bonne (tap court) / mauvaise (double buzz) réponse — jeu + tuto, toggle dédié dans le Scriptorium (`save.hapticsEnabled`).
 - [x] **Musique du lobby intégrée + tuto→Training — session 05/07/2026**
   - **Compo** : « Le Seuil » composé (Web Audio, 120 mes., boucle seamless) `music/le-seuil.html` puis **mixé et validé dans LMMS** (`music/Lobby.mmpz`, backup `Lobby.backup.mmpz`). Synth TripleOscillator natif (les SF2 ne filtrent pas), percu cajón/palmas, basse orgue, flûte reverb, luth. Détails → mémoire `project-music-pipeline-furnace.md` + `LOBBY_RECAP.md` §8.
   - **Intégration** : export OGG → `public/music/le_hall.ogg`. Module `src/music.js` : lecture **Web Audio** (`AudioBufferSourceNode.loop`, pas `<audio loop>`) → boucle échantillon-exact + **rognage du silence en tête/queue** (corrige le « blanc » de boucle). Démarrage différé au 1er geste, coupée en partie (`nav === 'game'`), liée au toggle son.
