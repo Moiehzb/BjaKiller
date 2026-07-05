@@ -22,29 +22,30 @@ const webVib = (pattern) => {
   } catch {}
 };
 
-// Tap léger — chaque appui sur un bouton du menu. Discret, non fatigant.
+// Intensités globales volontairement basses : retour discret, jamais fatigant.
+
+// Tap léger — chaque appui sur un bouton du menu.
 export const vibrateTap = () => {
   if (!_enabled) return;
   if (NATIVE) { Haptics.impact({ style: ImpactStyle.Light }).catch(() => {}); }
-  else webVib(10);
+  else webVib(6);
 };
 
 // Victoire (bonne réponse) — un tap court et net, satisfaisant.
 export const vibrateWin = () => {
   if (!_enabled) return;
-  if (NATIVE) { Haptics.impact({ style: ImpactStyle.Medium }).catch(() => {}); }
-  else webVib(20);
+  if (NATIVE) { Haptics.impact({ style: ImpactStyle.Light }).catch(() => {}); }
+  else webVib(12);
 };
 
-// Défaite (mauvaise réponse) — buzz plus lourd, nettement distinct.
+// Défaite (mauvaise réponse) — distinct de la victoire, mais doux.
 export const vibrateLose = () => {
   if (!_enabled) return;
   if (NATIVE) {
-    // Notification "warning" = double vibration marquée côté OS.
-    Haptics.notification({ type: NotificationType.Warning }).catch(() => {
-      Haptics.vibrate({ duration: 90 }).catch(() => {});
+    Haptics.impact({ style: ImpactStyle.Medium }).catch(() => {
+      Haptics.vibrate({ duration: 45 }).catch(() => {});
     });
-  } else webVib([45, 60, 90]);
+  } else webVib([18, 40, 25]);
 };
 
 // Coupe une vibration en cours (ex. au démontage).

@@ -562,6 +562,13 @@ const rankTranscription = (name, lang) => {
   return w && w !== name ? w : '';
 };
 
+// Nom du rang dans la langue sélectionnée. Repli sur le nom français d'origine
+// (langues sans traduction, ou fr). On n'affiche plus de sous-titre étranger.
+const localizedRankName = (name, lang) => {
+  if (!lang || lang === 'fr') return name;
+  return RANK_TL[name]?.[lang] || name;
+};
+
 // ─── SUB-RANK SYSTEM ─────────────────────────────────────────────
 // Chaque rang (Cuivre…Adamantium) a 3 sous-rangs (I, II, III) = 18 paliers.
 // Pénétration par sous-rang : I=60%, II=70%, III=80% (identique pour tous les rangs).
@@ -1430,8 +1437,9 @@ export default function EliteCounter() {
   useEffect(() => { setHapticsEnabled(save?.hapticsEnabled !== false); }, [save?.hapticsEnabled]);
 
   // Tap léger sur tout élément cliquable (boutons, cartes de mode, drapeau…).
-  // Délégation globale : on remonte le DOM et on déclenche si le curseur est
-  // "pointer". Hors partie (le jeu a déjà ses propres retours win/lose).
+  // On écoute 'click' (et non 'pointerdown') : un scroll ne produit pas de
+  // click, donc pas de vibration au défilement. On remonte le DOM et on
+  // déclenche si le curseur est "pointer". Hors partie (retours win/lose dédiés).
   useEffect(() => {
     const onTap = (e) => {
       if (nav === 'game') return;
@@ -1443,8 +1451,8 @@ export default function EliteCounter() {
         try { if (getComputedStyle(el).cursor === 'pointer') { vibrateTap(); return; } } catch {}
       }
     };
-    document.addEventListener('pointerdown', onTap, true);
-    return () => document.removeEventListener('pointerdown', onTap, true);
+    document.addEventListener('click', onTap, true);
+    return () => document.removeEventListener('click', onTap, true);
   }, [nav]);
 
   // ── Musique du lobby ───────────────────────────────────────────
@@ -1503,7 +1511,7 @@ export default function EliteCounter() {
   const curRankCfg = getRankConfig(save?.rankId || 1, curSubRank);
   // "Cuivre I", "Adamantium III", … — nom de rang + chiffre romain du sous-rang
   const rankLabel = (rankId = save?.rankId || 1, subRank = curSubRank) =>
-    `${RANKS_DEF[rankId - 1]?.name || ''} ${subRankRoman(subRank)}`;
+    `${localizedRankName(RANKS_DEF[rankId - 1]?.name || '', lang)} ${subRankRoman(subRank)}`;
   // Palier final absolu = Master III (plus de progression possible)
   const isMaxTier = (save?.rankId === 6) && (curSubRank === SUB_RANKS);
 
@@ -2140,7 +2148,7 @@ export default function EliteCounter() {
         <div className="logo">BLACKJACK ACADEMY I</div>
         {!minimal && (
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <div className="pill" style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }} onClick={() => { snd(playClick); setShowRankLadder(true); }}><RankSigil color={displayRank.color} size={13} /> {displayRank.name}</div>
+            <div className="pill" style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }} onClick={() => { snd(playClick); setShowRankLadder(true); }}><RankSigil color={displayRank.color} size={13} /> {localizedRankName(displayRank.name, lang)}</div>
             <div className="pill" style={{ display: 'flex', alignItems: 'center', gap: 5 }}><Coin size={13} /> {save.coins}</div>
           </div>
         )}
@@ -2200,9 +2208,6 @@ export default function EliteCounter() {
                   {t('lobby.currentRank')}
                 </div>
                 <div style={{ fontFamily: 'Cinzel, serif', fontSize: 17, fontWeight: 700 }}>{rankLabel()}</div>
-                {rankTranscription(rank.name, lang) && (
-                  <div style={{ fontFamily: 'EB Garamond, serif', fontStyle: 'italic', fontSize: 12, color: G.textSecondary, marginTop: -1, marginBottom: 1 }}>{rankTranscription(rank.name, lang)}</div>
-                )}
                 {!isMaster && (
                   <>
                     <div className="mmrtrack">
@@ -2478,10 +2483,7 @@ export default function EliteCounter() {
                     <RankSigil color={rk.color} size={30} dim={!isReached && !isCurrent} />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                        <div style={{ fontFamily: 'Cinzel, serif', fontSize: 16, fontWeight: 700, color: rk.color }}>{rk.name}</div>
-                        {rankTranscription(rk.name, lang) && (
-                          <div style={{ fontFamily: 'EB Garamond, serif', fontStyle: 'italic', fontSize: 11.5, color: G.textSecondary }}>· {rankTranscription(rk.name, lang)}</div>
-                        )}
+                        <div style={{ fontFamily: 'Cinzel, serif', fontSize: 16, fontWeight: 700, color: rk.color }}>{localizedRankName(rk.name, lang)}</div>
                         <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: statusColor, border: `1px solid ${statusColor}`, borderRadius: 20, padding: '1px 7px' }}>{status}</div>
                       </div>
                       <div style={{ fontSize: 11, color: G.textSecondary, marginBottom: 8 }}>{t('rankLadder.tiers')}</div>
@@ -2830,10 +2832,7 @@ export default function EliteCounter() {
                     <RankSigil color={displayRank.color} size={32} />
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 3 }}>
-                        {displayRank.name}
-                        {rankTranscription(displayRank.name, lang) && (
-                          <span style={{ fontFamily: 'EB Garamond, serif', fontStyle: 'italic', fontSize: 12, fontWeight: 400, color: G.textSecondary }}> · {rankTranscription(displayRank.name, lang)}</span>
-                        )}
+                        {localizedRankName(displayRank.name, lang)}
                       </div>
                       {placementOngoing ? (
                         <div style={{ fontSize: 11, color: G.gold, marginTop: 3 }}>{t('stats.placementInProgress')}</div>
