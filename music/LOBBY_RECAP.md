@@ -127,6 +127,10 @@ Références analysées (dans `.midi/`, via parser maison — voir méthodologie
 > **On NE logue PAS chaque micro-réglage.** Les valeurs exactes vivent dans le **code** (`le-seuil.html` fait foi). Une session de tweaks = **une** ligne consolidée (« guitare La Marche portée à X, validé »), pas dix.
 > Format : `AAAA-MM-JJ — ce qui change — pourquoi`. Le plus récent en haut.
 
+### 2026-07-05 (soir) — Intégration app câblée (option B) ⚙️ en attente de l'OGG
+- **Code branché** : nouveau module `src/music.js` (`<audio loop>` sur `/music/lobby.ogg`, vol 0.55, démarrage différé au 1er geste utilisateur via listener pointerdown/keydown, coupé en partie, muté par le toggle son existant). Importé dans `EliteCounter.jsx` : play sur tous les écrans de menu, `stop` quand `nav === 'game'`. Build OK.
+- **Reste utilisateur** : exporter `Lobby.mmpz` → **`public/music/lobby.ogg`** (LMMS File → Export, OGG Vorbis). `public/music/README.txt` posé comme rappel. Aucun autre code à toucher.
+
 ### 2026-07-05 (soir) — Mix LMMS terminé et validé ✅ (rendu final)
 - **Rendu final = LMMS**, pas le Web Audio. MIDI (`generate-midi.js`) importé dans **`music/Lobby.mmpz`** (backup `Lobby.backup.mmpz`) ; **on édite le .mmp directement** (jamais réimporter le MIDI → écraserait le mix). Valeurs exactes = le fichier ; know-how + pièges = mémoire `project-music-pipeline-furnace.md`.
 - **Synth** recréé en **TripleOscillator natif** (2 saw ±10c + tri + sub, filtre LP résonant + env) car le **sf2player ne gère NI filtre NI enveloppe**. **Percu** kit GM → **cajón (congas) + palmas**. **Basse** → **orgue Drawbar** (sustain). **Flûte** : fin de note adoucie par **reverb interne** (release impossible). **Luth** : vélocité des NOTES (fader insuffisant), Cloître ajusté, croche mes.56 retirée.

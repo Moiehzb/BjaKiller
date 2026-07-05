@@ -7,7 +7,7 @@
 
 ### Musique
 - [x] **Lobby « Le Seuil »** — ✅ composé (Web Audio, 120 mes., boucle seamless) `music/le-seuil.html` + **mixé et validé dans LMMS** (session 05/07/2026). Projet : `music/Lobby.mmpz` (backup `Lobby.backup.mmpz`). Synth recréé en TripleOscillator natif (les SF2 ne filtrent pas), percu cajón/palmas, basse orgue, flûte reverb, luth. Détails → mémoire `project-music-pipeline-furnace.md` + `LOBBY_RECAP.md` §8.
-- [ ] **Intégrer la musique du lobby dans le jeu** — exporter le projet LMMS en **OGG** (LMMS : File → Export), placer le fichier dans l'app React, le jouer **en boucle** dans le lobby (`<audio loop>` ou Web Audio), **démarrage au 1er clic** (règle navigateur). Vérifier la couture de boucle (fondu si la reverb de fin coupe).
+- [~] **Intégrer la musique du lobby dans le jeu** — ⚙️ **Code branché** (session 05/07/2026) : module `src/music.js` (`<audio loop>`, démarrage différé au 1er geste, coupé en partie, lié au toggle son) importé dans `EliteCounter.jsx`. Joue sur tous les écrans de menu (`nav !== 'game'`), s'arrête en `game`. **⚠️ Reste à TOI** : exporter `music/Lobby.mmpz` en **OGG** (LMMS : File → Export, format OGG Vorbis) et déposer le fichier sous le nom **`lobby.ogg`** dans **`public/music/`** (voir `public/music/README.txt`). Rien d'autre à coder. Ensuite : vérifier la couture de boucle (fondu si la reverb de fin coupe).
 - [ ] **Autres morceaux à composer** : game loop, jingle victoire, jingle défaite. ⚠️ **Nouvelle méthode : composer DIRECT dans LMMS** (MIDI + instruments natifs/SF2), plus de prévisualisation Web Audio — cf. `music/METHODE_COMPOSITION.md`.
 
 ### UX

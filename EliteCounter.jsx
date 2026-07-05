@@ -4,6 +4,7 @@ import TutorialOverlay from './EliteCounterTutorial.jsx';
 import { makeT, DEFAULT_LANG, getLanguage } from './i18n';
 import { LanguageSelectScreen, LanguageModal, Flag } from './LanguageSelect.jsx';
 import { initAudio, setMuted, playCorrect, playWrong, playChip, playRankUp, playAchievement, playClick, playCountdown, playGo } from './src/sounds.js';
+import { playLobbyMusic, stopLobbyMusic, setMusicMuted } from './src/music.js';
 
 // ─── Constants ────────────────────────────────────────────────────
 const CARD_VALUES = {
@@ -1400,8 +1401,16 @@ export default function EliteCounter() {
     const on = save?.soundEnabled !== false;
     soundEnabledRef.current = on;
     setMuted(!on);
+    setMusicMuted(!on);
   }, [save?.soundEnabled]);
   const snd = (fn) => { if (soundEnabledRef.current) fn(); };
+
+  // ── Musique du lobby ───────────────────────────────────────────
+  // Joue en boucle sur tous les écrans de menu ; se coupe en partie.
+  useEffect(() => {
+    if (nav === 'game') stopLobbyMusic();
+    else playLobbyMusic();
+  }, [nav]);
 
 
   // patch peut être un objet, ou une fonction (prev) => patch quand le nouveau
