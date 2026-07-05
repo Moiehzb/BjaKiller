@@ -59,7 +59,7 @@
         <automationtrack/>
       </track>
       <track solo="0" type="0" name="Synth Lead" muted="0">
-        <instrumenttrack fxch="0" usemasterpitch="1" vol="15" pitch="0" pitchrange="2" pan="0" basenote="57">
+        <instrumenttrack fxch="0" usemasterpitch="1" vol="10" pitch="0" pitchrange="2" pan="0" basenote="57">
           <instrument name="tripleoscillator">
             <tripleoscillator finer1="0" userwavefile0="" userwavefile1="" wavetype0="2" userwavefile2="" coarse0="0" modalgo1="2" finel2="0" modalgo3="2" finel1="0" modalgo2="2" finer2="0" stphdetun2="0" pan1="0" wavetype1="1" vol2="13" finel0="-10" vol0="50" coarse2="-12" phoffset2="0" phoffset0="0" coarse1="0" phoffset1="0" stphdetun1="0" vol1="22" pan0="0" stphdetun0="12" pan2="0" finer0="10" wavetype2="1"/>
           </instrument>
@@ -285,7 +285,7 @@
         </pattern>
       </track>
       <track solo="0" type="0" name="Flute" muted="0">
-        <instrumenttrack fxch="0" usemasterpitch="1" vol="100" pitch="0" pitchrange="2" pan="0" basenote="57">
+        <instrumenttrack fxch="0" usemasterpitch="1" vol="80" pitch="0" pitchrange="2" pan="0" basenote="57">
           <instrument name="sf2player">
             <sf2player src="D:/ax2/Musiques/GeneralUser-GS/GeneralUser-GS.sf2" patch="73" gain="1" chorusNum="3" reverbOn="1" chorusLevel="2" chorusOn="0" chorusSpeed="0.3" chorusDepth="8" reverbLevel="0.95" bank="0" reverbWidth="0.7" reverbRoomSize="0.85" reverbDamping="0.1"/>
           </instrument>
@@ -1280,7 +1280,7 @@
         </pattern>
       </track>
       <track solo="0" type="0" name="Guitar" muted="0">
-        <instrumenttrack fxch="0" usemasterpitch="1" vol="100" pitch="0" pitchrange="2" pan="0" basenote="57">
+        <instrumenttrack fxch="0" usemasterpitch="1" vol="80" pitch="0" pitchrange="2" pan="0" basenote="57">
           <instrument name="sf2player">
             <sf2player src="D:/ax2/Musiques/GeneralUser-GS/GeneralUser-GS.sf2" patch="24" gain="1" chorusNum="3" reverbOn="0" chorusLevel="2" chorusOn="0" chorusSpeed="0.3" chorusDepth="8" reverbLevel="0.9" bank="0" reverbWidth="0.5" reverbRoomSize="0.2" reverbDamping="0"/>
           </instrument>
@@ -2032,7 +2032,7 @@
         </pattern>
       </track>
       <track solo="0" type="0" name="Lute" muted="0">
-        <instrumenttrack fxch="0" usemasterpitch="1" vol="180" pitch="0" pitchrange="2" pan="35" basenote="57">
+        <instrumenttrack fxch="0" usemasterpitch="1" vol="180" pitch="0" pitchrange="2" pan="0" basenote="57">
           <instrument name="sf2player">
             <sf2player src="D:/ax2/Musiques/GeneralUser-GS/GeneralUser-GS.sf2" patch="24" gain="1" chorusNum="3" reverbOn="0" chorusLevel="2" chorusOn="0" chorusSpeed="0.3" chorusDepth="8" reverbLevel="0.9" bank="0" reverbWidth="0.5" reverbRoomSize="0.2" reverbDamping="0"/>
           </instrument>
@@ -2100,15 +2100,14 @@
           <note key="56" vol="44" pos="168" len="48" pan="0"/>
         </pattern>
         <pattern steps="12" type="1" pos="7488" name="Lute" muted="0">
-          <note key="64" vol="90" pos="108" len="48" pan="0"/>
+          <note key="64" vol="45" pos="108" len="48" pan="0"/>
         </pattern>
         <pattern steps="12" type="1" pos="7872" name="Lute" muted="0">
-          <note key="64" vol="90" pos="12" len="48" pan="0"/>
-          <note key="64" vol="108" pos="72" len="48" pan="0"/>
-          <note key="67" vol="108" pos="300" len="48" pan="0"/>
-          <note key="64" vol="108" pos="444" len="48" pan="0"/>
-          <note key="67" vol="108" pos="588" len="48" pan="0"/>
-          <note key="64" vol="108" pos="732" len="48" pan="0"/>
+          <note key="64" vol="45" pos="12" len="48" pan="0"/>
+          <note key="67" vol="54" pos="300" len="48" pan="0"/>
+          <note key="64" vol="54" pos="444" len="48" pan="0"/>
+          <note key="67" vol="54" pos="588" len="48" pan="0"/>
+          <note key="64" vol="54" pos="732" len="48" pan="0"/>
         </pattern>
         <pattern steps="12" type="1" pos="14784" name="Lute" muted="0">
           <note key="64" vol="72" pos="120" len="48" pan="0"/>
@@ -2145,7 +2144,7 @@
         </pattern>
       </track>
       <track solo="0" type="0" name="Bass" muted="0">
-        <instrumenttrack fxch="0" usemasterpitch="1" vol="85" pitch="0" pitchrange="2" pan="0" basenote="57">
+        <instrumenttrack fxch="0" usemasterpitch="1" vol="100" pitch="0" pitchrange="2" pan="0" basenote="57">
           <instrument name="sf2player">
             <sf2player src="D:/ax2/Musiques/GeneralUser-GS/GeneralUser-GS.sf2" patch="16" gain="1" chorusNum="3" reverbOn="0" chorusLevel="2" chorusOn="0" chorusSpeed="0.3" chorusDepth="8" reverbLevel="0.9" bank="0" reverbWidth="0.5" reverbRoomSize="0.2" reverbDamping="0"/>
           </instrument>
