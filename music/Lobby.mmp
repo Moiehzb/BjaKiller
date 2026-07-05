@@ -61,7 +61,7 @@
       <track solo="0" type="0" name="Synth Lead" muted="0">
         <instrumenttrack fxch="0" usemasterpitch="1" vol="75" pitch="0" pitchrange="2" pan="0" basenote="57">
           <instrument name="sf2player">
-            <sf2player src="D:/ax2/Musiques/GeneralUser-GS/GeneralUser-GS.sf2" patch="89" gain="1" chorusNum="3" reverbOn="0" chorusLevel="2" chorusOn="0" chorusSpeed="0.3" chorusDepth="8" reverbLevel="0.9" bank="0" reverbWidth="0.5" reverbRoomSize="0.2" reverbDamping="0"/>
+            <sf2player src="D:/ax2/Musiques/GeneralUser-GS/GeneralUser-GS.sf2" patch="82" gain="1" chorusNum="3" reverbOn="0" chorusLevel="2" chorusOn="0" chorusSpeed="0.3" chorusDepth="8" reverbLevel="0.9" bank="0" reverbWidth="0.5" reverbRoomSize="0.2" reverbDamping="0"/>
           </instrument>
           <eldata fcut="14000" ftype="0" fres="0.5" fwet="0">
             <elvol amt="0" userwavefile="" rel="0.1" att="0" latt="0" ctlenvamt="0" lpdel="0" lamt="0" sustain="0.5" x100="0" dec="0.5" hold="0.5" pdel="0" lshp="0" lspd_denominator="4" lspd="0.1" lspd_syncmode="0" lspd_numerator="4"/>
@@ -287,7 +287,7 @@
       <track solo="0" type="0" name="Flute" muted="0">
         <instrumenttrack fxch="0" usemasterpitch="1" vol="100" pitch="0" pitchrange="2" pan="0" basenote="57">
           <instrument name="sf2player">
-            <sf2player src="D:/ax2/Musiques/GeneralUser-GS/GeneralUser-GS.sf2" patch="73" gain="1" chorusNum="3" reverbOn="1" chorusLevel="2" chorusOn="0" chorusSpeed="0.3" chorusDepth="8" reverbLevel="0.8" bank="0" reverbWidth="0.5" reverbRoomSize="0.6" reverbDamping="0.3"/>
+            <sf2player src="D:/ax2/Musiques/GeneralUser-GS/GeneralUser-GS.sf2" patch="73" gain="1" chorusNum="3" reverbOn="1" chorusLevel="2" chorusOn="0" chorusSpeed="0.3" chorusDepth="8" reverbLevel="0.95" bank="0" reverbWidth="0.7" reverbRoomSize="0.85" reverbDamping="0.1"/>
           </instrument>
           <eldata fcut="14000" ftype="0" fres="0.5" fwet="0">
             <elvol amt="0" userwavefile="" rel="0.1" att="0" latt="0" ctlenvamt="0" lpdel="0" lamt="0" sustain="0.5" x100="0" dec="0.5" hold="0.5" pdel="0" lshp="0" lspd_denominator="4" lspd="0.1" lspd_syncmode="0" lspd_numerator="4"/>
