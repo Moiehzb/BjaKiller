@@ -19,6 +19,7 @@ let _muted = false;
 let _volume = DEFAULT_VOL;
 let _wantPlaying = false;
 let _armed = false;
+let _ducked = false; // musique baissée (en partie) mais source toujours vivante
 let _loop = { start: 0, end: 0 };
 
 const ctx = () => {
@@ -89,12 +90,52 @@ const armGesture = () => {
   document.addEventListener('keydown', resume, { once: true });
 };
 
+// Applique le gain « cible » instantanément (utilisé par mute/volume).
+const applyGain = () => {
+  if (!_gain) return;
+  _gain.gain.cancelScheduledValues(ctx().currentTime);
+  _gain.gain.value = (_muted || _ducked) ? 0 : _volume;
+};
+
 export const playLobbyMusic = () => {
   _wantPlaying = true;
   if (_muted) return;
   const c = ctx();
   if (c.state === 'running') load().then(startSource);
   else armGesture();
+};
+
+// La source n'est JAMAIS arrêtée en cours de session : elle boucle en continu,
+// on ne fait que fondre le gain. La musique reprend donc là où elle en était
+// (jamais toujours le même passage), et l'entrée en partie n'est plus abrupte.
+export const fadeInLobbyMusic = (sec = 1.2) => {
+  _wantPlaying = true;
+  _ducked = false;
+  if (_muted) return;
+  const c = ctx();
+  const run = () => {
+    startSource();
+    if (!_gain) return;
+    const now = ctx().currentTime;
+    const g = _gain.gain;
+    g.cancelScheduledValues(now);
+    g.setValueAtTime(Math.max(0.0001, g.value), now);
+    g.linearRampToValueAtTime(_volume, now + sec);
+  };
+  if (c.state === 'running') load().then(run);
+  else armGesture(); // 1er lancement : démarrera au geste utilisateur
+};
+
+// Fond la musique jusqu'au silence sur `sec` (calé sur le décompte) SANS couper
+// la source → position préservée, reprise transparente au retour au lobby.
+export const fadeOutLobbyMusic = (sec = 3) => {
+  _ducked = true;
+  if (!_gain || !_src) return;
+  const now = ctx().currentTime;
+  const g = _gain.gain;
+  g.cancelScheduledValues(now);
+  g.setValueAtTime(Math.max(0.0001, g.value), now);
+  g.linearRampToValueAtTime(0.0001, now + sec);
 };
 
 export const stopLobbyMusic = () => {
@@ -108,12 +149,12 @@ export const stopLobbyMusic = () => {
 
 export const setMusicMuted = (v) => {
   _muted = v;
-  if (_gain) _gain.gain.value = v ? 0 : _volume;
+  applyGain();
   if (v) return;
   if (_wantPlaying && !_src) playLobbyMusic(); // reprise après un-mute
 };
 
 export const setMusicVolume = (v) => {
   _volume = Math.max(0, Math.min(1, Number(v) || 0));
-  if (_gain && !_muted) _gain.gain.value = _volume;
+  applyGain();
 };

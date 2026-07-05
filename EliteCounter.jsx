@@ -4,7 +4,7 @@ import TutorialOverlay from './EliteCounterTutorial.jsx';
 import { makeT, DEFAULT_LANG, getLanguage } from './i18n';
 import { LanguageSelectScreen, LanguageModal, Flag } from './LanguageSelect.jsx';
 import { initAudio, setMuted, playCorrect, playWrong, playChip, playRankUp, playAchievement, playClick, playCountdown, playGo, playCardFlip } from './src/sounds.js';
-import { playLobbyMusic, stopLobbyMusic, setMusicMuted, setMusicVolume } from './src/music.js';
+import { fadeInLobbyMusic, fadeOutLobbyMusic, setMusicMuted, setMusicVolume } from './src/music.js';
 
 // ─── Constants ────────────────────────────────────────────────────
 const CARD_VALUES = {
@@ -1407,10 +1407,12 @@ export default function EliteCounter() {
   const snd = (fn) => { if (soundEnabledRef.current) fn(); };
 
   // ── Musique du lobby ───────────────────────────────────────────
-  // Joue en boucle sur tous les écrans de menu ; se coupe en partie.
+  // Boucle en continu sur tous les écrans de menu. En partie, elle ne s'arrête
+  // pas : on la fond pendant le décompte (~3 s) puis on la relance là où elle
+  // en était au retour au lobby — jamais toujours le même passage.
   useEffect(() => {
-    if (nav === 'game') stopLobbyMusic();
-    else playLobbyMusic();
+    if (nav === 'game') fadeOutLobbyMusic(3);
+    else fadeInLobbyMusic(1.2);
   }, [nav]);
   useEffect(() => { setMusicVolume(save?.musicVolume ?? 0.35); }, [save?.musicVolume]);
 
