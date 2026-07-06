@@ -23,7 +23,9 @@
       "Bash(printf '\\\\n8933bad161af4178b1185d1a37fbf41ea5269c55\\\\nd56f5187479451eabf01fb78af6dfcb131a6481e\\\\n24333f8a63b6825ea9c5514f83c2829b004d1fee\\\\n')",
       "Bash(printf '\\\\n84831b9409646a918e30573bab4c9c91346d8abd\\\\n')",
       "Bash(printf '\\\\n859f317696f67ef3d7f30a50a5560e7834b43903\\\\n')",
-      "PowerShell(.\\\\build-apk.ps1)"
+      "PowerShell(.\\\\build-apk.ps1)",
+      "PowerShell(.\\\\build-apk.ps1 2>&1 | Select-Object -Last 30)",
+      "PowerShell(Get-Item \"D:\\\\CLAUDE CODE CS CODE\\\\Blackjack-Academy.apk\" | Select-Object Name, @{N='Taille\\(Mo\\)';E={[math]::Round\\($_.Length/1MB,1\\)}}, LastWriteTime | Format-List)"
     ]
   },
   "hooks": {
