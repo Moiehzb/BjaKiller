@@ -6,6 +6,7 @@ import { LanguageSelectScreen, LanguageModal, Flag } from './LanguageSelect.jsx'
 import { initAudio, setMuted, playCorrect, playWrong, playChip, playRankUp, playAchievement, playClick, playCountdown, playGo, playCardFlip, playVictory, playDefeat } from './src/sounds.js';
 import { fadeInLobbyMusic, fadeOutLobbyMusic, setMusicMuted, setMusicVolume } from './src/music.js';
 import { setHapticsEnabled, vibrateWin, vibrateLose, vibrateTap } from './src/haptics.js';
+import { App as CapApp } from '@capacitor/app';
 
 // ─── Constants ────────────────────────────────────────────────────
 const CARD_VALUES = {
@@ -2163,10 +2164,11 @@ export default function EliteCounter() {
     }
   };
 
-  // ── Bouton retour physique Android (Capacitor route le back via l'historique
-  //    WebView tant qu'aucun plugin App n'intercepte). On fait « retour » DANS
-  //    l'app au lieu de la quitter : ferme le modal ouvert, sinon revient au lobby.
-  //    Le ref est réassigné à chaque rendu pour toujours lire l'état frais.
+  // ── Bouton retour physique Android (@capacitor/app) ────────────
+  //    Peu importe où on est dans l'app, le retour ne quitte PAS : il ferme
+  //    d'abord un éventuel modal ouvert, sinon il ramène au lobby. On ne quitte
+  //    l'app que si on est déjà au lobby, rien d'ouvert. Le ref est réassigné à
+  //    chaque rendu pour toujours lire l'état frais.
   const androidBackRef = useRef(() => false);
   androidBackRef.current = () => {
     // 1) Modals (du plus imbriqué au moins imbriqué)
@@ -2179,23 +2181,18 @@ export default function EliteCounter() {
     if (showLangModal)        { setShowLangModal(false);    return true; }
     if (showShop)             { setShowShop(false);         return true; }
     if (showSettings)         { setShowSettings(false);     return true; }
-    if (showAbandon)          { setShowAbandon(false); togglePause(); return true; } // = « Continuer »
-    // 2) En jeu → même geste que la croix (confirme l'abandon en ranked, sinon retour lobby)
-    if (nav === 'game')       { handleXButton();            return true; }
-    // 3) Dans un sous-menu → retour lobby
-    if (nav !== 'lobby')      { setNav('lobby');            return true; }
-    // 4) Au lobby, rien d'ouvert → laisse le comportement natif (quitter)
+    if (showAbandon)          { setShowAbandon(false);      return true; }
+    // 2) Partout ailleurs (jeu ou sous-menu) → retour au lobby
+    if (nav !== 'lobby')      { snd(playClick); goBack();   return true; }
+    // 3) Déjà au lobby, rien d'ouvert → laisse quitter l'app
     return false;
   };
   useEffect(() => {
-    // Amorce une entrée d'historique pour que le 1er back soit interceptable.
-    window.history.pushState({ ec: true }, '');
-    const onPop = () => {
-      // Si on a consommé le retour, on re-empile pour rester interceptable.
-      if (androidBackRef.current()) window.history.pushState({ ec: true }, '');
-    };
-    window.addEventListener('popstate', onPop);
-    return () => window.removeEventListener('popstate', onPop);
+    let handle;
+    CapApp.addListener('backButton', () => {
+      if (!androidBackRef.current()) CapApp.exitApp();
+    }).then(h => { handle = h; });
+    return () => { if (handle) handle.remove(); };
   }, []);
 
   if (!save) return <div className="r"><style>{css}</style><div style={{ padding: 40, textAlign: 'center', color: G.textSecondary }}>{t('common.loading')}</div></div>;

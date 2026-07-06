@@ -14,8 +14,8 @@
     <clipPath id="icl"><circle cx="64" cy="64" r="38"/></clipPath>
   </defs>
 
-  <!-- œil placé dans la zone de sûreté de l'adaptive icon (~63 %) -->
-  <g transform="translate(153.6 153.6) scale(5.6)">
+  <!-- œil placé dans la zone de sûreté de l'adaptive icon, zoomé (centré 512,512) -->
+  <g transform="translate(128 128) scale(6.0)">
     <!-- globe -->
     <g clip-path="url(#ec)"><rect x="6" y="12" width="116" height="104" fill="url(#ir)"/></g>
 
