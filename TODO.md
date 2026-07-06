@@ -5,16 +5,14 @@
 
 ## 🛠️ Features en attente (backlog)
 
-### ⏳ En attente d'un retour de l'utilisateur (après test de l'APK sur son Android)
-- [ ] **Réglage du volume** : boost posé « à l'aveugle » (SFX ×2.5 = `MASTER` dans `src/sounds.js`, musique ×1.9 = `BOOST` dans `src/music.js`). À ajuster selon son ressenti sur mobile.
-- [ ] **Langue de la transcription des rangs** : actuellement anglais pour les FR (Copper/Silver/…). Confirmer ou changer (rien en FR ? autre ?). Table `RANK_TL` dans `EliteCounter.jsx`.
-- [ ] **Débogage USB** : proposé pour installer les MàJ en 3 s via `adb install -r` (voir [[project-android-apk]]) au lieu de retransférer le fichier. Pas encore activé côté téléphone.
-- [ ] L'utilisateur avait annoncé « plusieurs changements » — d'autres retours possibles après ce lot.
-
-### Monétisation (dépend de l'APK)
-- [ ] Brancher l'achat des artefacts « Le Marchand » (4,99 €/artefact) sur un **vrai paiement** — aujourd'hui le clic "4,99 €" débloque directement en localStorage (démo). Techno = **Play Billing** si APK Android, sinon Stripe/StoreKit selon la plateforme finale.
-
-### Avant publication
+### Publication Play Store — étapes manuelles (utilisateur)
+Le code du paywall est branché (Play Billing). Pour que les achats fonctionnent réellement, il faut configurer la Google Play Console :
+- [ ] Créer un **compte développeur Google Play** (25 $ une fois) sur play.google.com/console
+- [ ] Créer l'app dans la console (`com.blackjackacademy.app`)
+- [ ] Générer un **keystore de signature** + builder un **AAB signé** (`bundleRelease`) — l'APK debug actuel ne peut pas être uploadé
+- [ ] Uploader l'AAB en piste **test interne** (les achats in-app exigent un build uploadé sur Play)
+- [ ] Créer les **10 produits in-app** (non consommables, 4,99 €) avec les IDs **exacts** : `sp_steampunk`, `sp_cyber`, `sp_vapor`, `sp_eldritch`, `sp_norse`, `sp_synth`, `sp_noir`, `sp_cosmos`, `sp_bio`, `sp_graffiti`
+- [ ] Ajouter son compte Google en **testeur de licence** (achats de test sans être débité)
 - [ ] Supprimer le code admin `adminmagueule` avant publication
 
 ## 🔮 Fin de roadmap — ne jamais mentionner quand on demande quoi faire
@@ -23,6 +21,14 @@
 
 ## ✅ Fait
 
+- [x] **Paywall réel « Le Marchand » — Google Play Billing (session 06/07/2026)**
+  - Plugin `cordova-plugin-purchase@13.17.2` (Play Billing Library 9) intégré via Capacitor.
+  - Module `src/billing.js` : init du store, 10 produits non consommables (IDs = ids des skins `sp_*`), achat → feuille de paiement Google Play, déblocage **uniquement** après confirmation Google (`approved` → unlock + equip + `finish()`/acknowledge), resynchronisation des achats possédés au démarrage (réinstallation/changement d'appareil), prix **localisés** du Play Store affichés dans la boutique et le modal (fallback « 4,99 € » tant que le store n'a pas répondu).
+  - Bouton **« Restaurer mes achats »** sous la liste du Marchand (natif uniquement).
+  - Sur navigateur/desktop (dev) : déblocage démo localStorage conservé (`billingIsNative()` === false).
+  - i18n : clé `shop.restore` ajoutée + `shop.forge` passé en prix dynamique `{price}` — 14 locales.
+  - ⚠️ Achats non testables tant que l'app n'est pas sur la Play Console (voir étapes manuelles ci-dessus).
+- [x] **Retours post-install APK — validés par l'utilisateur le 06/07/2026** (volume, transcription des rangs, musique arrière-plan, vibrations, icône — plus rien en attente)
 - [x] **Retours post-install APK — session 06/07/2026**
   - **Musique coupée en arrière-plan** : `music.js` suspend l'AudioContext sur `visibilitychange` (la WebView Android gardait la boucle active), reprise au retour au 1er plan.
   - **Volume général monté** : bus master + limiteur (DynamicsCompressor anti-clipping) — SFX ×2.5 (`sounds.js`), musique ×1.9 (`music.js`).

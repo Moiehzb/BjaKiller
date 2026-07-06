@@ -150,7 +150,8 @@ const es = {
       'Contador… he oído hablar de ti. Estos artefactos no son para cualquiera — pero contigo haré una excepción. 4,99 € la pieza. Pagado una vez, tuyo para siempre. Sin suscripción — nunca paso dos veces por el mismo camino.',
     preview: 'Examinar',
     price499: '4,99 €',
-    forge: 'Adquirir — 4,99 €',
+    forge: 'Adquirir — {price}',
+    restore: 'Restaurar compras',
     tagline: {
       sp_steampunk: 'Steampunk · engranajes y vapor',
       sp_cyber: 'Cyberpunk · hex 02-09, figuras K Q J T',

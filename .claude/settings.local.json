@@ -29,7 +29,9 @@
       "Bash(ls android/app/src/main/res/mipmap-anydpi-v26/)",
       "Bash(ls node_modules/sharp/package.json)",
       "Bash(ls node_modules/@capacitor/assets)",
-      "Bash(npx @capacitor/assets generate --android)"
+      "Bash(npx @capacitor/assets generate --android)",
+      "PowerShell(npm ls *)",
+      "PowerShell(powershell -ExecutionPolicy Bypass -File \"D:\\\\CLAUDE CODE CS CODE\\\\build-apk.ps1\")"
     ]
   },
   "hooks": {

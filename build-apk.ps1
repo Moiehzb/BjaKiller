@@ -19,6 +19,11 @@ npx cap sync android
 Write-Host "== 3/3  Build APK (Gradle) ==" -ForegroundColor Cyan
 Set-Location "$root\android"
 .\gradlew.bat assembleDebug
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "`nEchec Gradle (code $LASTEXITCODE) — APK non copie." -ForegroundColor Red
+    Set-Location $root
+    exit 1
+}
 
 $apk = "$root\android\app\build\outputs\apk\debug\app-debug.apk"
 if (Test-Path $apk) {

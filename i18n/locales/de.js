@@ -152,7 +152,8 @@ const de = {
       'Zähler… ich habe von dir gehört. Diese Artefakte sind nicht für jedermann — aber für dich mache ich eine Ausnahme. 4,99 € das Stück. Einmal bezahlt, für immer dein. Kein Abo — ich komme nie zweimal denselben Weg.',
     preview: 'Begutachten',
     price499: '4,99 €',
-    forge: 'Erwerben — 4,99 €',
+    forge: 'Erwerben — {price}',
+    restore: 'Käufe wiederherstellen',
     tagline: {
       sp_steampunk: 'Steampunk · Zahnräder & Dampf',
       sp_cyber: 'Cyberpunk · Hex 02-09, Bilder K Q J T',

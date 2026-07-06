@@ -150,7 +150,8 @@ const sq = {
       'Numërues… kam dëgjuar për ju. Këto artefakte nuk janë për të gjithë — por për ju, do të bëj një përjashtim. €4.99 secili. Paguhet njëherë, i juaji përgjithmonë. Pa abonim — nuk kaloj kurrë dy herë të njëjtën rrugë.',
     preview: 'Shiko',
     price499: '€4.99',
-    forge: 'Merr — €4.99',
+    forge: 'Merr — {price}',
+    restore: 'Rikthe blerjet',
     tagline: {
       sp_steampunk: 'Steampunk · ingranazhe dhe avull',
       sp_cyber: 'Cyberpunk · hex 02-09, figura K Q J T',

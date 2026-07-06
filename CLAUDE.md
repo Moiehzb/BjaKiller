@@ -70,6 +70,15 @@ Musiques **codées à la main** en Web Audio API (fichiers `.html` autonomes dan
 - Si une tâche est confirmée faite → la déplacer dans la section ✅ Fait
 - En début de session, si l'utilisateur demande "y'a quoi à faire ?", lire `TODO.md` et répondre directement
 
+## Paywall — Google Play Billing
+Achats réels des artefacts du Marchand via `cordova-plugin-purchase` (Play Billing), module `src/billing.js`.
+- **Produits** : 10 non-consommables, product IDs Play Console = ids des skins (`sp_steampunk`, `sp_cyber`, …)
+- **Natif** (`billingIsNative()`) : clic « Acquérir » → feuille Google Play ; déblocage uniquement via callback `onPurchased` (approved → `finish()` = acknowledge). Achats possédés resynchronisés au démarrage (`onEntitled`). Prix localisés du store affichés (fallback `shop.price499`).
+- **Web/dev** : déblocage démo direct en localStorage (comme avant).
+- Bouton « Restaurer mes achats » (`shop.restore`) sous la liste du Marchand, natif uniquement.
+- ⚠️ Les achats ne marchent qu'avec l'app uploadée sur la Play Console (produits créés + testeur de licence) — étapes dans `TODO.md`.
+- Android : compileSdk/targetSdk 35, AGP 8.7.2, Gradle 8.11.1 (exigés par la Play Billing Library 9).
+
 ## Backlog prioritaire
-1. Paywall 4,99 € par artefact (localStorage en démo — UI « Le Marchand » prête, logique de paiement à brancher)
+1. Publication Play Store (keystore + AAB signé + config console — étapes manuelles dans `TODO.md`)
 2. App 2 séparée : mode table réaliste style Card Counter Lite

@@ -6,6 +6,7 @@ import { LanguageSelectScreen, LanguageModal, Flag } from './LanguageSelect.jsx'
 import { initAudio, setMuted, playCorrect, playWrong, playChip, playRankUp, playAchievement, playClick, playCountdown, playGo, playCardFlip, playVictory, playDefeat } from './src/sounds.js';
 import { fadeInLobbyMusic, fadeOutLobbyMusic, setMusicMuted, setMusicVolume } from './src/music.js';
 import { setHapticsEnabled, vibrateWin, vibrateLose, vibrateTap } from './src/haptics.js';
+import { billingIsNative, initBilling, orderArtefact, restorePurchases } from './src/billing.js';
 import { App as CapApp } from '@capacitor/app';
 
 // ─── Constants ────────────────────────────────────────────────────
@@ -1152,7 +1153,7 @@ const PREVIEW_CARDS = [
   { rank: '4',  suitName: 'diamonds' },
 ];
 
-const SupportPreviewModal = ({ skin, owned, active, onClose, onBuy, onEquip, t }) => {
+const SupportPreviewModal = ({ skin, owned, active, onClose, onBuy, onEquip, t, price }) => {
   const [idx, setIdx] = useState(0);
   useEffect(() => {
     const t = setInterval(() => setIdx(i => (i + 1) % PREVIEW_CARDS.length), 1100);
@@ -1178,7 +1179,7 @@ const SupportPreviewModal = ({ skin, owned, active, onClose, onBuy, onEquip, t }
             ? <span style={{ flex: 1, padding: '11px', background: skin.accent, borderRadius: 9, color: '#0d0a1a', fontWeight: 700, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{t('common.equipped')}</span>
             : owned
               ? <button onClick={() => { onEquip(); onClose(); }} style={{ flex: 1, padding: '11px', background: G.green, border: 'none', borderRadius: 9, color: '#0d0a1a', fontWeight: 700, cursor: 'pointer', fontSize: 13 }}>{t('common.equip')}</button>
-              : <button onClick={() => { onBuy(); onClose(); }} style={{ flex: 1, padding: '11px', background: 'linear-gradient(135deg,#8a6820,#e8c97a,#8a6820)', border: '1px solid #e8c97a', borderRadius: 9, color: '#0d0a1a', fontWeight: 700, cursor: 'pointer', fontSize: 13 }}>{t('shop.forge')}</button>}
+              : <button onClick={() => { onBuy(); onClose(); }} style={{ flex: 1, padding: '11px', background: 'linear-gradient(135deg,#8a6820,#e8c97a,#8a6820)', border: '1px solid #e8c97a', borderRadius: 9, color: '#0d0a1a', fontWeight: 700, cursor: 'pointer', fontSize: 13 }}>{t('shop.forge', { price })}</button>}
         </div>
       </div>
     </div>
@@ -1431,6 +1432,7 @@ export default function EliteCounter() {
   // ── modals
   const [showShop, setShowShop] = useState(false);
   const [previewSkin, setPreviewSkin] = useState(null);
+  const [storePrices, setStorePrices] = useState({}); // prix Play Store localisés {sp_xxx: '4,99 €'}
   const [showChallenges, setShowChallenges] = useState(false);
   const [showAchievement, setShowAchievement] = useState(null);
   const [toastLeaving, setToastLeaving] = useState(false);
@@ -1524,6 +1526,24 @@ export default function EliteCounter() {
   // patch peut être un objet, ou une fonction (prev) => patch quand le nouveau
   // patch doit lire l'état déjà modifié dans le même tick (ex. cumuler des coins).
   const patchSave = (patch) => setSave(prev => ({ ...prev, ...(typeof patch === 'function' ? patch(prev) : patch) }));
+
+  // ── Le Marchand — Google Play Billing (natif uniquement) ────────
+  // Init après le chargement du save (les callbacks patchent eliteSave).
+  // Achat frais → débloque + équipe ; possédé (restore/réinstall) → débloque.
+  const billingInitRef = useRef(false);
+  useEffect(() => {
+    if (!save || billingInitRef.current || !billingIsNative()) return;
+    billingInitRef.current = true;
+    const unlock = (id, equip) => patchSave(prev => prev.unlockedSkins.includes(id)
+      ? {}
+      : { unlockedSkins: [...prev.unlockedSkins, id], ...(equip ? { activeSkin: id } : {}) });
+    initBilling(SUPPORT_SKINS.map(s => s.id), {
+      onPurchased: (id) => { snd(playChip); unlock(id, true); },
+      onEntitled: (id) => unlock(id, false),
+      onPrices: setStorePrices,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [save]);
 
   // ── i18n ──────────────────────────────────────────────────────
   const lang = save?.lang || DEFAULT_LANG;
@@ -2665,8 +2685,13 @@ export default function EliteCounter() {
               {SUPPORT_SKINS.map(sk => {
                 const owned = save.unlockedSkins.includes(sk.id);
                 const active = save.activeSkin === sk.id;
-                const buy = () => patchSave({ unlockedSkins: [...save.unlockedSkins, sk.id], activeSkin: sk.id });
+                // Natif : feuille de paiement Google Play, déblocage via onPurchased.
+                // Web (dev) : déblocage démo direct en localStorage.
+                const buy = () => billingIsNative()
+                  ? orderArtefact(sk.id)
+                  : patchSave({ unlockedSkins: [...save.unlockedSkins, sk.id], activeSkin: sk.id });
                 const equip = () => patchSave({ activeSkin: sk.id });
+                const price = storePrices[sk.id] || t('shop.price499');
                 return (
                   <div key={sk.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 0', borderBottom: `1px solid ${G.border}`, opacity: owned ? 1 : 0.85 }}>
                     <div style={{ position: 'relative', width: 40, height: 56, borderRadius: 6, overflow: 'hidden', border: `2px solid ${active ? sk.accent : G.border}`, flexShrink: 0 }}>
@@ -2675,7 +2700,7 @@ export default function EliteCounter() {
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 1, color: owned ? sk.accent : G.textPrimary }}>{sk.name}</div>
-                      <div style={{ fontSize: 12, color: G.textSecondary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{owned ? t('shop.tagline.' + sk.id) : t('shop.price499')}</div>
+                      <div style={{ fontSize: 12, color: G.textSecondary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{owned ? t('shop.tagline.' + sk.id) : price}</div>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
                       <button onClick={() => { snd(playClick); setPreviewSkin(sk); }}
@@ -2684,11 +2709,17 @@ export default function EliteCounter() {
                         ? <span style={{ fontSize: 11, color: '#0d0a1a', background: sk.accent, borderRadius: 6, padding: '4px 10px', fontWeight: 700, letterSpacing: '.04em' }}>{t('common.equipped')}</span>
                         : owned
                           ? <button style={{ fontSize: 11, color: '#0d0a1a', background: G.green, border: 'none', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', fontWeight: 700 }} onClick={() => { snd(playClick); equip(); }}>{t('common.equip')}</button>
-                          : <button style={{ fontSize: 11, color: '#0d0a1a', background: '#e8c97a', border: 'none', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', fontWeight: 700 }} onClick={() => { snd(playClick); buy(); }}>{t('shop.price499')}</button>}
+                          : <button style={{ fontSize: 11, color: '#0d0a1a', background: '#e8c97a', border: 'none', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', fontWeight: 700 }} onClick={() => { snd(playClick); buy(); }}>{price}</button>}
                     </div>
                   </div>
                 );
               })}
+              {billingIsNative() && (
+                <button onClick={() => { snd(playClick); restorePurchases(); }}
+                  style={{ marginTop: 16, width: '100%', padding: '9px', background: 'transparent', border: `1px solid ${G.border}`, borderRadius: 8, color: G.textMuted, cursor: 'pointer', fontFamily: 'Cinzel, serif', fontSize: 10.5, letterSpacing: '.18em', textTransform: 'uppercase' }}>
+                  {t('shop.restore')}
+                </button>
+              )}
             </div>
           </div>
         )}
@@ -2697,10 +2728,13 @@ export default function EliteCounter() {
           <SupportPreviewModal
             skin={previewSkin}
             t={t}
+            price={storePrices[previewSkin.id] || t('shop.price499')}
             owned={save.unlockedSkins.includes(previewSkin.id)}
             active={save.activeSkin === previewSkin.id}
             onClose={() => setPreviewSkin(null)}
-            onBuy={() => patchSave({ unlockedSkins: [...save.unlockedSkins, previewSkin.id], activeSkin: previewSkin.id })}
+            onBuy={() => billingIsNative()
+              ? orderArtefact(previewSkin.id)
+              : patchSave({ unlockedSkins: [...save.unlockedSkins, previewSkin.id], activeSkin: previewSkin.id })}
             onEquip={() => patchSave({ activeSkin: previewSkin.id })}
           />
         )}

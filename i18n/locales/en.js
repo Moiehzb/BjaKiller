@@ -150,7 +150,8 @@ const en = {
       'Counter… I have heard of you. These artifacts are not for everyone — but for you, I shall make an exception. €4.99 apiece. Paid once, yours forever. No subscription — I never pass the same way twice.',
     preview: 'Examine',
     price499: '€4.99',
-    forge: 'Acquire — €4.99',
+    forge: 'Acquire — {price}',
+    restore: 'Restore purchases',
     tagline: {
       sp_steampunk: 'Steampunk · gears & steam',
       sp_cyber: 'Cyberpunk · hex 02-09, faces K Q J T',
