@@ -2171,6 +2171,9 @@ export default function EliteCounter() {
   //    chaque rendu pour toujours lire l'état frais.
   const androidBackRef = useRef(() => false);
   androidBackRef.current = () => {
+    // 0) Écrans pré-app (rendus en early-return) → retour au lobby
+    if (showTutorialReplay)   { setShowTutorialReplay(false); setNav('lobby'); return true; }
+    if (save && !save.tutorialDone) { patchSave({ tutorialDone: true }); setNav('lobby'); return true; }
     // 1) Modals (du plus imbriqué au moins imbriqué)
     if (showResetConfirm)     { setShowResetConfirm(false); return true; }
     if (previewSkin)          { setPreviewSkin(null);       return true; }
