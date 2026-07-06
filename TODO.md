@@ -5,15 +5,24 @@
 
 ## 🛠️ Features en attente (backlog)
 
-### Publication Play Store — étapes manuelles (utilisateur)
-Le code du paywall est branché (Play Billing). Pour que les achats fonctionnent réellement, il faut configurer la Google Play Console :
-- [ ] Créer un **compte développeur Google Play** (25 $ une fois) sur play.google.com/console
-- [ ] Créer l'app dans la console (`com.blackjackacademy.app`)
-- [ ] Générer un **keystore de signature** + builder un **AAB signé** (`bundleRelease`) — l'APK debug actuel ne peut pas être uploadé
-- [ ] Uploader l'AAB en piste **test interne** (les achats in-app exigent un build uploadé sur Play)
-- [ ] Créer les **10 produits in-app** (non consommables, 4,99 €) avec les IDs **exacts** : `sp_steampunk`, `sp_cyber`, `sp_vapor`, `sp_eldritch`, `sp_norse`, `sp_synth`, `sp_noir`, `sp_cosmos`, `sp_bio`, `sp_graffiti`
-- [ ] Ajouter son compte Google en **testeur de licence** (achats de test sans être débité)
-- [ ] Supprimer le code admin `adminmagueule` avant publication
+### Publication Play Store — tester les achats à 4,99 € sans payer (checklist, dans l'ordre)
+Le code du paywall est branché (Play Billing). Les achats ne marchent **que** via une app connue de la Play Console, installée depuis le Play Store. Le mécanisme « testeur de licence » permet de tester avec le vrai prix affiché mais une carte de test (jamais débité).
+
+**Étapes utilisateur (manuelles) :**
+- [ ] 1. Créer un **compte développeur Google Play** (25 $ une fois) sur play.google.com/console — vérification d'identité par Google : compter 1–2 jours. *(À lancer en premier, c'est le seul vrai délai.)*
+- [ ] 2. Créer le **profil de paiement marchand** (Console → Paramètres) — obligatoire pour vendre des produits payants (c'est là que Google verse les revenus)
+- [ ] 3. Créer l'app dans la console : « Blackjack Academy I », package `com.blackjackacademy.app`
+- [ ] 4. Uploader l'**AAB signé** en piste **Test interne** (l'AAB est préparé par Claude, voir plus bas — dispo en quelques minutes, pas de review complète)
+- [ ] 5. Créer les **10 produits in-app** (Monétiser → Produits → Produits intégrés) : **non consommables**, **4,99 €**, IDs **exacts** : `sp_steampunk`, `sp_cyber`, `sp_vapor`, `sp_eldritch`, `sp_norse`, `sp_synth`, `sp_noir`, `sp_cosmos`, `sp_bio`, `sp_graffiti` — puis les **activer**
+- [ ] 6. S'ajouter en **testeur de licence** (Console, page d'accueil → Paramètres → Test de licence → son Gmail) → la feuille de paiement affichera 4,99 € avec « Carte de test, toujours approuvée »
+- [ ] 7. S'ajouter aussi en **testeur interne** de l'app, ouvrir le lien d'opt-in, **installer depuis le Play Store** (⚠️ pas l'APK debug transféré à la main — les achats n'y marcheront pas)
+- [ ] 8. Tester : achat d'un artefact (prix affiché 4,99 €, paiement test), puis « Restaurer mes achats » après désinstall/réinstall
+- 💡 Re-tester un achat déjà fait : le rembourser dans la console (Gestion des commandes → Rembourser) → l'app le reverra comme non possédé
+
+**Étapes Claude (demander quand prêt — « go keystore ») :**
+- [ ] Générer le **keystore de signature** release (⚠️ à sauvegarder précieusement : perdu = plus aucune MàJ possible de l'app)
+- [ ] Configurer la signature release dans Gradle + builder l'**AAB** (`bundleRelease`) prêt à uploader
+- [ ] Supprimer le code admin `adminmagueule` avant publication publique
 
 ## 🔮 Fin de roadmap — ne jamais mentionner quand on demande quoi faire
 
