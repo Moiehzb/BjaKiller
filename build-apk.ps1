@@ -20,7 +20,7 @@ Write-Host "== 3/3  Build APK (Gradle) ==" -ForegroundColor Cyan
 Set-Location "$root\android"
 .\gradlew.bat assembleDebug
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "`nEchec Gradle (code $LASTEXITCODE) — APK non copie." -ForegroundColor Red
+    Write-Host "`nEchec Gradle (code $LASTEXITCODE) - APK non copie." -ForegroundColor Red
     Set-Location $root
     exit 1
 }
