@@ -27,6 +27,7 @@ Le code du paywall est branché (Play Billing). Pour que les achats fonctionnent
   - Bouton **« Restaurer mes achats »** sous la liste du Marchand (natif uniquement).
   - Sur navigateur/desktop (dev) : déblocage démo localStorage conservé (`billingIsNative()` === false).
   - i18n : clé `shop.restore` ajoutée + `shop.forge` passé en prix dynamique `{price}` — 14 locales.
+  - **Projet Android mis à niveau** (exigé par la Billing Library 9, et par le Play Store pour publier) : compileSdk/targetSdk 34→35, minSdk 22→23 (perd Android 5 uniquement), AGP 8.2.1→8.7.2, Gradle 8.2.1→8.11.1, platform-35 installée dans `D:\android-build-tools`. `build-apk.ps1` corrigé (ne copie plus un vieil APK quand Gradle échoue). Build APK OK (14,5 Mo).
   - ⚠️ Achats non testables tant que l'app n'est pas sur la Play Console (voir étapes manuelles ci-dessus).
 - [x] **Retours post-install APK — validés par l'utilisateur le 06/07/2026** (volume, transcription des rangs, musique arrière-plan, vibrations, icône — plus rien en attente)
 - [x] **Retours post-install APK — session 06/07/2026**
