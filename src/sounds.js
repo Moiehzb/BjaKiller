@@ -65,8 +65,9 @@ export const playClick = () => {
   try {
     const ctx = ac();
     const t = ctx.currentTime;
-    osc(ctx, rnd(310, 0.1), 'sine', 0.22, t, 0.026);
-    osc(ctx, rnd(180, 0.1), 'sine', 0.12, t, 0.034);
+    // volume boutons de menu abaissé de 15% (0.22→0.187 / 0.12→0.102)
+    osc(ctx, rnd(310, 0.1), 'sine', 0.187, t, 0.026);
+    osc(ctx, rnd(180, 0.1), 'sine', 0.102, t, 0.034);
   } catch {}
 };
 

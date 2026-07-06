@@ -2163,6 +2163,41 @@ export default function EliteCounter() {
     }
   };
 
+  // ── Bouton retour physique Android (Capacitor route le back via l'historique
+  //    WebView tant qu'aucun plugin App n'intercepte). On fait « retour » DANS
+  //    l'app au lieu de la quitter : ferme le modal ouvert, sinon revient au lobby.
+  //    Le ref est réassigné à chaque rendu pour toujours lire l'état frais.
+  const androidBackRef = useRef(() => false);
+  androidBackRef.current = () => {
+    // 1) Modals (du plus imbriqué au moins imbriqué)
+    if (showResetConfirm)     { setShowResetConfirm(false); return true; }
+    if (previewSkin)          { setPreviewSkin(null);       return true; }
+    if (showRankLadder)       { setShowRankLadder(false);   return true; }
+    if (showPlacementHistory) { setShowPlacementHistory(false); return true; }
+    if (showStats)            { setShowStats(false);        return true; }
+    if (showChallenges)       { setShowChallenges(false);   return true; }
+    if (showLangModal)        { setShowLangModal(false);    return true; }
+    if (showShop)             { setShowShop(false);         return true; }
+    if (showSettings)         { setShowSettings(false);     return true; }
+    if (showAbandon)          { setShowAbandon(false); togglePause(); return true; } // = « Continuer »
+    // 2) En jeu → même geste que la croix (confirme l'abandon en ranked, sinon retour lobby)
+    if (nav === 'game')       { handleXButton();            return true; }
+    // 3) Dans un sous-menu → retour lobby
+    if (nav !== 'lobby')      { setNav('lobby');            return true; }
+    // 4) Au lobby, rien d'ouvert → laisse le comportement natif (quitter)
+    return false;
+  };
+  useEffect(() => {
+    // Amorce une entrée d'historique pour que le 1er back soit interceptable.
+    window.history.pushState({ ec: true }, '');
+    const onPop = () => {
+      // Si on a consommé le retour, on re-empile pour rester interceptable.
+      if (androidBackRef.current()) window.history.pushState({ ec: true }, '');
+    };
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
+
   if (!save) return <div className="r"><style>{css}</style><div style={{ padding: 40, textAlign: 'center', color: G.textSecondary }}>{t('common.loading')}</div></div>;
 
   // ── First launch: pick a language BEFORE the tutorial ──────────
