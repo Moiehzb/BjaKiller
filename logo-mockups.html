@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Blackjack Academy — Pistes de logo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=EB+Garamond:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bgDeep:#0d0a1a; --bgCard:#13102a; --bgPanel:#1a1535; --purpleMid:#2d2060;
+    --border:#2e2654; --borderGold:#4a3a1d;
+    --gold:#c9a24b; --goldLight:#e8c97a; --goldDark:#8a6820;
+    --amber:#d4813a; --teal:#2dd4bf;
+    --textPrimary:#f0e6cc; --textSecondary:#a896c8; --textMuted:#5c4f7a;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:radial-gradient(ellipse at top,#1a1535,var(--bgDeep) 70%);
+    min-height:100vh; font-family:'EB Garamond',serif; color:var(--textPrimary);
+    -webkit-font-smoothing:antialiased; padding:48px 24px 80px;
+  }
+  .wrap{max-width:1180px;margin:0 auto}
+  header{text-align:center;margin-bottom:14px}
+  h1{
+    font-family:'Cinzel',serif; font-weight:700; letter-spacing:.14em;
+    text-transform:uppercase; font-size:26px; margin:0 0 8px;
+    color:var(--goldLight);
+  }
+  .sub{color:var(--textSecondary); font-size:15px; max-width:640px; margin:0 auto; line-height:1.55}
+  .legend{
+    text-align:center; color:var(--textMuted); font-size:12.5px; letter-spacing:.06em;
+    text-transform:uppercase; margin:22px 0 34px;
+  }
+  .grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:26px}
+  .card{
+    background:var(--bgCard); border:1px solid var(--border); border-radius:16px;
+    padding:26px 24px 28px; display:flex; flex-direction:column; align-items:center; text-align:center;
+  }
+  /* ── tuile d'icône (superellipse iOS ≈ 22 %) ── */
+  .tile{
+    width:196px; height:196px; border-radius:44px; flex-shrink:0;
+    background:radial-gradient(ellipse at 32% 24%, #1a1535 0%, #0d0a1a 72%);
+    border:1px solid rgba(201,162,75,.35);
+    box-shadow:inset 0 1px 0 rgba(232,201,122,.18),
+               inset 0 0 42px rgba(45,32,96,.55),
+               0 14px 36px rgba(0,0,0,.55);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .tile svg{width:150px;height:150px;display:block}
+  .hint{color:var(--gold);font-size:12px;letter-spacing:.04em;margin:14px 0 2px;opacity:.85}
+  /* ── bande de scalabilité ── */
+  .strip{display:flex;align-items:flex-end;gap:12px;margin:16px 0 4px;min-height:76px}
+  .mini{
+    border-radius:22%;
+    background:radial-gradient(ellipse at 32% 24%, #1a1535 0%, #0d0a1a 74%);
+    border:1px solid rgba(201,162,75,.3);
+    box-shadow:inset 0 1px 0 rgba(232,201,122,.14), 0 4px 12px rgba(0,0,0,.45);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .mini svg{width:76%;height:76%;display:block}
+  .sizes{color:var(--textMuted);font-size:11px;letter-spacing:.14em;margin-bottom:20px}
+  .idx{
+    font-family:'Cinzel',serif;font-size:12px;letter-spacing:.3em;color:var(--goldDark);
+    margin-top:4px;
+  }
+  h2{
+    font-family:'Cinzel',serif;font-weight:600;font-size:19px;margin:6px 0 4px;color:var(--textPrimary);
+    display:flex;align-items:center;gap:9px;justify-content:center;flex-wrap:wrap;
+  }
+  .reco{
+    font-family:'EB Garamond',serif;text-transform:uppercase;letter-spacing:.12em;font-size:10px;
+    color:var(--bgDeep);background:linear-gradient(135deg,var(--goldLight),var(--gold));
+    padding:3px 9px;border-radius:20px;font-weight:700;
+  }
+  .concept{color:var(--textPrimary);font-size:15px;line-height:1.5;margin:4px 0 10px;max-width:360px}
+  .why{color:var(--textSecondary);font-size:14px;line-height:1.55;margin:0;max-width:360px}
+  .why b{color:var(--gold);font-weight:600}
+  footer{text-align:center;color:var(--textMuted);font-size:13px;margin-top:52px;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Blackjack Academy — Pistes de logo</h1>
+    <p class="sub">Cinq directions pour l'icône, dessinées dans le langage de l'app :
+      trait d'or sur violet profond, formes à facettes, zéro emoji.
+      Art transparent composé sur une vraie tuile d'icône.</p>
+  </header>
+  <p class="legend">Chaque piste testée de 72 px jusqu'à 26 px (taille favicon)</p>
+
+  <div class="grid">
+
+    <!-- 01 -->
+    <article class="card">
+      <div class="tile"><svg viewBox="0 0 128 128"><use href="#ic1"/></svg></div>
+      <div class="hint">Pupille&nbsp;♠ · cadran de comptage · repères&nbsp;+/−</div>
+      <div class="strip" data-icon="ic1"></div>
+      <div class="sizes">72 · 52 · 36 · 26&nbsp;px</div>
+      <div class="idx">01</div>
+      <h2>L'Œil du Compteur <span class="reco">Recommandé</span></h2>
+      <p class="concept">Un œil en trait d'or, pupille en pique, cerné d'un cadran gradué.</p>
+      <p class="why">Hyper <b>distinctif</b> — impossible à confondre avec une app casino. Colle au thème « société secrète » : compter, c'est <b>voir</b> le count. Silhouette forte qui survit au monochrome et aux petites tailles.</p>
+    </article>
+
+    <!-- 02 -->
+    <article class="card">
+      <div class="tile"><svg viewBox="0 0 128 128"><use href="#ic2"/></svg></div>
+      <div class="hint">Sceau · sigil de rang (RankSigil) · « I » d'Academy</div>
+      <div class="strip" data-icon="ic2"></div>
+      <div class="sizes">72 · 52 · 36 · 26&nbsp;px</div>
+      <div class="idx">02</div>
+      <h2>Le Sceau de la Guilde</h2>
+      <p class="concept">Un médaillon-sceau de cire, sigil de compteur au centre, « I » romain.</p>
+      <p class="why">La <b>valeur sûre</b> : lecture immédiate « académie/guilde », premium et intemporel. Réutilise ton <b>RankSigil</b> existant. Un emblème vieillit toujours bien.</p>
+    </article>
+
+    <!-- 03 -->
+    <article class="card">
+      <div class="tile"><svg viewBox="0 0 128 128"><use href="#ic3"/></svg></div>
+      <div class="hint">As de pique · « 21 » gravé en négatif dans le pique</div>
+      <div class="strip" data-icon="ic3"></div>
+      <div class="sizes">72 · 52 · 36 · 26&nbsp;px</div>
+      <div class="idx">03</div>
+      <h2>L'As de Pique-Grimoire</h2>
+      <p class="concept">Un seul pique doré ; le « 21 » caché dans son négatif, index « A♠ ».</p>
+      <p class="why">Ancré <b>blackjack</b> sans cliché Vegas — un seul symbole noble et sombre, pas d'éventail de cartes. Le « 21 » gravé = le hook malin. Très lisible.</p>
+    </article>
+
+    <!-- 04 -->
+    <article class="card">
+      <div class="tile"><svg viewBox="0 0 128 128"><use href="#ic4"/></svg></div>
+      <div class="hint">Symbole ± Hi-Lo dans le « 0 » (true count), cadre alchimique</div>
+      <div class="strip" data-icon="ic4"></div>
+      <div class="sizes">72 · 52 · 36 · 26&nbsp;px</div>
+      <div class="idx">04</div>
+      <h2>Le Glyphe Hi-Lo</h2>
+      <p class="concept">Un « ± » gravé au cœur d'un zéro, enchâssé dans un losange alchimique.</p>
+      <p class="why">Parle de la <b>méthode</b> (le comptage Hi-Lo : +1 / −1 / 0), pas juste « cartes ». Ultra-ownable, moderne, mystique. Le plus abstrait des cinq.</p>
+    </article>
+
+    <!-- 05 -->
+    <article class="card">
+      <div class="tile"><svg viewBox="0 0 128 128"><use href="#ic5"/></svg></div>
+      <div class="hint">Lettrine Cinzel « A » · pique niché dans le contre-poinçon</div>
+      <div class="strip" data-icon="ic5"></div>
+      <div class="sizes">72 · 52 · 36 · 26&nbsp;px</div>
+      <div class="idx">05</div>
+      <h2>L'Initiale Enluminée</h2>
+      <p class="concept">Un « A » Cinzel traité en lettrine d'enluminure, pique glissé dans la lettre.</p>
+      <p class="why">Dark academia pur, <b>cohérent avec ta typo</b> Cinzel. Décline parfaitement en monogramme/favicon. Variante « XXI » (21) possible en un swap.</p>
+    </article>
+
+  </div>
+
+  <footer>
+    Fichier autonome — palette & SVG repris de <code>EliteCounter.jsx</code> (Coin, RankSigil, Merchant).<br>
+    Dis-moi la piste retenue : je la finalise et je génère le jeu d'icônes (iOS/Android + favicon).
+  </footer>
+</div>
+
+<!-- ══════════ Définitions SVG (symbols + dégradés) ══════════ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="goldGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e8c97a"/>
+      <stop offset="0.5" stop-color="#c9a24b"/>
+      <stop offset="1" stop-color="#8a6820"/>
+    </linearGradient>
+
+    <!-- pique réutilisable (viewBox 0..100) -->
+    <symbol id="spade" viewBox="0 0 100 100">
+      <path d="M50 18 C50 18 24 40 24 58 C24 70 33 76 42 72 C42 78 39 84 33 88 L67 88 C61 84 58 78 58 72 C67 76 76 70 76 58 C76 40 50 18 50 18 Z" fill="currentColor"/>
+    </symbol>
+
+    <!-- ── 01 · L'Œil du Compteur ── -->
+    <symbol id="ic1" viewBox="0 0 128 128">
+      <circle cx="64" cy="64" r="58" fill="none" stroke="#4a3a1d" stroke-width="2"/>
+      <path d="M22 64 Q64 26 106 64 Q64 102 22 64 Z" fill="none" stroke="#c9a24b" stroke-width="3" stroke-linejoin="round"/>
+      <circle cx="64" cy="64" r="25" fill="none" stroke="#e8c97a" stroke-width="1.4" stroke-dasharray="1.5 5" opacity="0.75"/>
+      <circle cx="64" cy="64" r="20" fill="none" stroke="#c9a24b" stroke-width="1.5"/>
+      <g color="#c9a24b"><use href="#spade" transform="translate(44,44.8) scale(0.4)"/></g>
+      <g stroke="#c9a24b" stroke-width="2.4" stroke-linecap="round">
+        <path d="M25 64 H35"/>
+        <path d="M93 64 H103 M98 59 V69"/>
+      </g>
+    </symbol>
+
+    <!-- ── 02 · Le Sceau de la Guilde ── -->
+    <symbol id="ic2" viewBox="0 0 128 128">
+      <circle cx="64" cy="64" r="58" fill="none" stroke="#c9a24b" stroke-width="2.2"/>
+      <circle cx="64" cy="64" r="54.5" fill="none" stroke="#e8c97a" stroke-width="1.4" stroke-dasharray="1.5 5" opacity="0.6"/>
+      <circle cx="64" cy="64" r="51" fill="none" stroke="#4a3a1d" stroke-width="1.4"/>
+      <path d="M64 26 L100 52 L86 95 L42 95 L28 52 Z" fill="#c9a24b" fill-opacity="0.12" stroke="#c9a24b" stroke-width="2.4" stroke-linejoin="round"/>
+      <path d="M64 40 L87 57 L78 83 L50 83 L41 57 Z" fill="#c9a24b" fill-opacity="0.28" stroke="#c9a24b" stroke-width="1.2" stroke-linejoin="round"/>
+      <g fill="#e8c97a">
+        <rect x="60" y="47" width="8" height="34" rx="1"/>
+        <rect x="52" y="45" width="24" height="5" rx="1.5"/>
+        <rect x="52" y="78" width="24" height="5" rx="1.5"/>
+      </g>
+    </symbol>
+
+    <!-- ── 03 · L'As de Pique-Grimoire ── -->
+    <symbol id="ic3" viewBox="0 0 128 128">
+      <rect x="16" y="16" width="96" height="96" rx="13" fill="none" stroke="#4a3a1d" stroke-width="1.3"/>
+      <!-- index coin haut-gauche -->
+      <text x="28" y="34" font-family="Cinzel,serif" font-weight="700" font-size="15" fill="#c9a24b" text-anchor="middle">A</text>
+      <g color="#c9a24b"><use href="#spade" transform="translate(23.5,36) scale(0.09)"/></g>
+      <!-- index coin bas-droite (retourné) -->
+      <g transform="rotate(180 64 64)">
+        <text x="28" y="34" font-family="Cinzel,serif" font-weight="700" font-size="15" fill="#c9a24b" text-anchor="middle">A</text>
+        <g color="#c9a24b"><use href="#spade" transform="translate(23.5,36) scale(0.09)"/></g>
+      </g>
+      <!-- grand pique -->
+      <path d="M50 18 C50 18 24 40 24 58 C24 70 33 76 42 72 C42 78 39 84 33 88 L67 88 C61 84 58 78 58 72 C67 76 76 70 76 58 C76 40 50 18 50 18 Z"
+            transform="translate(18.3,11.6) scale(0.914)" fill="url(#goldGrad)" stroke="#8a6820" stroke-width="1.4"/>
+      <!-- 21 gravé en négatif -->
+      <text x="64" y="72" font-family="Cinzel,serif" font-weight="700" font-size="27" fill="#0d0a1a" text-anchor="middle" dominant-baseline="central">21</text>
+    </symbol>
+
+    <!-- ── 04 · Le Glyphe Hi-Lo (±) ── -->
+    <symbol id="ic4" viewBox="0 0 128 128">
+      <path d="M64 10 L118 64 L64 118 L10 64 Z" fill="none" stroke="#c9a24b" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="M64 20 L108 64 L64 108 L20 64 Z" fill="none" stroke="#4a3a1d" stroke-width="1.2" stroke-linejoin="round"/>
+      <g fill="#c9a24b"><circle cx="64" cy="10" r="2.4"/><circle cx="118" cy="64" r="2.4"/><circle cx="64" cy="118" r="2.4"/><circle cx="10" cy="64" r="2.4"/></g>
+      <circle cx="64" cy="64" r="30" fill="none" stroke="#e8c97a" stroke-width="1" opacity="0.28"/>
+      <g fill="url(#goldGrad)" stroke="#8a6820" stroke-width="0.8">
+        <rect x="60" y="40" width="8" height="38" rx="1.5"/>
+        <rect x="44" y="54" width="40" height="8" rx="1.5"/>
+        <rect x="44" y="80" width="40" height="8" rx="1.5"/>
+      </g>
+    </symbol>
+
+    <!-- ── 05 · L'Initiale Enluminée ── -->
+    <symbol id="ic5" viewBox="0 0 128 128">
+      <rect x="14" y="14" width="100" height="100" rx="16" fill="#13102a" stroke="#c9a24b" stroke-width="2"/>
+      <rect x="20" y="20" width="88" height="88" rx="12" fill="none" stroke="#4a3a1d" stroke-width="1"/>
+      <g fill="none" stroke="#c9a24b" stroke-width="1.6" stroke-linecap="round">
+        <path d="M24 42 Q24 24 42 24"/>
+        <path d="M86 24 Q104 24 104 42"/>
+        <path d="M104 86 Q104 104 86 104"/>
+        <path d="M42 104 Q24 104 24 86"/>
+      </g>
+      <text x="64" y="66" font-family="Cinzel,serif" font-weight="700" font-size="78" fill="url(#goldGrad)" stroke="#8a6820" stroke-width="0.6" text-anchor="middle" dominant-baseline="central">A</text>
+      <g color="#c9a24b"><use href="#spade" transform="translate(54,72) scale(0.2)"/></g>
+    </symbol>
+  </defs>
+</svg>
+
+<script>
+  // Bande de scalabilité : chaque icône rendue à plusieurs tailles.
+  var SIZES = [72, 52, 36, 26];
+  document.querySelectorAll('.strip').forEach(function (strip) {
+    var id = strip.getAttribute('data-icon');
+    SIZES.forEach(function (s) {
+      var d = document.createElement('div');
+      d.className = 'mini';
+      d.style.width = s + 'px';
+      d.style.height = s + 'px';
+      d.innerHTML = '<svg viewBox="0 0 128 128"><use href="#' + id + '"/></svg>';
+      strip.appendChild(d);
+    });
+  });
+</script>
+</body>
+</html>
