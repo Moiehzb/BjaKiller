@@ -378,6 +378,66 @@ const Merchant = ({ size = 46 }) => (
   </svg>
 );
 
+// ─── Logo de l'app — l'Œil du Compteur (le blackjack se reflète dans l'iris) ──
+// Œil géant : deux ronds forment l'iris (anneau + cadran gradué), la main As+10
+// se reflète dedans, jetons Hi-Lo (+1 / −1) collés aux cartes.
+const AppLogo = ({ size = 30 }) => {
+  const SPADE = "M50 18 C50 18 24 40 24 58 C24 70 33 76 42 72 C42 78 39 84 33 88 L67 88 C61 84 58 78 58 72 C67 76 76 70 76 58 C76 40 50 18 50 18 Z";
+  return (
+    <svg width={size} height={size} viewBox="0 0 128 128" aria-hidden="true" style={{ display: 'block', flexShrink: 0 }}>
+      <defs>
+        <linearGradient id="alGold" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#e8c97a" />
+          <stop offset="0.5" stopColor="#c9a24b" />
+          <stop offset="1" stopColor="#8a6820" />
+        </linearGradient>
+        <radialGradient id="alIris" cx="42%" cy="36%" r="75%">
+          <stop offset="0" stopColor="#2a1f52" />
+          <stop offset="0.6" stopColor="#160f30" />
+          <stop offset="1" stopColor="#0b0818" />
+        </radialGradient>
+        <clipPath id="alEyeClip"><path d="M2 64 Q64 8 126 64 Q64 120 2 64 Z" /></clipPath>
+        <clipPath id="alIrisClip"><circle cx="64" cy="64" r="40" /></clipPath>
+      </defs>
+      {/* globe de l'œil */}
+      <g clipPath="url(#alEyeClip)">
+        <rect x="2" y="8" width="124" height="112" fill="url(#alIris)" />
+      </g>
+      {/* iris : reflet + cartes + jetons, borné par le cercle de l'iris */}
+      <g clipPath="url(#alIrisClip)">
+        <circle cx="64" cy="64" r="40" fill="#120c28" />
+        {/* carte As */}
+        <g transform="rotate(-11 64 92)">
+          <rect x="46" y="38" width="36" height="52" rx="4" fill="#f4ecd6" stroke="#c9a24b" strokeWidth="1.6" />
+          <text x="53" y="48" fontFamily="Cinzel,serif" fontWeight="700" fontSize="10" fill="#14102a" textAnchor="middle" dominantBaseline="central">A</text>
+          <path d={SPADE} transform="translate(52.57,51.88) scale(0.2286)" fill="#14102a" />
+        </g>
+        {/* carte 10 */}
+        <g transform="rotate(11 64 92)">
+          <rect x="46" y="38" width="36" height="52" rx="4" fill="#f4ecd6" stroke="#c9a24b" strokeWidth="1.6" />
+          <text x="55" y="48" fontFamily="Cinzel,serif" fontWeight="700" fontSize="9" fill="#14102a" textAnchor="middle" dominantBaseline="central">10</text>
+          <path d={SPADE} transform="translate(52.57,51.88) scale(0.2286)" fill="#14102a" />
+        </g>
+        {/* jeton −1 collé à la carte gauche */}
+        <circle cx="36" cy="62" r="9" fill="#2d2060" stroke="#c9a24b" strokeWidth="1.4" />
+        <text x="36" y="63" fontFamily="Cinzel,serif" fontWeight="700" fontSize="9" fill="#e8c97a" textAnchor="middle" dominantBaseline="central">−1</text>
+        {/* jeton +1 collé à la carte droite */}
+        <circle cx="92" cy="62" r="9" fill="url(#alGold)" stroke="#8a6820" strokeWidth="1.2" />
+        <text x="92" y="63" fontFamily="Cinzel,serif" fontWeight="700" fontSize="9" fill="#14102a" textAnchor="middle" dominantBaseline="central">+1</text>
+        {/* reflets brillants */}
+        <ellipse cx="49" cy="45" rx="11" ry="6" fill="#ffffff" opacity="0.20" transform="rotate(-22 49 45)" />
+        <ellipse cx="82" cy="80" rx="5" ry="3" fill="#ffffff" opacity="0.12" transform="rotate(-22 82 80)" />
+      </g>
+      {/* les deux ronds de l'iris */}
+      <circle cx="64" cy="64" r="46" fill="none" stroke="#e8c97a" strokeWidth="1.5" strokeDasharray="1.6 6" opacity="0.7" />
+      <circle cx="64" cy="64" r="40" fill="none" stroke="#c9a24b" strokeWidth="2.6" />
+      {/* paupières */}
+      <path d="M2 64 Q64 8 126 64 Q64 120 2 64 Z" fill="none" stroke="#c9a24b" strokeWidth="3.2" strokeLinejoin="round" />
+      <path d="M12 60 Q64 20 116 60" fill="none" stroke="#c9a24b" strokeWidth="1" opacity="0.3" />
+    </svg>
+  );
+};
+
 // ─── CHALLENGES — Geometry Dash style: hard, short, retry-friendly ────
 // coins: reward credited on unlock, matched to a specific skin price.
 const CHALLENGES = [
@@ -2139,7 +2199,10 @@ export default function EliteCounter() {
   const renderHeader = (minimal = false, showTutoBtn = false) => (
     <div className="hd">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div className="logo">BLACKJACK ACADEMY I</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+          <AppLogo size={30} />
+          <div className="logo">BLACKJACK ACADEMY I</div>
+        </div>
         {!minimal && (
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
             <div className="pill" style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }} onClick={() => { snd(playClick); setShowRankLadder(true); }}><RankSigil color={displayRank.color} size={13} /> {displayRank.name}</div>

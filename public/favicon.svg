@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <defs>
+    <radialGradient id="bg" cx="32%" cy="24%" r="90%">
+      <stop offset="0" stop-color="#1a1535" />
+      <stop offset="0.72" stop-color="#0d0a1a" />
+    </radialGradient>
+    <linearGradient id="alGold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e8c97a" />
+      <stop offset="0.5" stop-color="#c9a24b" />
+      <stop offset="1" stop-color="#8a6820" />
+    </linearGradient>
+    <radialGradient id="alIris" cx="42%" cy="36%" r="75%">
+      <stop offset="0" stop-color="#2a1f52" />
+      <stop offset="0.6" stop-color="#160f30" />
+      <stop offset="1" stop-color="#0b0818" />
+    </radialGradient>
+    <clipPath id="alEyeClip"><path d="M6 64 Q64 12 122 64 Q64 116 6 64 Z" /></clipPath>
+    <clipPath id="alIrisClip"><circle cx="64" cy="64" r="38" /></clipPath>
+  </defs>
+
+  <rect width="128" height="128" rx="28" fill="url(#bg)" />
+
+  <g clip-path="url(#alEyeClip)">
+    <rect x="6" y="12" width="116" height="104" fill="url(#alIris)" />
+  </g>
+
+  <g clip-path="url(#alIrisClip)">
+    <circle cx="64" cy="64" r="38" fill="#120c28" />
+    <g transform="rotate(-11 64 90)">
+      <rect x="47" y="40" width="34" height="48" rx="4" fill="#f4ecd6" stroke="#c9a24b" stroke-width="1.6" />
+      <text x="54" y="49" font-family="Cinzel,serif" font-weight="700" font-size="10" fill="#14102a" text-anchor="middle" dominant-baseline="central">A</text>
+      <path d="M50 18 C50 18 24 40 24 58 C24 70 33 76 42 72 C42 78 39 84 33 88 L67 88 C61 84 58 78 58 72 C67 76 76 70 76 58 C76 40 50 18 50 18 Z" transform="translate(53.29,51.88) scale(0.2143)" fill="#14102a" />
+    </g>
+    <g transform="rotate(11 64 90)">
+      <rect x="47" y="40" width="34" height="48" rx="4" fill="#f4ecd6" stroke="#c9a24b" stroke-width="1.6" />
+      <text x="55" y="49" font-family="Cinzel,serif" font-weight="700" font-size="9" fill="#14102a" text-anchor="middle" dominant-baseline="central">10</text>
+      <path d="M50 18 C50 18 24 40 24 58 C24 70 33 76 42 72 C42 78 39 84 33 88 L67 88 C61 84 58 78 58 72 C67 76 76 70 76 58 C76 40 50 18 50 18 Z" transform="translate(53.29,51.88) scale(0.2143)" fill="#14102a" />
+    </g>
+    <circle cx="38" cy="62" r="8.5" fill="#2d2060" stroke="#c9a24b" stroke-width="1.4" />
+    <text x="38" y="63" font-family="Cinzel,serif" font-weight="700" font-size="9" fill="#e8c97a" text-anchor="middle" dominant-baseline="central">−1</text>
+    <circle cx="90" cy="62" r="8.5" fill="url(#alGold)" stroke="#8a6820" stroke-width="1.2" />
+    <text x="90" y="63" font-family="Cinzel,serif" font-weight="700" font-size="9" fill="#14102a" text-anchor="middle" dominant-baseline="central">+1</text>
+    <ellipse cx="49" cy="46" rx="10" ry="5.5" fill="#ffffff" opacity="0.20" transform="rotate(-22 49 46)" />
+  </g>
+
+  <circle cx="64" cy="64" r="44" fill="none" stroke="#e8c97a" stroke-width="1.5" stroke-dasharray="1.6 6" opacity="0.7" />
+  <circle cx="64" cy="64" r="38" fill="none" stroke="#c9a24b" stroke-width="2.6" />
+  <path d="M6 64 Q64 12 122 64 Q64 116 6 64 Z" fill="none" stroke="#c9a24b" stroke-width="3.2" stroke-linejoin="round" />
+  <path d="M15 60 Q64 22 113 60" fill="none" stroke="#c9a24b" stroke-width="1" opacity="0.3" />
+</svg>
