@@ -1,4 +1,4 @@
-// ─── हिन्दी ────────────────────────────────────────────────────────
+﻿// ─── हिन्दी ────────────────────────────────────────────────────────
 // Mirror of fr.js — keep the key structure identical across locales.
 // संपादकीय स्वर: संयमित, दीक्षात्मक — काउंटर्स की गुप्त अकादमी।
 // अनुवाद न होने वाले उचित संज्ञाएं: रैंक (Cuivre…Adamantium), स्किन, उपलब्धियां।
@@ -43,6 +43,7 @@ const hi = {
   modeName: {
     training: 'अध्ययन कक्ष', ranked: 'गिल्ड के द्वार', promo: 'पदोन्नति',
     placement: 'दीक्षा', casino: 'परीक्षण', daily: 'दैनिक अनुष्ठान',
+    speedrun: 'तूफ़ान', quiz: 'पहचान',
   },
 
   ranks: {
@@ -95,6 +96,7 @@ const hi = {
     dailyDoneWin: ({ score }) => `✓ पूर्ण · ${score} अंक`,
     dailyDoneLoss: '✗ असफल',
     dailyComeBack: 'कल वापस आएं',
+    dailyLocked: 'सील — पहले दीक्षा पूरी करें',
     settings: 'लिपिकागार',
     settingsSub: 'विकल्प · रीसेट',
     currentStreak: ({ streak }) => `वर्तमान क्रम: ${streak}`,
@@ -291,6 +293,8 @@ const hi = {
     countdownPromo: 'पदोन्नति',
     countdownPlacement: ({ n, total }) => `दीक्षा ${n}/${total}`,
     countdownTraining: 'अध्ययन कक्ष',
+    countdownSpeedrun: 'तूफ़ान',
+    countdownQuiz: 'पहचान',
     countdownRanked: 'गिल्ड के द्वार',
     go: 'गिनें',
     cardsTime: ({ cards, tl }) => `${cards} पत्ते · ${tl}से`,
@@ -331,6 +335,10 @@ const hi = {
     abandonBody1: 'छोड़ना हार के रूप में गिना जाएगा।',
     abandonMmr: '−25 MMR',
     abandonBody2: ' तुरंत काट लिए जाएंगे।',
+    tapCard: 'अगले कार्ड के लिए टैप करें',
+    speedrunResult: ({ time }) => `समय: ${time}s`,
+    speedrunBest: ({ time }) => `रिकॉर्ड: ${time}s`,
+    speedrunNewBest: 'नया रिकॉर्ड!',
     abandon: 'छोड़ें',
   },
 
@@ -344,15 +352,34 @@ const hi = {
   },
 
   challenges: {
-    frame_perfect: { name: 'Frame Perfect', desc: '1 डेक — 0.40से/पत्ता या कठिन — गणना बंद' },
-    no_mercy: { name: 'No Mercy', desc: 'पहली बार में Or → Émeraude द्वार पार करें — गणना बंद' },
-    the_wall: { name: 'The Wall', desc: '6 डेक — 90%+ प्रवेश — 0.50से/पत्ता या कम — गणना बंद' },
-    blind_run: { name: 'Blind Run', desc: '8 डेक — 0.45से/पत्ता या कठिन — गणना बंद' },
-    iron_streak: { name: 'Iron Streak', desc: '10 लगातार जीत — औसत 0.55से/पत्ता या कम — गणना बंद' },
-    full_burn: { name: 'Full Burn', desc: '8 डेक — 95%+ प्रवेश — गणना बंद' },
-    casino_complete: { name: 'Casino Ready', desc: 'परीक्षण पूरी तरह पूरा करें' },
+    frame_perfect: { name: 'Kairos', desc: '1 डेक — 0.40से/पत्ता या कठिन — गणना बंद' },
+    flash: { name: 'Fulgur', desc: '2 डेक · 50% प्रवेश · 52 पत्ते · 25 सेकंड से कम — काउंटर बंद' },
+    the_wall: { name: 'अभेद्य', desc: '6 डेक — 90%+ प्रवेश — 0.50से/पत्ता या कम — गणना बंद' },
+    blind_run: { name: 'पारगमन', desc: '8 डेक — 0.45से/पत्ता या कठिन — गणना बंद' },
+    iron_streak: { name: 'श्रृंखला', desc: '10 लगातार जीत — औसत 0.55से/पत्ता या कम — गणना बंद' },
+    full_burn: { name: 'महाज्वाला', desc: '8 डेक — 95%+ प्रवेश — गणना बंद' },
+    casino_complete: { name: 'अभिलाषी', desc: 'परीक्षण पूरी तरह पूरा करें' },
   },
 
+
+  trainingSubMode: {
+    title: 'अध्ययन कक्ष', sub: 'अभ्यास का मार्ग चुनें',
+    standardTitle: 'लोहशाला', standardSub: 'स्वतंत्र विन्यास, विराम अनुमत — रैंक के दबाव के बिना अपने स्वचालित प्रतिवर्त गढ़ें।',
+    speedrunTitle: 'तूफ़ान', speedrunSub: 'कार्ड दर कार्ड · स्टॉपवॉच · अंतिम गणना',
+    quizTitle: 'पहचान', quizSub: 'हर कार्ड का Hi-Lo मान पहचानें: +1, 0 या −1',
+  },
+  speedrunConfig: {
+    title: 'तूफ़ान', sub: 'एक-एक कार्ड टैप · स्टॉपवॉच · अंतिम गिनती',
+    cards: ({ cards }) => `${cards} पत्ते`, best: ({ time }) => `${time}से`, start: 'तूफ़ान में प्रवेश करें',
+  },
+  quizConfig: {
+    title: 'पहचान', sub: 'अगले कार्ड से पहले प्रत्येक कार्ड का Hi-Lo मूल्य प्रकट करें',
+    cardCount: 'कार्डों की संख्या', hint: 'निम्न (2–6) → +1 · तटस्थ (7–9) → 0 · उच्च (10–A) → −1', start: 'पहचान में प्रवेश करें',
+  },
+  quizResult: {
+    title: 'पहचान — सत्र समाप्त', perfect: 'निर्दोष। पहचान मिली।', good: 'दृढ़। निखारते रहें।', ok: 'प्रतिवर्त बन रहा है।', poor: 'अभ्यास वृत्ति को गढ़ता है। पुनः प्रयास करें।',
+  },
+  quiz: { ansLow: '+1 (2-6)', ansNeutral: '0 (7-9)', ansHigh: '−1 (10-A)' },
   tutorial: {
     skip: 'छोड़ें',
     welcome: {

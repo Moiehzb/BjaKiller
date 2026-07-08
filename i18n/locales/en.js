@@ -43,6 +43,7 @@ const en = {
   modeName: {
     training: 'Study Hall', ranked: 'The Guild Gates', promo: 'Ascension',
     placement: 'Initiation', casino: 'The Trial', daily: 'Daily Rite',
+    speedrun: 'The Tempest', quiz: 'The Decipherment',
   },
 
   ranks: {
@@ -95,6 +96,7 @@ const en = {
     dailyDoneWin: ({ score }) => `✓ Fulfilled · ${score} pts`,
     dailyDoneLoss: '✗ Missed',
     dailyComeBack: 'Return tomorrow',
+    dailyLocked: 'Sealed — complete the Initiation first',
     settings: 'Scriptorium',
     settingsSub: 'Options · Reset',
     currentStreak: ({ streak }) => `Current streak: ${streak}`,
@@ -291,6 +293,8 @@ const en = {
     countdownPromo: 'ASCENSION',
     countdownPlacement: ({ n, total }) => `INITIATION ${n}/${total}`,
     countdownTraining: 'STUDY HALL',
+    countdownSpeedrun: 'THE TEMPEST',
+    countdownQuiz: 'THE DECIPHERMENT',
     countdownRanked: 'THE GUILD GATES',
     go: 'COUNT',
     cardsTime: ({ cards, tl }) => `${cards} cards · ${tl}s`,
@@ -332,6 +336,10 @@ const en = {
     abandonMmr: '−25 MMR',
     abandonBody2: ' will be deducted immediately.',
     abandon: 'Quit',
+    tapCard: 'Tap the card to advance',
+    speedrunResult: ({ time }) => `Time: ${time}s`,
+    speedrunBest: ({ time }) => `Best: ${time}s`,
+    speedrunNewBest: 'New record!',
   },
 
   timePicker: {
@@ -344,13 +352,54 @@ const en = {
   },
 
   challenges: {
-    frame_perfect: { name: 'Frame Perfect', desc: '1 deck — 0.40s/card or harder — counter sealed' },
-    no_mercy: { name: 'No Mercy', desc: 'Pass the Or → Émeraude gate on your first try — counter sealed' },
-    the_wall: { name: 'The Wall', desc: '6 decks — 90%+ penetration — 0.50s/card or less — counter sealed' },
-    blind_run: { name: 'Blind Run', desc: '8 decks — 0.45s/card or harder — counter sealed' },
-    iron_streak: { name: 'Iron Streak', desc: '10 wins in a row — 0.55s/card avg or less — counter sealed' },
-    full_burn: { name: 'Full Burn', desc: '8 decks — 95%+ penetration — counter sealed' },
-    casino_complete: { name: 'Casino Ready', desc: 'Complete the Trial in full' },
+    frame_perfect: { name: 'Kairos', desc: '1 deck — 0.40s/card or harder — counter sealed' },
+    flash: { name: 'Fulgur', desc: '2 decks · 50% pen. · 52 cards · under 25s — counter sealed' },
+    the_wall: { name: 'The Impassable', desc: '6 decks — 90%+ penetration — 0.50s/card or less — counter sealed' },
+    blind_run: { name: 'The Crossing', desc: '8 decks — 0.45s/card or harder — counter sealed' },
+    iron_streak: { name: 'The Chain', desc: '10 wins in a row — 0.55s/card avg or less — counter sealed' },
+    full_burn: { name: 'The Great Blaze', desc: '8 decks — 95%+ penetration — counter sealed' },
+    casino_complete: { name: 'The Aspirant', desc: 'Complete the Trial in full' },
+  },
+
+  trainingSubMode: {
+    title: 'Study Hall',
+    sub: 'Choose your training path',
+    standardTitle: 'The Forge',
+    standardSub: 'Free configuration, pause allowed — build your reflexes without rank pressure.',
+    speedrunTitle: 'The Tempest',
+    speedrunSub: 'Card by card on tap · stopwatch · final count',
+    quizTitle: 'The Decipherment',
+    quizSub: 'Identify the Hi-Lo value of each card: +1, 0 or −1',
+  },
+
+  speedrunConfig: {
+    title: 'The Tempest',
+    sub: 'Advance cards by tapping · the clock runs · give the final count',
+    cards: ({ cards }) => `${cards} cards to count`,
+    best: ({ time }) => `Record: ${time}s`,
+    start: 'Enter the Tempest',
+  },
+
+  quizConfig: {
+    title: 'The Decipherment',
+    sub: 'Identify the Hi-Lo value of each card before the next',
+    cardCount: 'Number of cards',
+    hint: 'Low (2-6) → +1 · Neutral (7-9) → 0 · High (10-A) → −1',
+    start: 'Enter the Decipherment',
+  },
+
+  quizResult: {
+    title: 'The Decipherment — session complete',
+    perfect: 'Flawless. Recognition is yours.',
+    good: 'Solid. Keep honing.',
+    ok: 'The reflex is forming.',
+    poor: 'Practice builds the instinct. Try again.',
+  },
+
+  quiz: {
+    ansLow: '+1 (Low: 2-6)',
+    ansNeutral: '0 (Neutral: 7-9)',
+    ansHigh: '−1 (High: 10-A)',
   },
 
   tutorial: {

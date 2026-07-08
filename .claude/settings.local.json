@@ -31,7 +31,14 @@
       "Bash(ls node_modules/@capacitor/assets)",
       "Bash(npx @capacitor/assets generate --android)",
       "PowerShell(npm ls *)",
-      "PowerShell(powershell -ExecutionPolicy Bypass -File \"D:\\\\CLAUDE CODE CS CODE\\\\build-apk.ps1\")"
+      "PowerShell(powershell -ExecutionPolicy Bypass -File \"D:\\\\CLAUDE CODE CS CODE\\\\build-apk.ps1\")",
+      "PowerShell(New-Item *)",
+      "PowerShell(Move-Item *)",
+      "Bash(python3 -c \"import sys; data = sys.stdin.buffer.read\\(\\); idx = data.find\\(b'training: '\\); print\\('Bytes:', ' '.join\\(f'{b:02X}' for b in data[idx:idx+30]\\)\\)\")",
+      "PowerShell($path = \"D:\\\\CLAUDE CODE CS CODE\\\\blackjack-academy-I\\\\feedbacks\\\\Capture d'écran 2026-07-08 172136.jpg\"; [System.IO.File]::Exists\\($path\\))",
+      "PowerShell(Copy-Item *)",
+      "PowerShell($bytes = [System.IO.File]::ReadAllBytes\\(\"D:\\\\CLAUDE CODE CS CODE\\\\blackjack-academy-I\\\\feedbacks\\\\Capture d'écran 2026-07-08 185720.jpg\"\\); $bytes.Length)",
+      "PowerShell(Out-File *)"
     ]
   },
   "hooks": {
@@ -40,7 +47,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$env:PATH += ';C:\\Program Files\\Git\\cmd'; Set-Location 'D:\\CLAUDE CODE CS CODE'; git add .; $s = git status --porcelain; if ($s) { $ts = Get-Date -Format 'yyyy-MM-dd HH:mm'; git commit -m \"Auto-save $ts\"; git push origin main }",
+            "command": "$env:PATH += ';C:\\Program Files\\Git\\cmd'; Set-Location 'D:\\CLAUDE CODE CS CODE\\blackjack-academy-I'; git add .; $s = git status --porcelain; if ($s) { $ts = Get-Date -Format 'yyyy-MM-dd HH:mm'; git commit -m \"Auto-save $ts\"; git push origin main }",
             "shell": "powershell",
             "timeout": 30,
             "statusMessage": "Sauvegarde GitHub..."

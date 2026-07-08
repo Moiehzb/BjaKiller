@@ -1,4 +1,4 @@
-// ─── 한국어 ────────────────────────────────────────────────────────
+﻿// ─── 한국어 ────────────────────────────────────────────────────────
 // Mirror of fr.js — keep the key structure identical across locales.
 // 편집 톤: 절제되고 입문적 — 카운터의 비밀 학원.
 // 고유명사 미번역: 랭크 (Cuivre…Adamantium), 스킨, 업적.
@@ -43,6 +43,7 @@ const ko = {
   modeName: {
     training: '수련의 방', ranked: '길드의 문', promo: '승급',
     placement: '입문', casino: '시련', daily: '일일 의식',
+    speedrun: '폭풍', quiz: '해독',
   },
 
   ranks: {
@@ -95,6 +96,7 @@ const ko = {
     dailyDoneWin: ({ score }) => `✓ 달성 · ${score}점`,
     dailyDoneLoss: '✗ 실패',
     dailyComeBack: '내일 다시 오세요',
+    dailyLocked: '봉인됨 — 먼저 입문을 완료하라',
     settings: '필경실',
     settingsSub: '옵션 · 초기화',
     currentStreak: ({ streak }) => `현재 연승: ${streak}`,
@@ -291,6 +293,8 @@ const ko = {
     countdownPromo: '승급',
     countdownPlacement: ({ n, total }) => `입문 ${n}/${total}`,
     countdownTraining: '수련의 방',
+    countdownSpeedrun: '폭풍',
+    countdownQuiz: '해독',
     countdownRanked: '길드의 문',
     go: '카운트',
     cardsTime: ({ cards, tl }) => `${cards}장 · ${tl}초`,
@@ -331,6 +335,10 @@ const ko = {
     abandonBody1: '나가면 패배로 처리됩니다.',
     abandonMmr: '−25 MMR',
     abandonBody2: ' 이 즉시 차감됩니다.',
+    tapCard: '카드를 탭하여 진행',
+    speedrunResult: ({ time }) => `시간: ${time}s`,
+    speedrunBest: ({ time }) => `기록: ${time}s`,
+    speedrunNewBest: '신기록!',
     abandon: '나가기',
   },
 
@@ -344,15 +352,34 @@ const ko = {
   },
 
   challenges: {
-    frame_perfect: { name: 'Frame Perfect', desc: '1덱 — 0.40초/장 이하 — 카운터 봉인' },
-    no_mercy: { name: 'No Mercy', desc: '첫 시도에 Or → Émeraude 관문 통과 — 카운터 봉인' },
-    the_wall: { name: 'The Wall', desc: '6덱 — 침투율 90% 이상 — 0.50초/장 이하 — 카운터 봉인' },
-    blind_run: { name: 'Blind Run', desc: '8덱 — 0.45초/장 이하 — 카운터 봉인' },
-    iron_streak: { name: 'Iron Streak', desc: '10연승 — 평균 0.55초/장 이하 — 카운터 봉인' },
-    full_burn: { name: 'Full Burn', desc: '8덱 — 침투율 95% 이상 — 카운터 봉인' },
-    casino_complete: { name: 'Casino Ready', desc: '시련 전체 완료' },
+    frame_perfect: { name: 'Kairos', desc: '1덱 — 0.40초/장 이하 — 카운터 봉인' },
+    flash: { name: 'Fulgur', desc: '2덱 · 50% 침투율 · 52장 · 25초 이내 — 카운터 봉인' },
+    the_wall: { name: '난공불락', desc: '6덱 — 침투율 90% 이상 — 0.50초/장 이하 — 카운터 봉인' },
+    blind_run: { name: '횡단', desc: '8덱 — 0.45초/장 이하 — 카운터 봉인' },
+    iron_streak: { name: '사슬', desc: '10연승 — 평균 0.55초/장 이하 — 카운터 봉인' },
+    full_burn: { name: '대화재', desc: '8덱 — 침투율 95% 이상 — 카운터 봉인' },
+    casino_complete: { name: '지망자', desc: '시련 전체 완료' },
   },
 
+
+  trainingSubMode: {
+    title: '수련의 방', sub: '훈련 경로를 선택하라',
+    standardTitle: '대장간', standardSub: '자유 설정, 일시정지 허용 — 랭크 압박 없이 반사 신경을 단련하라.',
+    speedrunTitle: '폭풍', speedrunSub: '카드를 탭 · 초시계 · 최종 카운트',
+    quizTitle: '해독', quizSub: '각 카드의 Hi-Lo 값을 식별하라: +1, 0 또는 −1',
+  },
+  speedrunConfig: {
+    title: '폭풍', sub: '카드마다 탭 · 스톱워치 · 최종 카운트',
+    cards: ({ cards }) => `${cards}장`, best: ({ time }) => `${time}s`, start: '폭풍 시작',
+  },
+  quizConfig: {
+    title: '해독', sub: '다음 카드 전에 각 카드의 Hi-Lo 값을 식별하라',
+    cardCount: '카드 수', hint: '낮은 (2–6) → +1 · 중립 (7–9) → 0 · 높은 (10–A) → −1', start: '해독 시작',
+  },
+  quizResult: {
+    title: '해독 — 세션 완료', perfect: '완벽. 인식이 생겼다.', good: '탄탄하다. 계속 연마하라.', ok: '반사신경이 형성되고 있다.', poor: '연습이 본능을 만든다. 다시 해보라.',
+  },
+  quiz: { ansLow: '+1 (2-6)', ansNeutral: '0 (7-9)', ansHigh: '−1 (10-A)' },
   tutorial: {
     skip: '건너뛰기',
     welcome: {

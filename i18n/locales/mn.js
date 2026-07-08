@@ -1,4 +1,4 @@
-// ─── Монгол ───────────────────────────────────────────────────────
+﻿// ─── Монгол ───────────────────────────────────────────────────────
 // Mirror of fr.js — keep the key structure identical across locales.
 // Редакцийн өнгө аяс: хязгаарлагдмал, эхлэлийн — Тоологчдын нууц академи.
 // Орчуулагдаагүй зөв нэрс: зэрэг (Cuivre…Adamantium), үндсэн дизайн, амжилт.
@@ -43,6 +43,7 @@ const mn = {
   modeName: {
     training: 'Судалгааны танхим', ranked: 'Гилдийн хаалга', promo: 'Дэвших',
     placement: 'Элсэлт', casino: 'Шалгалт', daily: 'Өдөр тутмын ёслол',
+    speedrun: 'Шуурга', quiz: 'Тайлал',
   },
 
   ranks: {
@@ -95,6 +96,7 @@ const mn = {
     dailyDoneWin: ({ score }) => `✓ Биелсэн · ${score} оноо`,
     dailyDoneLoss: '✗ Алдсан',
     dailyComeBack: 'Маргааш буцаарай',
+    dailyLocked: 'Битүүмжлэгдсэн — эхлээд Эхлэлтийг дуусга',
     settings: 'Скрипториум',
     settingsSub: 'Тохиргоо · Дахин тохируулах',
     currentStreak: ({ streak }) => `Одоогийн дараалал: ${streak}`,
@@ -291,6 +293,8 @@ const mn = {
     countdownPromo: 'ДЭВШИХ',
     countdownPlacement: ({ n, total }) => `ЭЛСЭЛТ ${n}/${total}`,
     countdownTraining: 'СУДАЛГААНЫ ТАНХИМ',
+    countdownSpeedrun: 'ШУУРГА',
+    countdownQuiz: 'ТАЙЛАЛ',
     countdownRanked: 'ГИЛДИЙН ХААЛГА',
     go: 'ТООЛ',
     cardsTime: ({ cards, tl }) => `${cards} карт · ${tl}с`,
@@ -331,6 +335,10 @@ const mn = {
     abandonBody1: 'Гарах нь ялагдал болж тооцогдоно.',
     abandonMmr: '−25 MMR',
     abandonBody2: ' шууд хасагдана.',
+    tapCard: 'Картыг дарж ахиц',
+    speedrunResult: ({ time }) => `Цаг: ${time}s`,
+    speedrunBest: ({ time }) => `Рекорд: ${time}s`,
+    speedrunNewBest: 'Шинэ рекорд!',
     abandon: 'Гарах',
   },
 
@@ -344,15 +352,34 @@ const mn = {
   },
 
   challenges: {
-    frame_perfect: { name: 'Frame Perfect', desc: '1 дэк — 0.40с/карт эсвэл хэцүү — тоологч лацдагдсан' },
-    no_mercy: { name: 'No Mercy', desc: 'Or → Émeraude хаалгыг эхний удаад дайр — тоологч лацдагдсан' },
-    the_wall: { name: 'The Wall', desc: '6 дэк — 90%+ нэвтрэлт — 0.50с/карт эсвэл бага — тоологч лацдагдсан' },
-    blind_run: { name: 'Blind Run', desc: '8 дэк — 0.45с/карт эсвэл хэцүү — тоологч лацдагдсан' },
-    iron_streak: { name: 'Iron Streak', desc: '10 дараалсан ялалт — дундаж 0.55с/карт эсвэл бага — тоологч лацдагдсан' },
-    full_burn: { name: 'Full Burn', desc: '8 дэк — 95%+ нэвтрэлт — тоологч лацдагдсан' },
-    casino_complete: { name: 'Casino Ready', desc: 'Шалгалтыг бүрэн дуусга' },
+    frame_perfect: { name: 'Kairos', desc: '1 дэк — 0.40с/карт эсвэл хэцүү — тоологч лацдагдсан' },
+    flash: { name: 'Fulgur', desc: '2 дек · 50% нэвтрэлт · 52 карт · 25 секундаас бага — тоолуур нуугдсан' },
+    the_wall: { name: 'Давагдашгүй', desc: '6 дэк — 90%+ нэвтрэлт — 0.50с/карт эсвэл бага — тоологч лацдагдсан' },
+    blind_run: { name: 'Гарц', desc: '8 дэк — 0.45с/карт эсвэл хэцүү — тоологч лацдагдсан' },
+    iron_streak: { name: 'Гинж', desc: '10 дараалсан ялалт — дундаж 0.55с/карт эсвэл бага — тоологч лацдагдсан' },
+    full_burn: { name: 'Агуу Гал', desc: '8 дэк — 95%+ нэвтрэлт — тоологч лацдагдсан' },
+    casino_complete: { name: 'Нэрмэдэгч', desc: 'Шалгалтыг бүрэн дуусга' },
   },
 
+
+  trainingSubMode: {
+    title: 'Сургалтын Танхим', sub: 'Дасгалын замаа сонго',
+    standardTitle: 'Хайлуур', standardSub: 'Чөлөөт тохиргоо, завсарлага зөвшөөрнө — зэрэглэлийн дарамтгүйгээр рефлексээ хайлуул.',
+    speedrunTitle: 'Шуурга', speedrunSub: 'Карт дарааллаар · хронометр · эцсийн тоолол',
+    quizTitle: 'Тайлал', quizSub: 'Карт бүрийн Hi-Lo утгыг тодорхойл: +1, 0 эсвэл −1',
+  },
+  speedrunConfig: {
+    title: 'Шуурга', sub: 'Карт бүрийг дарж · хэмжилтийн цаг · эцсийн тооцоо',
+    cards: ({ cards }) => `${cards} карт`, best: ({ time }) => `${time}с`, start: 'Шуурга эхлүүлэх',
+  },
+  quizConfig: {
+    title: 'Тайлал', sub: 'Дараагийн картаас өмнө Hi-Lo утгыг илчил',
+    cardCount: 'Картын тоо', hint: 'Бага (2-6) → +1 · Саармаг (7-9) → 0 · Өндөр (10-A) → −1', start: 'Тайлалд орох',
+  },
+  quizResult: {
+    title: 'Тайлал — хуралдаан дууссан', perfect: 'Төгс. Таних мэдрэмж бий болов.', good: 'Бат бөх. Нарийсгаж байгаарай.', ok: 'Рефлекс бүрэлдэж байна.', poor: 'Дадлага зөн совингийг бүтээнэ. Дахин оролд.',
+  },
+  quiz: { ansLow: '+1 (2-6)', ansNeutral: '0 (7-9)', ansHigh: '−1 (10-A)' },
   tutorial: {
     skip: 'Алгасах',
     welcome: {

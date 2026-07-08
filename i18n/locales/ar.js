@@ -1,4 +1,4 @@
-// ─── العربية ──────────────────────────────────────────────────────
+﻿// ─── العربية ──────────────────────────────────────────────────────
 // Mirror of fr.js — keep the key structure identical across locales.
 // النبرة التحريرية: رصينة، تمهيدية — أكاديمية العدّادين السرية.
 // الأسماء الخاصة غير مترجمة: الرتب (Cuivre…Adamantium)، الجلود، الإنجازات.
@@ -42,6 +42,7 @@ const ar = {
   modeName: {
     training: 'قاعة الدراسة', ranked: 'بوابات النقابة', promo: 'الترقية',
     placement: 'التأهيل', casino: 'الاختبار', daily: 'طقس اليوم',
+    speedrun: 'العاصفة', quiz: 'فك الشيفرة',
   },
 
   ranks: {
@@ -94,6 +95,7 @@ const ar = {
     dailyDoneWin: ({ score }) => `✓ مُنجَز · ${score} نقطة`,
     dailyDoneLoss: '✗ غير مُنجَز',
     dailyComeBack: 'عُد غداً',
+    dailyLocked: 'مختوم — أكمل التأهيل أولاً',
     settings: 'السكريبتوريوم',
     settingsSub: 'الخيارات · إعادة الضبط',
     currentStreak: ({ streak }) => `السلسلة الحالية: ${streak}`,
@@ -290,6 +292,8 @@ const ar = {
     countdownPromo: 'الترقية',
     countdownPlacement: ({ n, total }) => `التأهيل ${n}/${total}`,
     countdownTraining: 'قاعة الدراسة',
+    countdownSpeedrun: 'العاصفة',
+    countdownQuiz: 'فك الشيفرة',
     countdownRanked: 'بوابات النقابة',
     go: 'عُدّ',
     cardsTime: ({ cards, tl }) => `${cards} ورقة · ${tl}ث`,
@@ -330,6 +334,10 @@ const ar = {
     abandonBody1: 'الخروج يُعدّ خسارة.',
     abandonMmr: '−25 نقطة',
     abandonBody2: ' تُخصَم فوراً.',
+    tapCard: 'اضغط على الورقة للمتابعة',
+    speedrunResult: ({ time }) => `الوقت: ${time}s`,
+    speedrunBest: ({ time }) => `أفضل: ${time}s`,
+    speedrunNewBest: 'رقم جديد!',
     abandon: 'خروج',
   },
 
@@ -343,15 +351,34 @@ const ar = {
   },
 
   challenges: {
-    frame_perfect: { name: 'Frame Perfect', desc: 'رزمة واحدة — 0.40ث/ورقة أو أصعب — العدّاد مغلق' },
-    no_mercy: { name: 'No Mercy', desc: 'اجتز بوابة Or → Émeraude من المحاولة الأولى — العدّاد مغلق' },
-    the_wall: { name: 'The Wall', desc: '6 رزم — اختراق 90%+ — 0.50ث/ورقة أو أقل — العدّاد مغلق' },
-    blind_run: { name: 'Blind Run', desc: '8 رزم — 0.45ث/ورقة أو أصعب — العدّاد مغلق' },
-    iron_streak: { name: 'Iron Streak', desc: '10 انتصارات متتالية — متوسط 0.55ث/ورقة أو أقل — العدّاد مغلق' },
-    full_burn: { name: 'Full Burn', desc: '8 رزم — اختراق 95%+ — العدّاد مغلق' },
-    casino_complete: { name: 'Casino Ready', desc: 'أكمل الاختبار بالكامل' },
+    frame_perfect: { name: 'Kairos', desc: 'رزمة واحدة — 0.40ث/ورقة أو أصعب — العدّاد مغلق' },
+    flash: { name: 'Fulgur', desc: '2 روزنة · 50% اختراق · 52 ورقة · أقل من 25ث — العداد مختوم' },
+    the_wall: { name: 'لا يُجتاز', desc: '6 رزم — اختراق 90%+ — 0.50ث/ورقة أو أقل — العدّاد مغلق' },
+    blind_run: { name: 'العبور', desc: '8 رزم — 0.45ث/ورقة أو أصعب — العدّاد مغلق' },
+    iron_streak: { name: 'السلسلة', desc: '10 انتصارات متتالية — متوسط 0.55ث/ورقة أو أقل — العدّاد مغلق' },
+    full_burn: { name: 'الحريق العظيم', desc: '8 رزم — اختراق 95%+ — العدّاد مغلق' },
+    casino_complete: { name: 'المتطلع', desc: 'أكمل الاختبار بالكامل' },
   },
 
+
+  trainingSubMode: {
+    title: 'قاعة الدراسة', sub: 'اختر مسار التدريب',
+    standardTitle: 'المسبك', standardSub: 'إعداد حر، إيقاف مسموح — اصنع ردود أفعالك دون ضغط الرتبة.',
+    speedrunTitle: 'العاصفة', speedrunSub: 'بطاقة بعد بطاقة · إيقاف الوقت · الحساب النهائي',
+    quizTitle: 'فك الشيفرة', quizSub: 'حدّد قيمة Hi-Lo لكل ورقة: +1، 0 أو −1',
+  },
+  speedrunConfig: {
+    title: 'العاصفة', sub: 'ورقة بورقة بالضغط · ساعة إيقاف · العد النهائي',
+    cards: ({ cards }) => `${cards} ورقة`, best: ({ time }) => `${time}ث`, start: 'ادخل العاصفة',
+  },
+  quizConfig: {
+    title: 'فك الشيفرة', sub: 'اكشف قيمة Hi-Lo لكل ورقة قبل التالية',
+    cardCount: 'عدد الأوراق', hint: 'منخفضة (2–6) → +1 · محايدة (7–9) → 0 · عالية (10–A) → −1', start: 'الدخول إلى فك الشيفرة',
+  },
+  quizResult: {
+    title: 'فك الشيفرة — الجلسة اكتملت', perfect: 'بلا أخطاء. التقدير حقك.', good: 'متين. استمر في الصقل.', ok: 'الردّ الفعلي يتشكّل.', poor: 'الممارسة تبني الغريزة. حاول مجدداً.',
+  },
+  quiz: { ansLow: '+1 (2-6)', ansNeutral: '0 (7-9)', ansHigh: '−1 (10-A)' },
   tutorial: {
     skip: 'تخطي',
     welcome: {

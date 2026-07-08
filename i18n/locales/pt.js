@@ -1,4 +1,4 @@
-// ─── Português ────────────────────────────────────────────────────
+﻿// ─── Português ────────────────────────────────────────────────────
 // Mirror of fr.js — keep the key structure identical across locales.
 // Tom editorial: sóbrio, iniciático — a Academia Secreta dos Contadores.
 // Substantivos próprios NÃO traduzidos: ranks (Cuivre…Adamantium), skins, achievements.
@@ -43,6 +43,7 @@ const pt = {
   modeName: {
     training: 'Sala de Estudo', ranked: 'Portas da Guilda', promo: 'Ascensão',
     placement: 'Iniciação', casino: 'A Provação', daily: 'Ritual do Dia',
+    speedrun: 'A Tempestade', quiz: 'A Decifração',
   },
 
   ranks: {
@@ -95,6 +96,7 @@ const pt = {
     dailyDoneWin: ({ score }) => `✓ Cumprido · ${score} pts`,
     dailyDoneLoss: '✗ Falhou',
     dailyComeBack: 'Volte amanhã',
+    dailyLocked: 'Selado — conclua primeiro a Iniciação',
     settings: 'Scriptorium',
     settingsSub: 'Opções · Reiniciar',
     currentStreak: ({ streak }) => `Sequência atual: ${streak}`,
@@ -291,6 +293,8 @@ const pt = {
     countdownPromo: 'ASCENSÃO',
     countdownPlacement: ({ n, total }) => `INICIAÇÃO ${n}/${total}`,
     countdownTraining: 'SALA DE ESTUDO',
+    countdownSpeedrun: 'A TEMPESTADE',
+    countdownQuiz: 'A DECIFRAÇÃO',
     countdownRanked: 'AS PORTAS DA GUILDA',
     go: 'CONTAR',
     cardsTime: ({ cards, tl }) => `${cards} cartas · ${tl}s`,
@@ -331,6 +335,10 @@ const pt = {
     abandonBody1: 'Abandonar conta como derrota.',
     abandonMmr: '−25 MMR',
     abandonBody2: ' serão deduzidos imediatamente.',
+    tapCard: 'Toca a carta para avançar',
+    speedrunResult: ({ time }) => `Tempo: ${time}s`,
+    speedrunBest: ({ time }) => `Recorde: ${time}s`,
+    speedrunNewBest: 'Novo recorde!',
     abandon: 'Abandonar',
   },
 
@@ -344,15 +352,34 @@ const pt = {
   },
 
   challenges: {
-    frame_perfect: { name: 'Frame Perfect', desc: '1 baralho — 0,40s/carta ou mais difícil — contador selado' },
-    no_mercy: { name: 'No Mercy', desc: 'Passe o portal Or → Émeraude na primeira tentativa — contador selado' },
-    the_wall: { name: 'The Wall', desc: '6 baralhos — 90%+ de penetração — 0,50s/carta ou menos — contador selado' },
-    blind_run: { name: 'Blind Run', desc: '8 baralhos — 0,45s/carta ou mais difícil — contador selado' },
-    iron_streak: { name: 'Iron Streak', desc: '10 vitórias seguidas — 0,55s/carta em média ou menos — contador selado' },
-    full_burn: { name: 'Full Burn', desc: '8 baralhos — 95%+ de penetração — contador selado' },
-    casino_complete: { name: 'Casino Ready', desc: 'Conclua a Provação integralmente' },
+    frame_perfect: { name: 'Kairos', desc: '1 baralho — 0,40s/carta ou mais difícil — contador selado' },
+    flash: { name: 'Fulgur', desc: '2 baralhos · 50% pen. · 52 cartas · menos de 25s — contador selado' },
+    the_wall: { name: 'O Intransponível', desc: '6 baralhos — 90%+ de penetração — 0,50s/carta ou menos — contador selado' },
+    blind_run: { name: 'A Travessia', desc: '8 baralhos — 0,45s/carta ou mais difícil — contador selado' },
+    iron_streak: { name: 'A Corrente', desc: '10 vitórias seguidas — 0,55s/carta em média ou menos — contador selado' },
+    full_burn: { name: 'O Grande Incêndio', desc: '8 baralhos — 95%+ de penetração — contador selado' },
+    casino_complete: { name: 'O Aspirante', desc: 'Conclua a Provação integralmente' },
   },
 
+
+  trainingSubMode: {
+    title: 'Sala de Estudo', sub: 'Escolhe o teu percurso de treino',
+    standardTitle: 'A Forja', standardSub: 'Configuração livre, pausa permitida — forja os teus reflexos sem pressão de rank.',
+    speedrunTitle: 'A Tempestade', speedrunSub: 'Carta a carta no toque · cronômetro · conta final',
+    quizTitle: 'A Decifração', quizSub: 'Identifica o valor Hi-Lo de cada carta: +1, 0 ou −1',
+  },
+  speedrunConfig: {
+    title: 'A Tempestade', sub: 'Carta a carta no toque · cronômetro · conta final',
+    cards: ({ cards }) => `${cards} cartas`, best: ({ time }) => `${time}s`, start: 'Entrar na Tempestade',
+  },
+  quizConfig: {
+    title: 'A Decifração', sub: 'Revela o valor Hi-Lo de cada carta antes da próxima',
+    cardCount: 'Número de cartas', hint: 'Baixas (2–6) → +1 · Neutras (7–9) → 0 · Altas (10–A) → −1', start: 'Entrar na Decifração',
+  },
+  quizResult: {
+    title: 'A Decifração — sessão concluída', perfect: 'Impecável. O reconhecimento é teu.', good: 'Sólido. Continua a aperfeiçoar.', ok: 'O reflexo está a tomar forma.', poor: 'A prática forja o instinto. Tenta de novo.',
+  },
+  quiz: { ansLow: '+1 (2-6)', ansNeutral: '0 (7-9)', ansHigh: '−1 (10-A)' },
   tutorial: {
     skip: 'Pular',
     welcome: {

@@ -1,6 +1,6 @@
-// ─── Français (locale de référence) ──────────────────────────────
+﻿// ─── Français (locale de référence) ──────────────────────────────
 // Keep the key structure identical across every locale file.
-// Ton éditorial : sobre, initiatique — l'Académie Secrète des Compteurs.
+// Ton éditorial : sobre, initiatique — l\'Académie Secrète des Compteurs.
 // Noms propres NON traduits : rangs (Cuivre…Adamantium), skins, achievements.
 const s = (n) => (n > 1 ? 's' : ''); // pluriel français : à partir de 2
 
@@ -36,13 +36,14 @@ const fr = {
   header: { tuto: 'Tuto', language: 'Langue' },
 
   crumbs: {
-    home: 'Le Hall', ranked: 'La Guilde', training: 'Salle d’Étude',
-    casino: 'L’Épreuve', game: 'Partie',
+    home: 'Le Hall', ranked: 'La Guilde', training: 'Salle d\'Étude',
+    casino: 'L\'Épreuve', game: 'Partie',
   },
 
   modeName: {
-    training: 'Salle d’Étude', ranked: 'Les Portes de la Guilde', promo: 'Ascension',
-    placement: 'Initiation', casino: 'L’Épreuve', daily: 'Rituel du jour',
+    training: 'Salle d\'Étude', ranked: 'Les Portes de la Guilde', promo: 'Ascension',
+    placement: 'Initiation', casino: 'L\'Épreuve', daily: 'Rituel du jour',
+    speedrun: 'La Rafale', quiz: 'Le Déchiffrement',
   },
 
   ranks: {
@@ -60,28 +61,28 @@ const fr = {
   },
 
   lobby: {
-    promoGame: 'PARTIE D’ASCENSION',
+    promoGame: 'PARTIE D\'ASCENSION',
     promoLocked: 'Ascension scellée',
     currentRank: 'Rang dans la Guilde',
     winToRankUp: 'Une victoire te rapproche du rang suivant.',
     mmrLocked: ({ mmr }) => `${mmr}/100 MMR — atteins 100 pour retenter`,
     mmr: ({ mmr }) => `${mmr}/100 MMR`,
-    maxRank: 'Sommet de la Guilde — l’Épreuve t’attend.',
-    placementTitle: 'L’Initiation',
+    maxRank: 'Sommet de la Guilde — l\'Épreuve t\'attend.',
+    placementTitle: 'L\'Initiation',
     placementDoneLabel: 'Achevée',
     placementProgress: ({ played, total, left }) =>
       `${played}/${total} jouées · ${left} restante${s(left)}`,
     gameModes: 'Les Voies',
     account: 'Les Archives',
     trainingSub: 'Pratique libre · compteur visible · sans enjeu',
-    rankedPlacement: 'L’Initiation',
-    rankedPromo: 'Partie d’Ascension',
-    rankedLocked: 'Scellé — achève d’abord une séance en Salle d’Étude',
+    rankedPlacement: 'L\'Initiation',
+    rankedPromo: 'Partie d\'Ascension',
+    rankedLocked: 'Scellé — achève d\'abord une séance en Salle d\'Étude',
     rankedPlacementSub: ({ left }) =>
       `${left} partie${s(left)} restante${s(left)} · Abandon = −MMR`,
     rankedSub: ({ rank, desc }) => `${rank} · ${desc} · Abandon = −25 MMR`,
     casinoSub: 'Cinq cercles · aucune erreur tolérée',
-    casinoLocked: 'Scellé — présente-toi d’abord aux Portes de la Guilde',
+    casinoLocked: 'Scellé — présente-toi d\'abord aux Portes de la Guilde',
     achievements: 'Hauts Faits',
     achievementsSub: ({ unlocked, total }) => `${unlocked}/${total} accomplis`,
     skins: 'Artefacts',
@@ -95,6 +96,7 @@ const fr = {
     dailyDoneWin: ({ score }) => `✓ Accompli · ${score} pts`,
     dailyDoneLoss: '✗ Manqué',
     dailyComeBack: 'Reviens demain',
+    dailyLocked: "Scellé — achève d\'abord l\'Initiation",
     settings: 'Scriptorium',
     settingsSub: 'Options · Réinitialisation',
     currentStreak: ({ streak }) => `Série en cours : ${streak}`,
@@ -107,7 +109,7 @@ const fr = {
     secretNameLocked: '???',
     secretNameUnlocked: 'The Architect',
     secretDescLocked: 'Haut fait scellé — la Guilde garde ses secrets',
-    secretDescUnlocked: '5/5 portes franchies à l’Initiation',
+    secretDescUnlocked: '5/5 portes franchies à l\'Initiation',
     toastLabel: 'Haut Fait',
     challengeDone: 'Épreuve accomplie',
   },
@@ -147,7 +149,7 @@ const fr = {
     warChest: 'Le Marchand',
     merchantSub: 'Marchand de passage · pièces rares',
     warChestDesc:
-      'Compteur… j’ai entendu parler de toi. Ces artefacts ne sont pas pour tout le monde — mais pour toi, je ferai une exception. 4,99 € pièce. Payé une fois, tien à jamais. Pas d’abonnement — je ne repasse jamais deux fois.',
+      'Compteur… j\'ai entendu parler de toi. Ces artefacts ne sont pas pour tout le monde — mais pour toi, je ferai une exception. 4,99 € pièce. Payé une fois, tien à jamais. Pas d\'abonnement — je ne repasse jamais deux fois.',
     preview: 'Examiner',
     price499: '4,99 €',
     forge: 'Acquérir — {price}',
@@ -212,7 +214,7 @@ const fr = {
     music: "Musique",
     haptics: 'Vibrations',
     devRankTitle: 'Dev · définir le rang',
-    devRankHint: 'Choisis un rang directement, sans passer par l’Initiation.',
+    devRankHint: 'Choisis un rang directement, sans passer par l\'Initiation.',
     reset: 'Effacer la progression',
     resetTitle: 'Effacement des registres',
     resetWarnPre: 'Irréversible. Écris ',
@@ -221,7 +223,7 @@ const fr = {
   },
 
   rankedConfig: {
-    placementTitle: 'L’Initiation',
+    placementTitle: 'L\'Initiation',
     promoTitle: 'Ascension',
     rankedTitle: 'Les Portes de la Guilde',
     placementSub: ({ n, total, type }) =>
@@ -250,13 +252,13 @@ const fr = {
     promoLockedHint: 'Ascension scellée — atteins 100 MMR pour la retenter',
     launchRecovery: 'Rattrapage',
     launchGate: ({ n, total }) => `Porte ${n}/${total}`,
-    launchPromo: 'Tenter l’Ascension',
+    launchPromo: 'Tenter l\'Ascension',
     launchRanked: '♠ Se présenter aux Portes',
     abandonWarn: 'Abandonner en cours de partie = −25 MMR',
   },
 
   trainingConfig: {
-    title: 'Salle d’Étude',
+    title: 'Salle d\'Étude',
     sub: 'Pratique libre · sans impact sur le MMR · pièces gagnées normalement',
     deckCount: 'Nombre de decks',
     deck: 'deck',
@@ -267,11 +269,11 @@ const fr = {
     options: 'Options',
     showCounter: 'Compteur visible',
     showCounterSub: 'Affiche le running count',
-    start: 'Commencer l’étude',
+    start: 'Commencer l\'étude',
   },
 
   casinoConfig: {
-    title: 'L’Épreuve',
+    title: 'L\'Épreuve',
     sub: 'Cinq cercles · 0.40s/carte · 90% pénétration · compteur scellé',
     alreadyDone: 'Épreuve déjà achevée — haut fait « Casino Ready » accompli.',
     stepsTitle: 'Cinq cercles, enchaînés sans retour',
@@ -280,46 +282,46 @@ const fr = {
     penShort: ({ pen }) => `${pen}% pén.`,
     spcShort: ({ spc }) => `${spc}s/c`,
     warn:
-      'Échouer à un cercle renvoie au premier. Le compteur doit rester scellé durant toute l’Épreuve pour accomplir le haut fait. 10 s de répit entre chaque cercle.',
-    launch: 'Entrer dans l’Épreuve',
+      'Échouer à un cercle renvoie au premier. Le compteur doit rester scellé durant toute l\'Épreuve pour accomplir le haut fait. 10 s de répit entre chaque cercle.',
+    launch: 'Entrer dans l\'Épreuve',
   },
 
   game: {
-    stepDoneNext: ({ n }) => `Cercle ${n} franchi ✓ — le suivant s’ouvre dans`,
+    stepDoneNext: ({ n }) => `Cercle ${n} franchi ✓ — le suivant s\'ouvre dans`,
     stepNext: ({ n, decks, tl }) => `Cercle ${n} : ${decks} deck${s(decks)} · ${tl}s`,
-    countdownCasino: ({ n }) => `L’ÉPREUVE — CERCLE ${n}/5`,
+    countdownCasino: ({ n }) => `L\'ÉPREUVE — CERCLE ${n}/5`,
     countdownPromo: 'ASCENSION',
     countdownPlacement: ({ n, total }) => `INITIATION ${n}/${total}`,
-    countdownTraining: 'SALLE D’ÉTUDE',
+    countdownTraining: 'SALLE D\'ÉTUDE',
     countdownRanked: 'LES PORTES DE LA GUILDE',
     go: 'COMPTE',
     cardsTime: ({ cards, tl }) => `${cards} cartes · ${tl}s`,
     countQuestion: 'Quelle est la valeur du compte ?',
     perfect: 'Compte exact.',
-    wasCount: ({ count }) => `C’était ${count}`,
+    wasCount: ({ count }) => `C\'était ${count}`,
     resultStats: ({ time, tl, decks }) => `${time}s / ${tl}s · ${decks}D`,
     promotion: 'ASCENSION',
     demotion: 'RÉTROGRADATION',
     mmrDelta: ({ delta }) => `${delta > 0 ? '+' : ''}${delta} MMR`,
     promoLockedResult: 'Ascension scellée — remonte à 100 MMR',
-    placementDoneTitle: 'L’Initiation est achevée.',
-    startRankPre: 'La Guilde t’admet au rang : ',
+    placementDoneTitle: 'L\'Initiation est achevée.',
+    startRankPre: 'La Guilde t\'admet au rang : ',
     startMmr: ({ mmr }) => `${mmr} MMR de départ`,
-    architectWin: 'The Architect — 5/5 portes franchies. La Guilde s’en souviendra.',
+    architectWin: 'The Architect — 5/5 portes franchies. La Guilde s\'en souviendra.',
     nextPre: 'Prochaine : ',
     recoveryParen: ' (rattrapage)',
     placementStats: ({ decks, pen, spc, tl }) => `${decks}D · ${pen}% · ${spc}s/c · ${tl}s`,
     gamesPlayed: ({ played, total }) => `${played}/${total} parties jouées`,
     coinsEarned: ({ coins }) => `+${coins}`,
-    casinoFail: 'Échec. L’Épreuve reprend au premier cercle.',
-    casinoStepOk: ({ n, next }) => `✓ Cercle ${n}/5 — le suivant s’ouvre dans ${next}s`,
-    casinoDone: 'L’Épreuve est achevée. Peu peuvent en dire autant.',
+    casinoFail: 'Échec. L\'Épreuve reprend au premier cercle.',
+    casinoStepOk: ({ n, next }) => `✓ Cercle ${n}/5 — le suivant s\'ouvre dans ${next}s`,
+    casinoDone: 'L\'Épreuve est achevée. Peu peuvent en dire autant.',
     dailyScore: 'Score du rituel',
     dailySpecial: 'Rituel majeur · 8 decks',
     dailyStreakKept: ({ n }) => `Série de ${n} jour${n > 1 ? 's' : ''} préservée.`,
     dailyStreakLost: 'La série est rompue.',
     dailyComeBack: 'Reviens demain pour un nouveau deck',
-    infoCasino: ({ n }) => `L’ÉPREUVE — Cercle ${n}/5`,
+    infoCasino: ({ n }) => `L\'ÉPREUVE — Cercle ${n}/5`,
     infoPromo: 'ASCENSION',
     infoPlacement: ({ n, total }) => `INITIATION ${n}/${total}`,
     infoRank: ({ rank }) => `Guilde · ${rank}`,
@@ -328,10 +330,16 @@ const fr = {
     pauseHint: 'Appuie sur ⏸ pour reprendre',
     count: ({ value }) => `Compte : ${value}`,
     abandonTitle: 'Abandonner la partie ?',
-    abandonBody1: 'L’abandon compte comme une défaite.',
+    abandonBody1: 'L\'abandon compte comme une défaite.',
     abandonMmr: '−25 MMR',
     abandonBody2: ' seront déduits immédiatement.',
     abandon: 'Abandonner',
+    countdownSpeedrun: 'LA RAFALE',
+    countdownQuiz: 'LE DÉCHIFFREMENT',
+    tapCard: 'Touche la carte pour avancer',
+    speedrunResult: ({ time }) => `Temps : ${time}s`,
+    speedrunBest: ({ time }) => `Record : ${time}s`,
+    speedrunNewBest: 'Nouveau record !',
   },
 
   timePicker: {
@@ -344,21 +352,21 @@ const fr = {
   },
 
   challenges: {
-    frame_perfect: { name: 'Frame Perfect', desc: '1 deck — 0.40s/carte ou plus dur — compteur scellé' },
-    no_mercy: { name: 'No Mercy', desc: 'Franchis la porte Or → Émeraude du premier coup — compteur scellé' },
-    the_wall: { name: 'The Wall', desc: '6 decks — 90%+ pénétration — 0.50s/carte ou moins — compteur scellé' },
-    blind_run: { name: 'Blind Run', desc: '8 decks — 0.45s/carte ou plus dur — compteur scellé' },
-    iron_streak: { name: 'Iron Streak', desc: '10 victoires consécutives — 0.55s/carte moy. ou moins — compteur scellé' },
-    full_burn: { name: 'Full Burn', desc: '8 decks — 95%+ pénétration — compteur scellé' },
-    casino_complete: { name: 'Casino Ready', desc: 'Achever l’Épreuve en entier' },
+    frame_perfect: { name: 'Kairos', desc: '1 deck — 0.40s/carte ou plus dur — compteur scellé' },
+    flash: { name: 'Fulgur', desc: '2 decks · 50% pén. · 52 cartes · moins de 25s — compteur scellé' },
+    the_wall: { name: 'L\'Infranchissable', desc: '6 decks — 90%+ pénétration — 0.50s/carte ou moins — compteur scellé' },
+    blind_run: { name: 'La Traversée', desc: '8 decks — 0.45s/carte ou plus dur — compteur scellé' },
+    iron_streak: { name: 'La Chaîne', desc: '10 victoires consécutives — 0.55s/carte moy. ou moins — compteur scellé' },
+    full_burn: { name: 'Le Grand Embrasement', desc: '8 decks — 95%+ pénétration — compteur scellé' },
+    casino_complete: { name: 'L\'Impétrant', desc: 'Achever l\'Épreuve en entier' },
   },
 
   tutorial: {
     skip: 'Passer',
     welcome: {
-      logoSub: 'L’Académie des Compteurs',
+      logoSub: 'L\'Académie des Compteurs',
       intro:
-        'Depuis des générations, l’Académie transmet l’art du Hi-Lo à ceux qui savent regarder. En cinq minutes, tu sauras suivre le compte d’un sabot entier.',
+        'Depuis des générations, l\'Académie transmet l\'art du Hi-Lo à ceux qui savent regarder. En cinq minutes, tu sauras suivre le compte d\'un sabot entier.',
       start: 'Franchir le seuil',
       skipKnow: 'Je sais déjà compter',
     },
@@ -370,10 +378,10 @@ const fr = {
       h1l1: 'Trois groupes.',
       h1l2: 'Trois valeurs. Rien de plus.',
       p: 'Chaque carte qui sort modifie ton compte courant de −1, 0 ou +1. Tu commences toujours à 0.',
-      tipTitle: 'L’intuition',
+      tipTitle: 'L\'intuition',
       tipBody:
         'Quand une basse sort, il reste plus de hautes → avantage pour toi → +1. Quand une haute sort, il en reste moins → −1. Un compte élevé annonce que les prochaines cartes seront probablement fortes.',
-      next: 'Compris — à l’exercice',
+      next: 'Compris — à l\'exercice',
     },
     quiz: {
       resultsLabel: 'Résultats',
@@ -399,7 +407,7 @@ const fr = {
       ansNeutral: 'Neutre',
       ansLow: 'Basse',
       correctFb: ({ rank, val }) => `✓ Juste — ${rank} vaut ${val}`,
-      wrongFb: ({ val, type }) => `✗ C’était ${val} (${type})`,
+      wrongFb: ({ val, type }) => `✗ C\'était ${val} (${type})`,
       typeLow: 'carte basse',
       typeNeutral: 'neutre',
       typeHigh: 'carte haute',
@@ -414,7 +422,7 @@ const fr = {
         'Six cartes vont défiler. Garde le compte en tête, puis donne le total final. Commence toujours à 0.',
       tipTitle: 'La méthode',
       tipBody:
-        'Murmure le compte à chaque carte : « un… zéro… moins un… » N’essaie pas de mémoriser chaque carte — seulement le total courant.',
+        'Murmure le compte à chaque carte : « un… zéro… moins un… » N\'essaie pas de mémoriser chaque carte — seulement le total courant.',
       see6: 'Voir les six cartes',
       watching: 'Suis le compte…',
       wrongTry: 'Pas tout à fait. Encore un essai.',
@@ -429,38 +437,72 @@ const fr = {
       label: 'Les trois Voies',
       h1l1: 'Trois voies,',
       h1l2: 'une progression.',
-      p: 'Commence en Salle d’Étude pour forger tes réflexes. Une fois prêt, présente-toi à l’Initiation pour entrer dans la Guilde.',
-      trainingName: 'Salle d’Étude',
+      p: 'Commence en Salle d\'Étude pour forger tes réflexes. Une fois prêt, présente-toi à l\'Initiation pour entrer dans la Guilde.',
+      trainingName: 'Salle d\'Étude',
       trainingSub: 'Pratique libre — commence ici',
       trainingDesc:
         'Règle tout à ta guise : decks (1 à 8), pénétration (50–95 %), vitesse. Pause permise. Compteur au choix. Le lieu où se forgent les réflexes.',
       rankedName: 'Les Portes de la Guilde',
-      rankedSub: 'Voie compétitive — s’ouvre après l’Initiation',
+      rankedSub: 'Voie compétitive — s\'ouvre après l\'Initiation',
       rankedDesc:
         'Gravis les rangs Cuivre → Argent → Or → Émeraude → Saphir → Adamantium. Config fixe par rang, pas de pause, compteur scellé.',
-      casinoName: 'L’Épreuve',
+      casinoName: 'L\'Épreuve',
       casinoSub: 'Cinq cercles enchaînés — la voie ultime',
       casinoDesc:
         '1D → 2D → 4D → 6D → 8D, tous à 90 % de pénétration et 0.40 s/carte. Échouer à un cercle renvoie au premier.',
       available: 'Ouverte',
-      calibTipTitle: 'L’Initiation',
+      calibTipTitle: 'L\'Initiation',
       calibTipBody:
-        'Avant d’entrer dans la Guilde, tu joueras cinq parties d’Initiation qui déterminent ton rang d’admission. Franchis les cinq Portes et l’artefact secret Obsidian Void te reviendra.',
+        'Avant d\'entrer dans la Guilde, tu joueras cinq parties d\'Initiation qui déterminent ton rang d\'admission. Franchis les cinq Portes et l\'artefact secret Obsidian Void te reviendra.',
       continue: 'Continuer',
     },
     ready: {
       check1: 'Hi-Lo compris : 2–6 = +1, 7–9 = 0, 10–A = −1',
       check2: 'Compte courant suivi sur une séquence réelle',
-      check3: 'Les trois Voies présentées — la Salle d’Étude t’est ouverte',
+      check3: 'Les trois Voies présentées — la Salle d\'Étude t\'est ouverte',
       title: 'Tu es des nôtres.',
-      p: 'Le reste s’apprend aux tables. Ouvre une séance en Salle d’Étude, va à ton rythme, observe ton compte.',
+      p: 'Le reste s\'apprend aux tables. Ouvre une séance en Salle d\'Étude, va à ton rythme, observe ton compte.',
       firstGoalTitle: 'Ton premier exercice',
-      firstGoalPre: 'Ouvre une séance d’étude : ',
+      firstGoalPre: 'Ouvre une séance d\'étude : ',
       firstGoalStrong: '1 deck, 75 % de pénétration',
       firstGoalPost:
         ', vitesse posée. Révèle le compteur si tu te perds — le verdict tombe à la fin de chaque séance.',
       enterLobby: 'Entrer dans le Hall',
     },
+  },
+  trainingSubMode: {
+    title: 'Salle d\'Étude', sub: 'Choisis ta voie d\'entraînement',
+    standardTitle: 'La Forge', standardSub: 'Configuration libre, pause permise — forgez vos automatismes sans pression de rang.',
+    speedrunTitle: 'La Rafale', speedrunSub: 'Cartes au toucher · chrono · compte final',
+    quizTitle: 'Le Déchiffrement', quizSub: 'Identifie la valeur Hi-Lo de chaque carte : +1, 0 ou −1',
+  },
+
+  speedrunConfig: {
+    title: 'La Rafale', sub: 'Avance les cartes au toucher. Chrono en marche.',
+    cards: ({ cards }) => `${cards} cartes`,
+    best: ({ time }) => `Record : ${time}s`,
+    start: 'Lancer la Rafale',
+  },
+
+  quizConfig: {
+    title: 'Le Déchiffrement', sub: 'Identifie la valeur Hi-Lo de chaque carte avant la suivante',
+    cardCount: 'Nombre de cartes',
+    hint: 'Basses (2–6) → +1 · Neutres (7–9) → 0 · Hautes (10–A) → −1',
+    start: 'Entrer dans le Déchiffrement',
+  },
+
+  quizResult: {
+    title: 'Le Déchiffrement — séance achevée',
+    perfect: 'Sans faute. La reconnaissance viendra.',
+    good: 'Solide. Continue d\'affiner.',
+    ok: 'Le geste vient.',
+    poor: 'La pratique ancre le geste.',
+  },
+
+  quiz: {
+    ansLow: '+1 (Basse : 26)',
+    ansNeutral: '0 (Neutre : 79)',
+    ansHigh: '1 (Haute : 10A)',
   },
 };
 

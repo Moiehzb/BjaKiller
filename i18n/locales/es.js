@@ -43,6 +43,7 @@ const es = {
   modeName: {
     training: 'Sala de Estudio', ranked: 'Las Puertas del Gremio', promo: 'Ascensión',
     placement: 'Iniciación', casino: 'La Prueba', daily: 'Rito diario',
+    speedrun: 'La Tempestad', quiz: 'El Desciframiento',
   },
 
   ranks: {
@@ -95,7 +96,8 @@ const es = {
     dailyDoneWin: ({ score }) => `✓ Cumplido · ${score} pts`,
     dailyDoneLoss: '✗ Fallado',
     dailyComeBack: 'Vuelve mañana',
-    settings: 'Scriptorium',
+    dailyLocked: 'Sellado — completa primero la Iniciación',
+    settings:'Scriptorium',
     settingsSub: 'Opciones · Reinicio',
     currentStreak: ({ streak }) => `Racha en curso: ${streak}`,
   },
@@ -291,6 +293,8 @@ const es = {
     countdownPromo: 'ASCENSIÓN',
     countdownPlacement: ({ n, total }) => `INICIACIÓN ${n}/${total}`,
     countdownTraining: 'SALA DE ESTUDIO',
+    countdownSpeedrun: 'LA TEMPESTAD',
+    countdownQuiz: 'EL DESCIFRAMIENTO',
     countdownRanked: 'LAS PUERTAS DEL GREMIO',
     go: 'CUENTA',
     cardsTime: ({ cards, tl }) => `${cards} cartas · ${tl}s`,
@@ -332,6 +336,10 @@ const es = {
     abandonMmr: '−25 MMR',
     abandonBody2: ' se descontarán de inmediato.',
     abandon: 'Abandonar',
+    tapCard: 'Toca la carta para avanzar',
+    speedrunResult: ({ time }) => `Tiempo: ${time}s`,
+    speedrunBest: ({ time }) => `Récord: ${time}s`,
+    speedrunNewBest: '¡Nuevo récord!',
   },
 
   timePicker: {
@@ -344,13 +352,54 @@ const es = {
   },
 
   challenges: {
-    frame_perfect: { name: 'Frame Perfect', desc: '1 mazo — 0.40s/carta o más difícil — contador sellado' },
-    no_mercy: { name: 'No Mercy', desc: 'Supera la puerta Or → Émeraude al primer intento — contador sellado' },
-    the_wall: { name: 'The Wall', desc: '6 mazos — 90%+ penetración — 0.50s/carta o menos — contador sellado' },
-    blind_run: { name: 'Blind Run', desc: '8 mazos — 0.45s/carta o más difícil — contador sellado' },
-    iron_streak: { name: 'Iron Streak', desc: '10 victorias seguidas — 0.55s/carta de media o menos — contador sellado' },
-    full_burn: { name: 'Full Burn', desc: '8 mazos — 95%+ penetración — contador sellado' },
-    casino_complete: { name: 'Casino Ready', desc: 'Completa la Prueba entera' },
+    frame_perfect: { name: 'Kairos', desc: '1 mazo — 0.40s/carta o más difícil — contador sellado' },
+    flash: { name: 'Fulgur', desc: '2 mazos · 50% pen. · 52 cartas · menos de 25s — contador sellado' },
+    the_wall: { name: 'Lo Infranqueable', desc: '6 mazos — 90%+ penetración — 0.50s/carta o menos — contador sellado' },
+    blind_run: { name: 'La Travesía', desc: '8 mazos — 0.45s/carta o más difícil — contador sellado' },
+    iron_streak: { name: 'La Cadena', desc: '10 victorias seguidas — 0.55s/carta de media o menos — contador sellado' },
+    full_burn: { name: 'El Gran Incendio', desc: '8 mazos — 95%+ penetración — contador sellado' },
+    casino_complete: { name: 'El Aspirante', desc: 'Completa la Prueba entera' },
+  },
+
+  trainingSubMode: {
+    title: 'Sala de Estudio',
+    sub: 'Elige tu vía de entrenamiento',
+    standardTitle: 'La Forja',
+    standardSub: 'Configuración libre, pausa permitida — forja tus reflejos sin presión de rango.',
+    speedrunTitle: 'La Tempestad',
+    speedrunSub: 'Carta a carta al toque · cronómetro · cuenta final',
+    quizTitle: 'El Desciframiento',
+    quizSub: 'Identifica el valor Hi-Lo de cada carta: +1, 0 o −1',
+  },
+
+  speedrunConfig: {
+    title: 'La Tempestad',
+    sub: 'Avanza las cartas tocando · el cronómetro corre · da la cuenta final',
+    cards: ({ cards }) => `${cards} cartas a contar`,
+    best: ({ time }) => `Récord: ${time}s`,
+    start: 'Lanzar la Tempestad',
+  },
+
+  quizConfig: {
+    title: 'El Desciframiento',
+    sub: 'Identifica el valor Hi-Lo de cada carta antes de la siguiente',
+    cardCount: 'Número de cartas',
+    hint: 'Bajas (2-6) → +1 · Neutras (7-9) → 0 · Altas (10-A) → −1',
+    start: 'Entrar en el Desciframiento',
+  },
+
+  quizResult: {
+    title: 'El Desciframiento — sesión completa',
+    perfect: 'Sin errores. El reconocimiento es tuyo.',
+    good: 'Sólido. Sigue afinando.',
+    ok: 'El reflejo está tomando forma.',
+    poor: 'La práctica forja el instinto. Inténtalo de nuevo.',
+  },
+
+  quiz: {
+    ansLow: '+1 (Baja: 2-6)',
+    ansNeutral: '0 (Neutra: 7-9)',
+    ansHigh: '−1 (Alta: 10-A)',
   },
 
   tutorial: {

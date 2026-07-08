@@ -43,6 +43,7 @@ const it = {
   modeName: {
     training: 'Sala di Studio', ranked: 'Le Porte della Gilda', promo: 'Ascensione',
     placement: 'Iniziazione', casino: 'La Prova', daily: 'Rito del Giorno',
+    speedrun: 'La Tempesta', quiz: 'La Decifrazione',
   },
 
   ranks: {
@@ -95,6 +96,7 @@ const it = {
     dailyDoneWin: ({ score }) => `✓ Compiuto · ${score} pt`,
     dailyDoneLoss: '✗ Fallito',
     dailyComeBack: 'Torna domani',
+    dailyLocked: 'Sigillato — completa prima l\'Iniziazione',
     settings: 'Scriptorium',
     settingsSub: 'Opzioni · Ripristino',
     currentStreak: ({ streak }) => `Serie attuale: ${streak}`,
@@ -291,6 +293,8 @@ const it = {
     countdownPromo: 'ASCENSIONE',
     countdownPlacement: ({ n, total }) => `INIZIAZIONE ${n}/${total}`,
     countdownTraining: 'SALA DI STUDIO',
+    countdownSpeedrun: 'LA TEMPESTA',
+    countdownQuiz: 'LA DECIFRAZIONE',
     countdownRanked: 'LE PORTE DELLA GILDA',
     go: 'CONTA',
     cardsTime: ({ cards, tl }) => `${cards} carte · ${tl}s`,
@@ -332,6 +336,10 @@ const it = {
     abandonMmr: '−25 MMR',
     abandonBody2: ' verranno detratti immediatamente.',
     abandon: 'Abbandona',
+    tapCard: 'Tocca la carta per avanzare',
+    speedrunResult: ({ time }) => `Tempo: ${time}s`,
+    speedrunBest: ({ time }) => `Record: ${time}s`,
+    speedrunNewBest: 'Nuovo record!',
   },
 
   timePicker: {
@@ -344,14 +352,34 @@ const it = {
   },
 
   challenges: {
-    frame_perfect: { name: 'Frame Perfect', desc: '1 mazzo — 0,40s/carta o più difficile — contatore sigillato' },
-    no_mercy: { name: 'No Mercy', desc: 'Supera la porta Or → Émeraude al primo tentativo — contatore sigillato' },
-    the_wall: { name: 'The Wall', desc: '6 mazzi — 90%+ penetrazione — 0,50s/carta o meno — contatore sigillato' },
-    blind_run: { name: 'Blind Run', desc: '8 mazzi — 0,45s/carta o più difficile — contatore sigillato' },
-    iron_streak: { name: 'Iron Streak', desc: '10 vittorie consecutive — media 0,55s/carta o meno — contatore sigillato' },
-    full_burn: { name: 'Full Burn', desc: '8 mazzi — 95%+ penetrazione — contatore sigillato' },
-    casino_complete: { name: 'Casino Ready', desc: 'Completa la Prova per intero' },
+    frame_perfect: { name: 'Kairos', desc: '1 mazzo — 0,40s/carta o più difficile — contatore sigillato' },
+    flash: { name: 'Fulgur', desc: '2 mazzi · 50% pen. · 52 carte · meno di 25s — contatore sigillato' },
+    the_wall: { name: 'L\'Invalicabile', desc: '6 mazzi — 90%+ penetrazione — 0,50s/carta o meno — contatore sigillato' },
+    blind_run: { name: 'L\'Attraversamento', desc: '8 mazzi — 0,45s/carta o più difficile — contatore sigillato' },
+    iron_streak: { name: 'La Catena', desc: '10 vittorie consecutive — media 0,55s/carta o meno — contatore sigillato' },
+    full_burn: { name: 'Il Grande Incendio', desc: '8 mazzi — 95%+ penetrazione — contatore sigillato' },
+    casino_complete: { name: 'L\'Aspirante', desc: 'Completa la Prova per intero' },
   },
+
+  trainingSubMode: {
+    title: 'Sala di Studio', sub: 'Scegli il tuo percorso di allenamento',
+    standardTitle: 'La Fucina', standardSub: 'Configurazione libera, pausa consentita — forgia i tuoi riflessi senza pressione di rango.',
+    speedrunTitle: 'La Tempesta', speedrunSub: 'Carta a carta al tocco · cronometro · conto finale',
+    quizTitle: 'La Decifrazione', quizSub: 'Identifica il valore Hi-Lo di ogni carta: +1, 0 o −1',
+  },
+  speedrunConfig: {
+    title: 'La Tempesta', sub: 'Avanza le carte toccando · l\'orologio gira · dai il conto finale',
+    cards: ({ cards }) => `${cards} carte da contare`, best: ({ time }) => `Record: ${time}s`, start: 'Entra nella Tempesta',
+  },
+  quizConfig: {
+    title: 'La Decifrazione', sub: 'Rivela il valore Hi-Lo di ogni carta prima della successiva',
+    cardCount: 'Numero di carte', hint: 'Basse (2–6) → +1 · Neutre (7–9) → 0 · Alte (10–A) → −1', start: 'Entra nella Decifrazione',
+  },
+  quizResult: {
+    title: 'La Decifrazione — seduta conclusa', perfect: 'Impeccabile. Il riconoscimento è tuo.',
+    good: 'Solido. Continua ad affinare.', ok: 'Il riflesso si sta formando.', poor: 'La pratica forgia l\'istinto. Riprova.',
+  },
+  quiz: { ansLow: '+1 (Bassa: 2-6)', ansNeutral: '0 (Neutra: 7-9)', ansHigh: '−1 (Alta: 10-A)' },
 
   tutorial: {
     skip: 'Salta',

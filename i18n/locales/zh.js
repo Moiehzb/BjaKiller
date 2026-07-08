@@ -1,4 +1,4 @@
-// ─── 中文（简体）──────────────────────────────────────────────────
+﻿// ─── 中文（简体）──────────────────────────────────────────────────
 // Mirror of fr.js — keep the key structure identical across locales.
 // 编辑基调：克制、入门式 — 计牌者秘密学院。
 // 专有名词不翻译：段位 (Cuivre…Adamantium)、皮肤、成就。
@@ -43,6 +43,7 @@ const zh = {
   modeName: {
     training: '研习室', ranked: '公会之门', promo: '晋升',
     placement: '入会考核', casino: '试炼', daily: '每日仪式',
+    speedrun: '风暴', quiz: '解读',
   },
 
   ranks: {
@@ -95,6 +96,7 @@ const zh = {
     dailyDoneWin: ({ score }) => `✓ 已完成 · ${score}分`,
     dailyDoneLoss: '✗ 未完成',
     dailyComeBack: '明天再来',
+    dailyLocked: '封印中 — 请先完成入会考核',
     settings: '典籍室',
     settingsSub: '选项 · 重置',
     currentStreak: ({ streak }) => `当前连胜: ${streak}`,
@@ -291,6 +293,8 @@ const zh = {
     countdownPromo: '晋升',
     countdownPlacement: ({ n, total }) => `入会考核 ${n}/${total}`,
     countdownTraining: '研习室',
+    countdownSpeedrun: '风暴',
+    countdownQuiz: '解读',
     countdownRanked: '公会之门',
     go: '开始计数',
     cardsTime: ({ cards, tl }) => `${cards}张 · ${tl}秒`,
@@ -331,6 +335,10 @@ const zh = {
     abandonBody1: '退出将计为失败。',
     abandonMmr: '−25 MMR',
     abandonBody2: ' 将立即扣除。',
+    tapCard: '点击牌面前进',
+    speedrunResult: ({ time }) => `用时: ${time}s`,
+    speedrunBest: ({ time }) => `记录: ${time}s`,
+    speedrunNewBest: '新纪录!',
     abandon: '退出',
   },
 
@@ -344,15 +352,34 @@ const zh = {
   },
 
   challenges: {
-    frame_perfect: { name: 'Frame Perfect', desc: '1副牌 — 0.40秒/张或更难 — 计数器封锁' },
-    no_mercy: { name: 'No Mercy', desc: '首次通过 Or → Émeraude 关卡 — 计数器封锁' },
-    the_wall: { name: 'The Wall', desc: '6副牌 — 穿透率90%以上 — 0.50秒/张以下 — 计数器封锁' },
-    blind_run: { name: 'Blind Run', desc: '8副牌 — 0.45秒/张或更难 — 计数器封锁' },
-    iron_streak: { name: 'Iron Streak', desc: '10连胜 — 平均0.55秒/张以下 — 计数器封锁' },
-    full_burn: { name: 'Full Burn', desc: '8副牌 — 穿透率95%以上 — 计数器封锁' },
-    casino_complete: { name: 'Casino Ready', desc: '完整完成试炼' },
+    frame_perfect: { name: 'Kairos', desc: '1副牌 — 0.40秒/张或更难 — 计数器封锁' },
+    flash: { name: 'Fulgur', desc: '2副牌 · 50%渗透率 · 52张 · 25秒内 — 计数器隐藏' },
+    the_wall: { name: '天堑', desc: '6副牌 — 穿透率90%以上 — 0.50秒/张以下 — 计数器封锁' },
+    blind_run: { name: '渡关', desc: '8副牌 — 0.45秒/张或更难 — 计数器封锁' },
+    iron_streak: { name: '铁链', desc: '10连胜 — 平均0.55秒/张以下 — 计数器封锁' },
+    full_burn: { name: '烈焰', desc: '8副牌 — 穿透率95%以上 — 计数器封锁' },
+    casino_complete: { name: '求道者', desc: '完整完成试炼' },
   },
 
+
+  trainingSubMode: {
+    title: '研习室', sub: '选择训练方式',
+    standardTitle: '锻造场', standardSub: '自由配置，可暂停 — 在无段位压力的情况下锻造你的反射弧。',
+    speedrunTitle: '风暴', speedrunSub: '逐张点击 · 秒表 · 最终计数',
+    quizTitle: '解读', quizSub: '识别每张牌的Hi-Lo值：+1、0或−1',
+  },
+  speedrunConfig: {
+    title: '风暴', sub: '逐张点击 · 秒表 · 最终计数',
+    cards: ({ cards }) => `${cards}张`, best: ({ time }) => `${time}s`, start: '进入风暴',
+  },
+  quizConfig: {
+    title: '解读', sub: '在下一张牌出现前揭示每张牌的Hi-Lo值',
+    cardCount: '卡牌数量', hint: '低牌 (2–6) → +1 · 中性 (7–9) → 0 · 高牌 (10–A) → −1', start: '进入解读',
+  },
+  quizResult: {
+    title: '解读 — 场次完成', perfect: '无懈可击。认知已得。', good: '稳固。继续磨砺。', ok: '反射正在形成。', poor: '练习铸就本能。再试一次。',
+  },
+  quiz: { ansLow: '+1 (2-6)', ansNeutral: '0 (7-9)', ansHigh: '−1 (10-A)' },
   tutorial: {
     skip: '跳过',
     welcome: {

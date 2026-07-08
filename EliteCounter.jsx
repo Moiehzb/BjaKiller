@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Play, Pause, X, ChevronRight, ChevronLeft, Eye, EyeOff, AlertTriangle, Globe, Volume2, VolumeX, Music, Vibrate, BookOpen, DoorOpen, Flame, CalendarDays, Sparkles, Award, Gem, BarChart3, ScrollText, Lock, KeyRound } from 'lucide-react';
+import { Play, Pause, X, ChevronRight, ChevronLeft, Eye, EyeOff, AlertTriangle, Globe, Volume2, VolumeX, Music, Vibrate, BookOpen, DoorOpen, Flame, CalendarDays, Sparkles, Award, Gem, BarChart3, ScrollText, Lock, KeyRound, Zap, Timer } from 'lucide-react';
 import TutorialOverlay from './EliteCounterTutorial.jsx';
 import { makeT, DEFAULT_LANG, getLanguage } from './i18n';
 import { LanguageSelectScreen, LanguageModal, Flag } from './LanguageSelect.jsx';
@@ -451,12 +451,11 @@ const CHALLENGES = [
     check: (ctx) => ctx.won && ctx.decks === 1 && ctx.spc <= 0.40 && !ctx.countWasShown,
   },
   {
-    id: 'no_mercy',
-    name: 'No Mercy',
-    desc: 'Réussis la porte Or → Émeraude du premier coup — compteur caché',
-    icon: '⚔️', coins: 500,
-    // gateId 2 = Or→Émeraude (the hardest gate most players will first attempt)
-    check: (ctx) => ctx.won && ctx.mode === 'placement' && ctx.slotType === 'gate' && ctx.gateId === 2 && ctx.firstAttemptOnThisSlot && !ctx.countWasShown,
+    id: 'flash',
+    name: 'Fulgur',
+    desc: '2 decks · 50% pén. · 52 cartes · moins de 25s — compteur scellé',
+    icon: '⚡', coins: 500,
+    check: (ctx) => ctx.won && ctx.mode === 'speedrun' && ctx.speedrunTime <= 25 && ctx.cards === 52 && !ctx.countWasShown,
   },
   {
     id: 'the_wall',
@@ -1332,6 +1331,7 @@ const DEFAULT_SAVE = {
   // lastResult: { key, won, score, error, trueCount, answer, decks }
   // history: [{ key, won, score }] (14 derniers jours)
   daily: { lastKey: '', lastResult: null, streak: 0, bestStreak: 0, bestScore: 0, totalPlayed: 0, totalWon: 0, history: [] },
+  speedrunBestTime: null, // meilleur temps en mode L'Éclair (secondes)
 
   // Casino Killer
   casinoChallenge: {
@@ -1418,8 +1418,16 @@ export default function EliteCounter() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [trainDecks, trainPen, trainTime, trainShowCount]);
 
+  // ── Training sub-modes (L'Éclair, L'Abécédaire)
+  const [trainSubMode, setTrainSubMode] = useState(null); // null | 'standard' | 'speedrun' | 'quiz'
+  const [speedrunDecks, setSpeedrunDecks] = useState(2);
+  const [speedrunPen, setSpeedrunPen] = useState(50);
+  const [quizCardCount, setQuizCardCount] = useState(20);
+  const [quizResult, setQuizResult] = useState(null); // {correct, expected} feedback per card
+  const [quizScore, setQuizScore] = useState({ correct: 0, total: 0 });
+
   // ── game mode tracking
-  const gameModeRef = useRef('ranked'); // 'ranked'|'placement'|'training'|'promo'|'casino'
+  const gameModeRef = useRef('ranked'); // 'ranked'|'placement'|'training'|'promo'|'casino'|'speedrun'|'quiz'
   const rankUsedRef = useRef(null);     // RANKS_DEF entry used for this game
   const timeLimitUsedRef = useRef(null);
   const placementTierPlayedRef = useRef(null);
@@ -1629,7 +1637,7 @@ export default function EliteCounter() {
   }, [currentIndex, gameState, deck.length, startTime]);
 
   // ── Core: launch any game ──────────────────────────────────────
-  const launchGame = (decks, pen, timeSec, mode, skipCountdown = false, initialCountShown = false, presetDeck = null) => {
+  const launchGame = (decks, pen, timeSec, mode, skipCountdown = false, initialCountShown = false, presetDeck = null, clickMode = false) => {
     const newDeck = presetDeck || buildDeck(decks, pen);
     setDeck(newDeck);
     setCurrentIndex(0);
@@ -1649,13 +1657,15 @@ export default function EliteCounter() {
       setCurrentIndex(1);
       setGameState('playing');
       setStartTime(Date.now());
-      const interval = (timeSec * 1000) / newDeck.length;
-      let ci = 1;
-      autoPlayRef.current = setInterval(() => {
-        ci++;
-        if (ci <= newDeck.length) setCurrentIndex(ci);
-        else clearInterval(autoPlayRef.current);
-      }, interval);
+      if (!clickMode) {
+        const interval = (timeSec * 1000) / newDeck.length;
+        let ci = 1;
+        autoPlayRef.current = setInterval(() => {
+          ci++;
+          if (ci <= newDeck.length) setCurrentIndex(ci);
+          else clearInterval(autoPlayRef.current);
+        }, interval);
+      }
     };
 
     if (skipCountdown) {
@@ -1717,6 +1727,56 @@ export default function EliteCounter() {
     // Pass trainShowCount as initialCountShown so launchGame sets the ref correctly
     // (setting it before launchGame would just get overwritten)
     launchGame(trainDecks, trainPen, trainTime, 'training', false, trainShowCount);
+  };
+
+  // ── L'Éclair (Speedrun) ────────────────────────────────────────
+  const startSpeedrun = () => {
+    gameModeRef.current = 'speedrun';
+    rankUsedRef.current = null;
+    setQuizResult(null);
+    setQuizScore({ correct: 0, total: 0 });
+    setNav('game');
+    setShowCount(false);
+    // Build deck with selected decks/pen; clickMode=true (manual card advance)
+    const newDeck = buildDeck(speedrunDecks, speedrunPen);
+    launchGame(speedrunDecks, speedrunPen, 9999, 'speedrun', false, false, newDeck, true);
+  };
+
+  const advanceSpeedrunCard = () => {
+    if (gameState !== 'playing' || gameModeRef.current !== 'speedrun') return;
+    setCurrentIndex(i => {
+      if (i >= deck.length) return i; // guard against over-click
+      return i + 1;
+    });
+  };
+
+  // ── L'Abécédaire (Quiz) ────────────────────────────────────────
+  const startQuiz = () => {
+    gameModeRef.current = 'quiz';
+    rankUsedRef.current = null;
+    setQuizResult(null);
+    setQuizScore({ correct: 0, total: 0 });
+    setNav('game');
+    setShowCount(false);
+    // Build a deck of exactly quizCardCount cards
+    const decksNeeded = quizCardCount <= 52 ? 1 : 2;
+    const rawDeck = buildDeck(decksNeeded, 100);
+    const slicedDeck = rawDeck.slice(0, quizCardCount);
+    launchGame(decksNeeded, 100, 9999, 'quiz', false, false, slicedDeck, true);
+  };
+
+  const answerQuiz = (answer) => {
+    if (quizResult !== null) return; // already answered this card
+    const expected = deck[currentIndex - 1]?.value;
+    if (expected === undefined) return;
+    const correct = answer === expected;
+    setQuizResult({ correct, expected, got: answer });
+    setQuizScore(q => ({ correct: q.correct + (correct ? 1 : 0), total: q.total + 1 }));
+    if (correct) { snd(playCorrect); vibrateWin(); } else { snd(playWrong); vibrateLose(); }
+    setTimeout(() => {
+      setQuizResult(null);
+      setCurrentIndex(i => i + 1);
+    }, 700);
   };
 
   // ── Défi du jour ────────────────────────────────────────────────
@@ -2049,6 +2109,8 @@ export default function EliteCounter() {
       penetration: penUsed,
       spc: spcUsed,
       finalTimeSec: timeInSec,
+      cards: cardsUsed,
+      speedrunTime: timeInSec,
       mode: gameModeRef.current,
       slotType: placementTierPlayedRef.current?.type,
       gateId: placementTierPlayedRef.current?.gateId,
@@ -2088,6 +2150,7 @@ export default function EliteCounter() {
       unlockedAchievements: newUnlockedAchievements,
       ...(gameModeRef.current === 'training' && !save.trainingDone ? { trainingDone: true } : {}),
       ...(['ranked', 'placement', 'promo'].includes(gameModeRef.current) && !save.rankedDone ? { rankedDone: true } : {}),
+      ...(gameModeRef.current === 'speedrun' && correct && (!save.speedrunBestTime || timeInSec < save.speedrunBestTime) ? { speedrunBestTime: timeInSec } : {}),
     });
 
     if (newlyUnlocked.length > 0) {
@@ -2145,11 +2208,10 @@ export default function EliteCounter() {
     setShowResult(false);
     setIsCorrect(null);
     setUserAnswer('');
-    if (gameModeRef.current === 'training') {
-      startTraining();
-    } else {
-      startRanked();
-    }
+    if (gameModeRef.current === 'speedrun') startSpeedrun();
+    else if (gameModeRef.current === 'quiz') startQuiz();
+    else if (gameModeRef.current === 'training') startTraining();
+    else startRanked();
   };
 
   const flushPendingAchievements = () => {
@@ -2167,6 +2229,7 @@ export default function EliteCounter() {
     setCasinoCountdown(null);
     setCasinoActive(false);
     setGameState('idle');
+    setQuizResult(null);
     setNav('lobby');
     flushPendingAchievements();
   };
@@ -2247,7 +2310,7 @@ export default function EliteCounter() {
     'mode-ranked': [t('crumbs.home'), t('crumbs.ranked')],
     'mode-training': [t('crumbs.home'), t('crumbs.training')],
     'mode-casino': [t('crumbs.home'), t('crumbs.casino')],
-    game: [t('crumbs.home'), gameModeRef.current === 'training' ? t('crumbs.training') : gameModeRef.current === 'casino' ? t('crumbs.casino') : gameModeRef.current === 'daily' ? t('modeName.daily') : t('crumbs.ranked'), t('crumbs.game')],
+    game: [t('crumbs.home'), gameModeRef.current === 'training' ? t('crumbs.training') : gameModeRef.current === 'speedrun' ? t('modeName.speedrun') : gameModeRef.current === 'quiz' ? t('modeName.quiz') : gameModeRef.current === 'casino' ? t('crumbs.casino') : gameModeRef.current === 'daily' ? t('modeName.daily') : t('crumbs.ranked'), t('crumbs.game')],
   };
   const crumbs = crumbMap[nav] || [t('crumbs.home')];
 
@@ -2377,32 +2440,38 @@ export default function EliteCounter() {
             const dRes = save.daily?.lastResult;
             const dCfg = getDailyConfig(daySeed(), save.rankId, save.subRank);
             const isSpecial = !dDone && dCfg.special;
+            const dailyLocked = !save.placementDone;
             return (
-              <div className="card" onClick={() => { snd(playClick); if (dDone) setShowStats(true); else startDaily(); }}
-                style={dDone
-                  ? { borderColor: G.border, background: 'rgba(255,255,255,.02)' }
-                  : isSpecial
-                    ? { borderColor: G.gold, background: 'rgba(201,162,75,.12)', boxShadow: '0 0 22px rgba(201,162,75,.28)' }
-                    : { borderColor: G.borderGold, background: 'rgba(201,162,75,.07)', boxShadow: '0 0 18px rgba(201,162,75,.15)' }}>
+              <div className="card"
+                onClick={dailyLocked ? undefined : () => { snd(playClick); if (dDone) setShowStats(true); else startDaily(); }}
+                style={dailyLocked
+                  ? { opacity: 0.45, cursor: 'not-allowed' }
+                  : dDone
+                    ? { borderColor: G.border, background: 'rgba(255,255,255,.02)' }
+                    : isSpecial
+                      ? { borderColor: G.gold, background: 'rgba(201,162,75,.12)', boxShadow: '0 0 22px rgba(201,162,75,.28)' }
+                      : { borderColor: G.borderGold, background: 'rgba(201,162,75,.07)', boxShadow: '0 0 18px rgba(201,162,75,.15)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
-                  <div className="ci" style={{ display: 'flex' }}>{isSpecial ? <Sparkles size={22} color={G.goldLight} /> : <CalendarDays size={22} color={dDone ? G.textMuted : G.gold} />}</div>
+                  <div className="ci" style={{ display: 'flex' }}>{isSpecial && !dailyLocked ? <Sparkles size={22} color={G.goldLight} /> : <CalendarDays size={22} color={dailyLocked ? G.textMuted : dDone ? G.textMuted : G.gold} />}</div>
                   <div>
-                    <div className="ct" style={{ color: dDone ? G.textPrimary : G.goldLight }}>
-                      {isSpecial ? t('lobby.dailySpecialTitle') : t('lobby.dailyTitle')}
+                    <div className="ct" style={{ color: dailyLocked ? G.textMuted : dDone ? G.textPrimary : G.goldLight }}>
+                      {isSpecial && !dailyLocked ? t('lobby.dailySpecialTitle') : t('lobby.dailyTitle')}
                     </div>
                     <div className="cs">
-                      {dDone
-                        ? (dRes?.won ? t('lobby.dailyDoneWin', { score: dRes.score }) : t('lobby.dailyDoneLoss')) + ' · ' + t('lobby.dailyComeBack')
-                        : t('lobby.dailyReadySub', { decks: dCfg.decks, secs: dCfg.timeLimit })}
+                      {dailyLocked
+                        ? t('lobby.dailyLocked')
+                        : dDone
+                          ? (dRes?.won ? t('lobby.dailyDoneWin', { score: dRes.score }) : t('lobby.dailyDoneLoss')) + ' · ' + t('lobby.dailyComeBack')
+                          : t('lobby.dailyReadySub', { decks: dCfg.decks, secs: dCfg.timeLimit })}
                     </div>
                   </div>
                 </div>
-                {dStreak > 0 && (
+                {!dailyLocked && dStreak > 0 && (
                   <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginRight: 6, fontSize: 13, fontWeight: 700, color: G.gold }}>
                     <Flame size={13} /> {dStreak}
                   </div>
                 )}
-                {!dDone && <ChevronRight className="chev" size={17} />}
+                {!dailyLocked && !dDone && <ChevronRight className="chev" size={17} />}
               </div>
             );
           })()}
@@ -2657,7 +2726,7 @@ export default function EliteCounter() {
                       )}
                     </div>
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 1 }}>{isSecret ? t('shop.secretName') : sk.name}</div>
+                      <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 1 }}>{isSecret ? t('shop.secretName') : (t('skins.' + sk.id + '.name') || sk.name)}</div>
                       <div style={{ fontSize: 12, color: G.textSecondary }}>{isSecret ? t('shop.secretDesc') : sk.price === 0 ? t('shop.free') : <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>{t('shop.priceCoins', { price: sk.price })}<Coin size={11} /></span>}</div>
                     </div>
                     {isSecret ? null : active
@@ -2699,7 +2768,7 @@ export default function EliteCounter() {
                       {!owned && <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Lock size={15} color={G.goldLight} /></div>}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 1, color: owned ? sk.accent : G.textPrimary }}>{sk.name}</div>
+                      <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 1, color: owned ? sk.accent : G.textPrimary }}>{t('skins.' + sk.id + '.name') || sk.name}</div>
                       <div style={{ fontSize: 12, color: G.textSecondary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{owned ? t('shop.tagline.' + sk.id) : price}</div>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
@@ -2853,7 +2922,7 @@ export default function EliteCounter() {
                   <div style={{ background: 'rgba(201,162,75,.06)', border: `1px solid ${G.borderGold}`, borderRadius: 8, padding: '10px 14px', marginBottom: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
                     <div style={{ fontSize: 13, color: G.gold, display: 'flex', alignItems: 'center', gap: 6 }}><Gem size={13} /> {t('stats.topSkin')}</div>
                     <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontFamily: 'Cinzel, serif', fontSize: 15, fontWeight: 700, color: G.goldLight }}>{skinNameById(topSkinId)}</div>
+                      <div style={{ fontFamily: 'Cinzel, serif', fontSize: 15, fontWeight: 700, color: G.goldLight }}>{t('skins.' + topSkinId + '.name') || skinNameById(topSkinId)}</div>
                       <div style={{ fontSize: 11, color: G.textSecondary }}>{t('stats.topSkinGames', { n: topSkinCount })}</div>
                     </div>
                   </div>
@@ -3277,59 +3346,193 @@ export default function EliteCounter() {
   // MODE-TRAINING CONFIG
   // ──────────────────────────────────────────────────────────────
   if (nav === 'mode-training') {
-    const tc = Math.floor(52 * trainDecks * trainPen / 100);
-    return (
-      <div className="r">
-        <style>{css}</style>
-        {renderHeader(true)}
-        {renderCrumbs()}
-        <div className="cfg">
-          <button className="back" onClick={() => { snd(playClick); goBack(); }} style={{ marginBottom: 14 }}><ChevronLeft size={13} /> {t('common.back')}</button>
-          <div style={{ fontFamily: 'Cinzel, serif', fontSize: 21, fontWeight: 700, marginBottom: 3 }}>{t('trainingConfig.title')}</div>
-          <div style={{ fontSize: 13, color: G.textSecondary, marginBottom: 18 }}>{t('trainingConfig.sub')}</div>
+    // ── Sub-mode picker ────────────────────────────────────────────
+    if (trainSubMode === null) {
+      return (
+        <div className="r">
+          <style>{css}</style>
+          {renderHeader(true)}
+          {renderCrumbs()}
+          <div className="cfg">
+            <button className="back" onClick={() => { snd(playClick); goBack(); }} style={{ marginBottom: 14 }}><ChevronLeft size={13} /> {t('common.back')}</button>
+            <div style={{ fontFamily: 'Cinzel, serif', fontSize: 21, fontWeight: 700, marginBottom: 3 }}>{t('trainingSubMode.title')}</div>
+            <div style={{ fontSize: 13, color: G.textSecondary, marginBottom: 22 }}>{t('trainingSubMode.sub')}</div>
 
-          <div className="cfgc">
-            <div className="cfgt">{t('trainingConfig.deckCount')}</div>
-            <div className="dgrid">
-              {[1, 2, 4, 6, 8].map(d => (
-                <button key={d} className={`dbtn${trainDecks === d ? ' a' : ''}`} onClick={() => { snd(playClick); setTrainDecks(d); }}>
-                  <span className="dnum">{d}</span><span className="dlbl">{d > 1 ? t('trainingConfig.decks') : t('trainingConfig.deck')}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="cfgc">
-            <div className="cfgt">{t('trainingConfig.penetration')}</div>
-            <div className="pgrid">
-              {[50, 60, 70, 75, 80, 85, 90, 95].map(p => (
-                <button key={p} className={`pbtn${trainPen === p ? ' a' : ''}`} onClick={() => { snd(playClick); setTrainPen(p); }}>{p}%</button>
-              ))}
-            </div>
-            <div style={{ fontSize: 11, color: G.textSecondary, marginTop: 7 }}>{t('trainingConfig.cardsOf', { cards: tc, total: 52 * trainDecks })}</div>
-          </div>
-
-          <div className="cfgc">
-            <div className="cfgt">{t('trainingConfig.duration')}</div>
-            <TimePicker value={trainTime} onChange={setTrainTime} totalCards={tc} t={t} snd={snd} />
-          </div>
-
-          <div className="cfgc">
-            <div className="cfgt">{t('trainingConfig.options')}</div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div>
-                <div style={{ fontSize: 13, fontWeight: 500 }}>{t('trainingConfig.showCounter')}</div>
-                <div style={{ fontSize: 11, color: G.textSecondary }}>{t('trainingConfig.showCounterSub')}</div>
+            <div className="card feat" onClick={() => { snd(playClick); setTrainSubMode('standard'); }}
+              style={{ marginBottom: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+                <div className="ci" style={{ display: 'flex' }}><BookOpen size={22} color={G.gold} /></div>
+                <div>
+                  <div className="ct">{t('trainingSubMode.standardTitle')}</div>
+                  <div className="cs">{t('trainingSubMode.standardSub')}</div>
+                </div>
               </div>
-              <button style={{ background: trainShowCount ? 'rgba(201,162,75,.15)' : 'rgba(255,255,255,.05)', border: `1px solid ${trainShowCount ? G.gold : G.border}`, borderRadius: 20, padding: '5px 14px', color: trainShowCount ? G.gold : G.textSecondary, cursor: 'pointer', fontSize: 13 }}
-                onClick={() => { snd(playClick); setTrainShowCount(p => !p); }}>{trainShowCount ? t('common.on') : t('common.off')}</button>
+              <ChevronRight className="chev" size={17} />
+            </div>
+
+            <div className="card" onClick={() => { snd(playClick); setTrainSubMode('speedrun'); }}
+              style={{ marginBottom: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+                <div className="ci" style={{ display: 'flex' }}><Zap size={22} color={G.gold} /></div>
+                <div>
+                  <div className="ct">{t('trainingSubMode.speedrunTitle')}</div>
+                  <div className="cs">{t('trainingSubMode.speedrunSub')}</div>
+                </div>
+              </div>
+              <ChevronRight className="chev" size={17} />
+            </div>
+
+            <div className="card" onClick={() => { snd(playClick); setTrainSubMode('quiz'); }}>
+              <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+                <div className="ci" style={{ display: 'flex' }}><ScrollText size={22} color={G.gold} /></div>
+                <div>
+                  <div className="ct">{t('trainingSubMode.quizTitle')}</div>
+                  <div className="cs">{t('trainingSubMode.quizSub')}</div>
+                </div>
+              </div>
+              <ChevronRight className="chev" size={17} />
             </div>
           </div>
-
-          <button className="lbtn" onClick={() => { snd(playClick); startTraining(); }}>{t('trainingConfig.start')}</button>
         </div>
-      </div>
-    );
+      );
+    }
+
+    // ── Standard training config ───────────────────────────────────
+    if (trainSubMode === 'standard') {
+      const tc = Math.floor(52 * trainDecks * trainPen / 100);
+      return (
+        <div className="r">
+          <style>{css}</style>
+          {renderHeader(true)}
+          {renderCrumbs()}
+          <div className="cfg">
+            <button className="back" onClick={() => { snd(playClick); setTrainSubMode(null); }} style={{ marginBottom: 14 }}><ChevronLeft size={13} /> {t('common.back')}</button>
+            <div style={{ fontFamily: 'Cinzel, serif', fontSize: 21, fontWeight: 700, marginBottom: 3 }}>{t('trainingConfig.title')}</div>
+            <div style={{ fontSize: 13, color: G.textSecondary, marginBottom: 18 }}>{t('trainingConfig.sub')}</div>
+
+            <div className="cfgc">
+              <div className="cfgt">{t('trainingConfig.deckCount')}</div>
+              <div className="dgrid">
+                {[1, 2, 4, 6, 8].map(d => (
+                  <button key={d} className={`dbtn${trainDecks === d ? ' a' : ''}`} onClick={() => { snd(playClick); setTrainDecks(d); }}>
+                    <span className="dnum">{d}</span><span className="dlbl">{d > 1 ? t('trainingConfig.decks') : t('trainingConfig.deck')}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="cfgc">
+              <div className="cfgt">{t('trainingConfig.penetration')}</div>
+              <div className="pgrid">
+                {[50, 60, 70, 75, 80, 85, 90, 95].map(p => (
+                  <button key={p} className={`pbtn${trainPen === p ? ' a' : ''}`} onClick={() => { snd(playClick); setTrainPen(p); }}>{p}%</button>
+                ))}
+              </div>
+              <div style={{ fontSize: 11, color: G.textSecondary, marginTop: 7 }}>{t('trainingConfig.cardsOf', { cards: tc, total: 52 * trainDecks })}</div>
+            </div>
+
+            <div className="cfgc">
+              <div className="cfgt">{t('trainingConfig.duration')}</div>
+              <TimePicker value={trainTime} onChange={setTrainTime} totalCards={tc} t={t} snd={snd} />
+            </div>
+
+            <div className="cfgc">
+              <div className="cfgt">{t('trainingConfig.options')}</div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 500 }}>{t('trainingConfig.showCounter')}</div>
+                  <div style={{ fontSize: 11, color: G.textSecondary }}>{t('trainingConfig.showCounterSub')}</div>
+                </div>
+                <button style={{ background: trainShowCount ? 'rgba(201,162,75,.15)' : 'rgba(255,255,255,.05)', border: `1px solid ${trainShowCount ? G.gold : G.border}`, borderRadius: 20, padding: '5px 14px', color: trainShowCount ? G.gold : G.textSecondary, cursor: 'pointer', fontSize: 13 }}
+                  onClick={() => { snd(playClick); setTrainShowCount(p => !p); }}>{trainShowCount ? t('common.on') : t('common.off')}</button>
+              </div>
+            </div>
+
+            <button className="lbtn" onClick={() => { snd(playClick); startTraining(); }}>{t('trainingConfig.start')}</button>
+          </div>
+        </div>
+      );
+    }
+
+    // ── L'Éclair (Speedrun) config ─────────────────────────────────
+    if (trainSubMode === 'speedrun') {
+      const tc = Math.floor(52 * speedrunDecks * speedrunPen / 100);
+      return (
+        <div className="r">
+          <style>{css}</style>
+          {renderHeader(true)}
+          {renderCrumbs()}
+          <div className="cfg">
+            <button className="back" onClick={() => { snd(playClick); setTrainSubMode(null); }} style={{ marginBottom: 14 }}><ChevronLeft size={13} /> {t('common.back')}</button>
+            <div style={{ fontFamily: 'Cinzel, serif', fontSize: 21, fontWeight: 700, marginBottom: 3 }}>{t('speedrunConfig.title')}</div>
+            <div style={{ fontSize: 13, color: G.textSecondary, marginBottom: 18 }}>{t('speedrunConfig.sub')}</div>
+
+            <div className="cfgc">
+              <div className="cfgt">{t('trainingConfig.deckCount')}</div>
+              <div className="dgrid">
+                {[1, 2, 4, 6, 8].map(d => (
+                  <button key={d} className={`dbtn${speedrunDecks === d ? ' a' : ''}`} onClick={() => { snd(playClick); setSpeedrunDecks(d); }}>
+                    <span className="dnum">{d}</span><span className="dlbl">{d > 1 ? t('trainingConfig.decks') : t('trainingConfig.deck')}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="cfgc">
+              <div className="cfgt">{t('trainingConfig.penetration')}</div>
+              <div className="pgrid">
+                {[50, 60, 70, 75, 80, 85, 90, 95].map(p => (
+                  <button key={p} className={`pbtn${speedrunPen === p ? ' a' : ''}`} onClick={() => { snd(playClick); setSpeedrunPen(p); }}>{p}%</button>
+                ))}
+              </div>
+              <div style={{ fontSize: 11, color: G.textSecondary, marginTop: 7 }}>{t('speedrunConfig.cards', { cards: tc })}</div>
+            </div>
+
+            {save.speedrunBestTime && (
+              <div style={{ background: 'rgba(201,162,75,.06)', border: `1px solid ${G.borderGold}`, borderRadius: 10, padding: '10px 14px', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Zap size={14} color={G.gold} />
+                <span style={{ fontSize: 12, color: G.gold }}>{t('speedrunConfig.best', { time: save.speedrunBestTime.toFixed(2) })}</span>
+              </div>
+            )}
+
+            <button className="lbtn" onClick={() => { snd(playClick); startSpeedrun(); }}>{t('speedrunConfig.start')}</button>
+          </div>
+        </div>
+      );
+    }
+
+    // ── L'Abécédaire (Quiz) config ─────────────────────────────────
+    if (trainSubMode === 'quiz') {
+      return (
+        <div className="r">
+          <style>{css}</style>
+          {renderHeader(true)}
+          {renderCrumbs()}
+          <div className="cfg">
+            <button className="back" onClick={() => { snd(playClick); setTrainSubMode(null); }} style={{ marginBottom: 14 }}><ChevronLeft size={13} /> {t('common.back')}</button>
+            <div style={{ fontFamily: 'Cinzel, serif', fontSize: 21, fontWeight: 700, marginBottom: 3 }}>{t('quizConfig.title')}</div>
+            <div style={{ fontSize: 13, color: G.textSecondary, marginBottom: 18 }}>{t('quizConfig.sub')}</div>
+
+            <div className="cfgc">
+              <div className="cfgt">{t('quizConfig.cardCount')}</div>
+              <div className="dgrid">
+                {[10, 20, 30, 52, 104].map(n => (
+                  <button key={n} className={`dbtn${quizCardCount === n ? ' a' : ''}`} onClick={() => { snd(playClick); setQuizCardCount(n); }}>
+                    <span className="dnum">{n}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ background: 'rgba(201,162,75,.05)', border: `1px solid ${G.border}`, borderRadius: 10, padding: '10px 14px', marginBottom: 18, fontSize: 12, color: G.textSecondary, lineHeight: 1.5 }}>
+              {t('quizConfig.hint')}
+            </div>
+
+            <button className="lbtn" onClick={() => { snd(playClick); startQuiz(); }}>{t('quizConfig.start')}</button>
+          </div>
+        </div>
+      );
+    }
   }
 
   // ──────────────────────────────────────────────────────────────
@@ -3442,7 +3645,7 @@ export default function EliteCounter() {
                 </div>
               )}
               <div style={{ fontSize: 12, color: G.textSecondary, letterSpacing: '.1em', textTransform: 'uppercase' }}>
-                {isCasino ? t('game.countdownCasino', { n: casinoStep + 1 }) : gameModeRef.current === 'daily' ? t('modeName.daily') : gameModeRef.current === 'promo' ? t('game.countdownPromo') : gameModeRef.current === 'placement' ? t('game.countdownPlacement', { n: save.placementGames + 1, total: PLACEMENT_TOTAL }) : gameModeRef.current === 'training' ? t('game.countdownTraining') : t('game.countdownRanked')}
+                {isCasino ? t('game.countdownCasino', { n: casinoStep + 1 }) : gameModeRef.current === 'daily' ? t('modeName.daily') : gameModeRef.current === 'promo' ? t('game.countdownPromo') : gameModeRef.current === 'placement' ? t('game.countdownPlacement', { n: save.placementGames + 1, total: PLACEMENT_TOTAL }) : gameModeRef.current === 'training' ? t('game.countdownTraining') : gameModeRef.current === 'speedrun' ? t('game.countdownSpeedrun') : gameModeRef.current === 'quiz' ? t('game.countdownQuiz') : t('game.countdownRanked')}
               </div>
               <div className="cdnum" key={countdown}>{countdown > 0 ? countdown : t('game.go')}</div>
               <div style={{ fontSize: 12, color: G.textSecondary }}>{t('game.cardsTime', { cards: deck.length, tl })}</div>
@@ -3456,13 +3659,45 @@ export default function EliteCounter() {
     if (gameState === 'finished') {
       const isPlace = gameModeRef.current === 'placement';
       const finalTimeSec = finalTime / 1000;
+      const isSpeedrun = gameModeRef.current === 'speedrun';
+      const isQuizMode = gameModeRef.current === 'quiz';
+
+      // ── Quiz finished screen ────────────────────────────────────
+      if (isQuizMode) {
+        const pct = quizScore.total > 0 ? Math.round(quizScore.correct / quizScore.total * 100) : 0;
+        const perf = pct === 100 ? 'perfect' : pct >= 75 ? 'good' : pct >= 50 ? 'ok' : 'poor';
+        return (
+          <div className="r"><style>{css}</style>
+            <div className="gm" style={{ padding: 0 }}>
+              <div style={{ padding: '18px 18px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <button className="back" onClick={() => { snd(playClick); goBack(); }}><ChevronLeft size={13} /> {t('common.menu')}</button>
+              </div>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 24px 32px' }}>
+                <div style={{ textAlign: 'center', maxWidth: 300, margin: '0 auto', width: '100%' }}>
+                  <div style={{ fontFamily: 'Cinzel, serif', fontSize: 20, fontWeight: 700, marginBottom: 6 }}>{t('quizResult.title')}</div>
+                  <div style={{ fontFamily: 'Cinzel, serif', fontSize: 48, fontWeight: 700, color: pct >= 75 ? G.goldLight : pct >= 50 ? G.amber : G.red, marginBottom: 4 }}>
+                    {quizScore.correct}<span style={{ fontSize: 22, color: G.textSecondary }}>/{quizScore.total}</span>
+                  </div>
+                  <div style={{ fontSize: 13, color: G.textSecondary, marginBottom: 20 }}>{t('quizResult.' + perf)}</div>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button style={{ flex: 1, padding: '11px 0', background: 'rgba(255,255,255,.04)', border: `1px solid ${G.border}`, borderRadius: 8, color: G.textSecondary, cursor: 'pointer', fontSize: 13 }} onClick={() => { snd(playClick); goBack(); }}>{t('common.menu')}</button>
+                    <button className="lbtn" style={{ flex: 2, marginTop: 0, padding: 11 }} onClick={() => { snd(playClick); playAgain(); }}>{t('common.replay')}</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
 
       return (
         <div className="r"><style>{css}</style>
           <div className="gm" style={{ padding: 0 }}>
             <div style={{ padding: '18px 18px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <button className="back" onClick={() => { snd(playClick); goBack(); }}><ChevronLeft size={13} /> {t('common.menu')}</button>
-              <div style={{ fontSize: 12, color: G.textSecondary }}>{finalTimeSec.toFixed(1)}s / {tl}s</div>
+              {isSpeedrun
+                ? <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 15, fontWeight: 700, color: G.goldLight }}><Timer size={14} color={G.goldLight} />{finalTimeSec.toFixed(2)}s</div>
+                : <div style={{ fontSize: 12, color: G.textSecondary }}>{finalTimeSec.toFixed(1)}s / {tl}s</div>}
             </div>
 
             {/* Input phase — no ghost card, keyboard in natural flow */}
@@ -3501,9 +3736,21 @@ export default function EliteCounter() {
                     <div style={{ fontFamily: 'Cinzel, serif', fontSize: 22, marginTop: 8, marginBottom: 4 }}>
                       {isCorrect ? t('game.perfect') : t('game.wasCount', { count: runningCount })}
                     </div>
-                    <div style={{ fontSize: 12, color: G.textSecondary, marginBottom: 14 }}>
-                      {t('game.resultStats', { time: finalTimeSec.toFixed(1), tl, decks: isDaily ? (dailyRef.current?.decks ?? 1) : (rankUsedRef.current || { decks: trainDecks }).decks })}
+                    <div style={{ fontSize: 12, color: G.textSecondary, marginBottom: isSpeedrun ? 10 : 14 }}>
+                      {isSpeedrun
+                        ? t('game.speedrunResult', { time: finalTimeSec.toFixed(2) })
+                        : t('game.resultStats', { time: finalTimeSec.toFixed(1), tl, decks: isDaily ? (dailyRef.current?.decks ?? 1) : (rankUsedRef.current || { decks: trainDecks }).decks })}
                     </div>
+
+                    {/* Speedrun: best time indicator */}
+                    {isSpeedrun && isCorrect && (
+                      <div style={{ marginBottom: 12, padding: '8px 14px', background: 'rgba(201,162,75,.08)', border: `1px solid ${G.borderGold}`, borderRadius: 8, fontSize: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <Zap size={13} color={G.gold} />
+                        {save.speedrunBestTime && save.speedrunBestTime <= finalTimeSec
+                          ? <span style={{ color: G.gold }}>{t('game.speedrunBest', { time: save.speedrunBestTime.toFixed(2) })}</span>
+                          : <span style={{ color: G.goldLight, fontWeight: 700 }}>{t('game.speedrunNewBest')}</span>}
+                      </div>
+                    )}
 
                     {/* MMR delta — promotion (999) / relégation (-998) / variation normale */}
                     {isRanked && !isPlace && mmrDelta !== 0 && (
@@ -3603,6 +3850,9 @@ export default function EliteCounter() {
       );
     }
 
+    const isSpeedrunMode = gameModeRef.current === 'speedrun';
+    const isQuizPlaying = gameModeRef.current === 'quiz';
+
     // Playing / paused
     return (
       <div className="r"><style>{css}</style>
@@ -3612,7 +3862,7 @@ export default function EliteCounter() {
             <div className="ghbtn" onClick={handleXButton}>
               <X size={15} />
             </div>
-            <div className="gtimer" style={{ color: timerColor }}>{timeDisplay}s</div>
+            <div className="gtimer" style={{ color: isSpeedrunMode ? G.goldLight : timerColor }}>{timeDisplay}s</div>
             <div className="gctr">
               <strong>{currentIndex}</strong>/ {deck.length}
             </div>
@@ -3633,7 +3883,7 @@ export default function EliteCounter() {
 
           {/* Progress */}
           <div style={{ height: 2, background: 'rgba(255,255,255,.04)' }}>
-            <div style={{ height: '100%', width: `${progress}%`, background: `linear-gradient(90deg,${G.goldDark},${timerColor})`, transition: 'width .12s' }} />
+            <div style={{ height: '100%', width: `${progress}%`, background: `linear-gradient(90deg,${G.goldDark},${isSpeedrunMode ? G.goldLight : timerColor})`, transition: 'width .12s' }} />
           </div>
 
           {/* Ranked info bar */}
@@ -3646,8 +3896,10 @@ export default function EliteCounter() {
             </div>
           )}
 
-          {/* Card */}
-          <div className="gstage">
+          {/* Card — speedrun: tappable; quiz: tappable only during feedback */}
+          <div className="gstage"
+            onClick={isSpeedrunMode && gameState === 'playing' ? advanceSpeedrunCard : undefined}
+            style={isSpeedrunMode && gameState === 'playing' ? { cursor: 'pointer' } : {}}>
             {currentCard && (
               <CasinoCard rank={currentCard.rank} suit={currentCard.suit} suitName={currentCard.suitName} skin={save.activeSkin} flash={cardFlash} />
             )}
@@ -3660,7 +3912,44 @@ export default function EliteCounter() {
             {showCount && gameModeRef.current === 'training' && (
               <div className="gcrev">{t('game.count', { value: runningCount > 0 ? `+${runningCount}` : runningCount })}</div>
             )}
+            {/* Speedrun tap hint */}
+            {isSpeedrunMode && gameState === 'playing' && (
+              <div style={{ position: 'absolute', bottom: 14, left: 0, right: 0, textAlign: 'center', fontSize: 11, color: G.textMuted, letterSpacing: '.06em', pointerEvents: 'none' }}>
+                {t('game.tapCard')}
+              </div>
+            )}
+            {/* Quiz per-card feedback overlay */}
+            {isQuizPlaying && quizResult && (
+              <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: quizResult.correct ? 'rgba(39,174,96,.18)' : 'rgba(192,57,43,.18)', borderRadius: 16, pointerEvents: 'none' }}>
+                <div style={{ fontFamily: 'Cinzel, serif', fontSize: 40, fontWeight: 700, color: quizResult.correct ? G.green : G.red }}>
+                  {quizResult.correct ? '✓' : '✗'}
+                </div>
+                {!quizResult.correct && (
+                  <div style={{ position: 'absolute', bottom: 20, fontSize: 13, color: G.textPrimary }}>
+                    {quizResult.expected === 1 ? t('quiz.ansLow') : quizResult.expected === 0 ? t('quiz.ansNeutral') : t('quiz.ansHigh')}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
+
+          {/* Quiz answer buttons */}
+          {isQuizPlaying && gameState === 'playing' && (
+            <div style={{ padding: '12px 16px 16px', display: 'flex', gap: 10 }}>
+              <button onClick={() => answerQuiz(-1)} disabled={!!quizResult}
+                style={{ flex: 1, padding: '14px 0', borderRadius: 10, border: `1px solid rgba(192,57,43,.4)`, background: 'rgba(192,57,43,.1)', color: G.red, cursor: quizResult ? 'default' : 'pointer', fontSize: 15, fontWeight: 700, fontFamily: 'Cinzel, serif', opacity: quizResult ? 0.4 : 1 }}>
+                −1
+              </button>
+              <button onClick={() => answerQuiz(0)} disabled={!!quizResult}
+                style={{ flex: 1, padding: '14px 0', borderRadius: 10, border: `1px solid ${G.border}`, background: 'rgba(255,255,255,.05)', color: G.textSecondary, cursor: quizResult ? 'default' : 'pointer', fontSize: 15, fontWeight: 700, fontFamily: 'Cinzel, serif', opacity: quizResult ? 0.4 : 1 }}>
+                0
+              </button>
+              <button onClick={() => answerQuiz(1)} disabled={!!quizResult}
+                style={{ flex: 1, padding: '14px 0', borderRadius: 10, border: `1px solid rgba(45,212,191,.4)`, background: 'rgba(45,212,191,.08)', color: G.teal, cursor: quizResult ? 'default' : 'pointer', fontSize: 15, fontWeight: 700, fontFamily: 'Cinzel, serif', opacity: quizResult ? 0.4 : 1 }}>
+                +1
+              </button>
+            </div>
+          )}
         </div>
 
         {/* ABANDON DIALOG (ranked only) */}

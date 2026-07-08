@@ -1,4 +1,4 @@
-// ─── Shqip ────────────────────────────────────────────────────────
+﻿// ─── Shqip ────────────────────────────────────────────────────────
 // Mirror of fr.js — keep the key structure identical across locales.
 // Ton editorial: i matur, iniciues — Akademia Sekrete e Numëruesve.
 // Emra të përveçëm të papërkthyer: rangjet (Cuivre…Adamantium), skins, arritjet.
@@ -43,6 +43,7 @@ const sq = {
   modeName: {
     training: 'Salla e Studimit', ranked: 'Portat e Gildës', promo: 'Ngritja',
     placement: 'Iniciimi', casino: 'Sprova', daily: 'Riti i Ditës',
+    speedrun: 'Stuhia', quiz: 'Deshifrimi',
   },
 
   ranks: {
@@ -95,6 +96,7 @@ const sq = {
     dailyDoneWin: ({ score }) => `✓ I kryer · ${score} pikë`,
     dailyDoneLoss: '✗ I humbur',
     dailyComeBack: 'Kthehuni nesër',
+    dailyLocked: 'Vulosur — kryej së pari Iniciimin',
     settings: 'Skriptorium',
     settingsSub: 'Opsione · Rivendosje',
     currentStreak: ({ streak }) => `Seria aktuale: ${streak}`,
@@ -291,6 +293,8 @@ const sq = {
     countdownPromo: 'NGRITJA',
     countdownPlacement: ({ n, total }) => `INICIIMI ${n}/${total}`,
     countdownTraining: 'SALLA E STUDIMIT',
+    countdownSpeedrun: 'STUHIA',
+    countdownQuiz: 'DESHIFRIMI',
     countdownRanked: 'PORTAT E GILDËS',
     go: 'NUMËRO',
     cardsTime: ({ cards, tl }) => `${cards} karta · ${tl}s`,
@@ -331,6 +335,10 @@ const sq = {
     abandonBody1: 'Braktisja llogaritet si humbje.',
     abandonMmr: '−25 MMR',
     abandonBody2: ' do të zbriten menjëherë.',
+    tapCard: 'Prek kartën për të avancuar',
+    speedrunResult: ({ time }) => `Koha: ${time}s`,
+    speedrunBest: ({ time }) => `Rekord: ${time}s`,
+    speedrunNewBest: 'Rekord i ri!',
     abandon: 'Braktis',
   },
 
@@ -344,15 +352,34 @@ const sq = {
   },
 
   challenges: {
-    frame_perfect: { name: 'Frame Perfect', desc: '1 dek — 0.40s/kartë ose më e vështirë — numëruesi i bllokuar' },
-    no_mercy: { name: 'No Mercy', desc: 'Kaloni portën Or → Émeraude në tentativën e parë — numëruesi i bllokuar' },
-    the_wall: { name: 'The Wall', desc: '6 dek — 90%+ penetrim — 0.50s/kartë ose më pak — numëruesi i bllokuar' },
-    blind_run: { name: 'Blind Run', desc: '8 dek — 0.45s/kartë ose më e vështirë — numëruesi i bllokuar' },
-    iron_streak: { name: 'Iron Streak', desc: '10 fitore radhazi — mesatare 0.55s/kartë ose më pak — numëruesi i bllokuar' },
-    full_burn: { name: 'Full Burn', desc: '8 dek — 95%+ penetrim — numëruesi i bllokuar' },
-    casino_complete: { name: 'Casino Ready', desc: 'Kryeni Sprovën plotësisht' },
+    frame_perfect: { name: 'Kairos', desc: '1 dek — 0.40s/kartë ose më e vështirë — numëruesi i bllokuar' },
+    flash: { name: 'Fulgur', desc: '2 deste · 50% depërtim · 52 karta · nën 25s — numëruesi i vulosur' },
+    the_wall: { name: 'E Pakalueshja', desc: '6 dek — 90%+ penetrim — 0.50s/kartë ose më pak — numëruesi i bllokuar' },
+    blind_run: { name: 'Kalimi', desc: '8 dek — 0.45s/kartë ose më e vështirë — numëruesi i bllokuar' },
+    iron_streak: { name: 'Zinxhiri', desc: '10 fitore radhazi — mesatare 0.55s/kartë ose më pak — numëruesi i bllokuar' },
+    full_burn: { name: 'Zjarri i Madh', desc: '8 dek — 95%+ penetrim — numëruesi i bllokuar' },
+    casino_complete: { name: 'Aspiranti', desc: 'Kryeni Sprovën plotësisht' },
   },
 
+
+  trainingSubMode: {
+    title: 'Salla e Studimit', sub: 'Zgjedh rrugën e stërvitjes',
+    standardTitle: 'Farkëtaria', standardSub: 'Konfigurim i lirë, pauzë e lejuar — farkëto reflekset e tua pa presionin e rangut.',
+    speedrunTitle: 'Stuhia', speedrunSub: 'Kartë pas karte · kohëmatës · numërim final',
+    quizTitle: 'Deshifrimi', quizSub: 'Identifiko vlerën Hi-Lo të çdo karte: +1, 0 ose −1',
+  },
+  speedrunConfig: {
+    title: 'Stuhia', sub: 'Kartë pas karte me prekje · kronometër · numërim final',
+    cards: ({ cards }) => `${cards} karta`, best: ({ time }) => `${time}s`, start: 'Hyr në Stuhi',
+  },
+  quizConfig: {
+    title: 'Deshifrimi', sub: 'Zbulo vlerën Hi-Lo të çdo karte para të ardhshmes',
+    cardCount: 'Numri i kartave', hint: 'E ulët (2–6) → +1 · Neutrale (7–9) → 0 · E lartë (10–A) → −1', start: 'Hyr në Deshifrim',
+  },
+  quizResult: {
+    title: 'Deshifrimi — sesioni përfundoi', perfect: 'Pa gabime. Njohja është e jotja.', good: 'E fortë. Vazhdo të mprehësh.', ok: 'Refleksi po formohet.', poor: 'Praktika ndërton instinktin. Provo sërish.',
+  },
+  quiz: { ansLow: '+1 (2-6)', ansNeutral: '0 (7-9)', ansHigh: '−1 (10-A)' },
   tutorial: {
     skip: 'Kalo',
     welcome: {

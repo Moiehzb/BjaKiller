@@ -1,4 +1,4 @@
-// ─── 日本語 ────────────────────────────────────────────────────────
+﻿// ─── 日本語 ────────────────────────────────────────────────────────
 // Mirror of fr.js — keep the key structure identical across locales.
 // 編集トーン：抑制的・入門的 — カウンターの秘密学院。
 // 固有名詞は翻訳しない：ランク (Cuivre…Adamantium)、スキン、実績。
@@ -43,6 +43,7 @@ const ja = {
   modeName: {
     training: '修練の間', ranked: 'ギルドの門', promo: '昇格',
     placement: '入門', casino: '試練', daily: '日課の儀式',
+    speedrun: '嵐', quiz: '解読',
   },
 
   ranks: {
@@ -95,6 +96,7 @@ const ja = {
     dailyDoneWin: ({ score }) => `✓ 達成 · ${score}点`,
     dailyDoneLoss: '✗ 失敗',
     dailyComeBack: '明日また来てください',
+    dailyLocked: '封印中 — まずイニシエーションを完了せよ',
     settings: '典籍室',
     settingsSub: 'オプション · リセット',
     currentStreak: ({ streak }) => `現在の連勝: ${streak}`,
@@ -291,6 +293,8 @@ const ja = {
     countdownPromo: '昇格',
     countdownPlacement: ({ n, total }) => `入門 ${n}/${total}`,
     countdownTraining: '修練の間',
+    countdownSpeedrun: '嵐',
+    countdownQuiz: '解読',
     countdownRanked: 'ギルドの門',
     go: '数える',
     cardsTime: ({ cards, tl }) => `${cards}枚 · ${tl}秒`,
@@ -331,6 +335,10 @@ const ja = {
     abandonBody1: '終了は敗北としてカウントされます。',
     abandonMmr: '−25 MMR',
     abandonBody2: ' が即座に差し引かれます。',
+    tapCard: 'カードをタップして進む',
+    speedrunResult: ({ time }) => `タイム: ${time}s`,
+    speedrunBest: ({ time }) => `記録: ${time}s`,
+    speedrunNewBest: '新記録!',
     abandon: '終了する',
   },
 
@@ -344,15 +352,34 @@ const ja = {
   },
 
   challenges: {
-    frame_perfect: { name: 'Frame Perfect', desc: '1デッキ — 0.40秒/枚以下 — カウンター封印' },
-    no_mercy: { name: 'No Mercy', desc: '初回でOr → Émeraude門を通過 — カウンター封印' },
-    the_wall: { name: 'The Wall', desc: '6デッキ — 浸透率90%以上 — 0.50秒/枚以下 — カウンター封印' },
-    blind_run: { name: 'Blind Run', desc: '8デッキ — 0.45秒/枚以下 — カウンター封印' },
-    iron_streak: { name: 'Iron Streak', desc: '10連勝 — 平均0.55秒/枚以下 — カウンター封印' },
-    full_burn: { name: 'Full Burn', desc: '8デッキ — 浸透率95%以上 — カウンター封印' },
-    casino_complete: { name: 'Casino Ready', desc: '試練を完全クリア' },
+    frame_perfect: { name: 'Kairos', desc: '1デッキ — 0.40秒/枚以下 — カウンター封印' },
+    flash: { name: 'Fulgur', desc: '2デッキ · 50%ペネトレーション · 52枚 · 25秒未満 — カウンター非表示' },
+    the_wall: { name: '越えられぬもの', desc: '6デッキ — 浸透率90%以上 — 0.50秒/枚以下 — カウンター封印' },
+    blind_run: { name: '渡り', desc: '8デッキ — 0.45秒/枚以下 — カウンター封印' },
+    iron_streak: { name: '鎖', desc: '10連勝 — 平均0.55秒/枚以下 — カウンター封印' },
+    full_burn: { name: '大炎上', desc: '8デッキ — 浸透率95%以上 — カウンター封印' },
+    casino_complete: { name: '志願者', desc: '試練を完全クリア' },
   },
 
+
+  trainingSubMode: {
+    title: '修練の間', sub: 'トレーニングの道を選べ',
+    standardTitle: '鍛冶場', standardSub: '自由設定、ポーズ可 — ランクの重圧なしに反射神経を鍛えろ。',
+    speedrunTitle: '嵐', speedrunSub: 'カードをタップ · ストップウォッチ · 最終カウント',
+    quizTitle: '解読', quizSub: '各カードのHi-Lo値を識別せよ：+1、0、−1',
+  },
+  speedrunConfig: {
+    title: '嵐', sub: '1枚ずつタップ · ストップウォッチ · 最終カウント',
+    cards: ({ cards }) => `${cards}枚`, best: ({ time }) => `${time}s`, start: '嵐に入る',
+  },
+  quizConfig: {
+    title: '解読', sub: '次の前に各カードのHi-Lo値を識別せよ',
+    cardCount: 'カード枚数', hint: '低い (2–6) → +1 · 中立 (7–9) → 0 · 高い (10–A) → −1', start: '解読に入る',
+  },
+  quizResult: {
+    title: '解読 — セッション完了', perfect: '完璧。認識は得た。', good: 'しっかりしている。研鑽を続けよ。', ok: '反射が形成されつつある。', poor: '練習が本能を築く。もう一度。',
+  },
+  quiz: { ansLow: '+1 (2-6)', ansNeutral: '0 (7-9)', ansHigh: '−1 (10-A)' },
   tutorial: {
     skip: 'スキップ',
     welcome: {

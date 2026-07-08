@@ -45,6 +45,7 @@ const de = {
   modeName: {
     training: 'Studiersaal', ranked: 'Die Tore der Gilde', promo: 'Aufstieg',
     placement: 'Initiation', casino: 'Die Prüfung', daily: 'Tagesritual',
+    speedrun: 'Der Sturm', quiz: 'Die Entschlüsselung',
   },
 
   ranks: {
@@ -97,6 +98,7 @@ const de = {
     dailyDoneWin: ({ score }) => `✓ Vollzogen · ${score} Pkt`,
     dailyDoneLoss: '✗ Verfehlt',
     dailyComeBack: 'Kehre morgen zurück',
+    dailyLocked: 'Versiegelt — beende zuerst die Initiation',
     settings: 'Skriptorium',
     settingsSub: 'Optionen · Zurücksetzen',
     currentStreak: ({ streak }) => `Laufende Serie: ${streak}`,
@@ -293,6 +295,8 @@ const de = {
     countdownPromo: 'AUFSTIEG',
     countdownPlacement: ({ n, total }) => `INITIATION ${n}/${total}`,
     countdownTraining: 'STUDIERSAAL',
+    countdownSpeedrun: 'DER STURM',
+    countdownQuiz: 'DIE ENTSCHLÜSSELUNG',
     countdownRanked: 'DIE TORE DER GILDE',
     go: 'ZÄHLE',
     cardsTime: ({ cards, tl }) => `${cards} Karten · ${tl}s`,
@@ -334,6 +338,10 @@ const de = {
     abandonMmr: '−25 MMR',
     abandonBody2: ' werden sofort abgezogen.',
     abandon: 'Abbrechen',
+    tapCard: 'Tippe die Karte zum Weiterblättern',
+    speedrunResult: ({ time }) => `Zeit: ${time}s`,
+    speedrunBest: ({ time }) => `Rekord: ${time}s`,
+    speedrunNewBest: 'Neuer Rekord!',
   },
 
   timePicker: {
@@ -346,13 +354,54 @@ const de = {
   },
 
   challenges: {
-    frame_perfect: { name: 'Frame Perfect', desc: '1 Deck — 0.40s/Karte oder härter — Zähler versiegelt' },
-    no_mercy: { name: 'No Mercy', desc: 'Durchschreite das Tor Or → Émeraude beim ersten Versuch — Zähler versiegelt' },
-    the_wall: { name: 'The Wall', desc: '6 Decks — 90%+ Penetration — 0.50s/Karte oder weniger — Zähler versiegelt' },
-    blind_run: { name: 'Blind Run', desc: '8 Decks — 0.45s/Karte oder härter — Zähler versiegelt' },
-    iron_streak: { name: 'Iron Streak', desc: '10 Siege in Folge — 0.55s/Karte Ø oder weniger — Zähler versiegelt' },
-    full_burn: { name: 'Full Burn', desc: '8 Decks — 95%+ Penetration — Zähler versiegelt' },
-    casino_complete: { name: 'Casino Ready', desc: 'Vollende die Prüfung zur Gänze' },
+    frame_perfect: { name: 'Kairos', desc: '1 Deck — 0.40s/Karte oder härter — Zähler versiegelt' },
+    flash: { name: 'Fulgur', desc: '2 Decks · 50% Pen. · 52 Karten · unter 25s — Zähler versiegelt' },
+    the_wall: { name: 'Das Unüberwindliche', desc: '6 Decks — 90%+ Penetration — 0.50s/Karte oder weniger — Zähler versiegelt' },
+    blind_run: { name: 'Die Überquerung', desc: '8 Decks — 0.45s/Karte oder härter — Zähler versiegelt' },
+    iron_streak: { name: 'Die Kette', desc: '10 Siege in Folge — 0.55s/Karte Ø oder weniger — Zähler versiegelt' },
+    full_burn: { name: 'Das Große Feuer', desc: '8 Decks — 95%+ Penetration — Zähler versiegelt' },
+    casino_complete: { name: 'Der Anwärter', desc: 'Vollende die Prüfung zur Gänze' },
+  },
+
+  trainingSubMode: {
+    title: 'Studiersaal',
+    sub: 'Wähle deinen Übungsweg',
+    standardTitle: 'Die Schmiede',
+    standardSub: 'Freie Konfiguration, Pause erlaubt — schmiede deine Reflexe ohne Rangdruck.',
+    speedrunTitle: 'Der Sturm',
+    speedrunSub: 'Karte für Karte per Tippen · Stoppuhr · Endkonto',
+    quizTitle: 'Die Entschlüsselung',
+    quizSub: 'Erkenne den Hi-Lo-Wert jeder Karte: +1, 0 oder −1',
+  },
+
+  speedrunConfig: {
+    title: 'Der Sturm',
+    sub: 'Karten per Tippen vorblättern · die Uhr läuft · gib das Endkonto an',
+    cards: ({ cards }) => `${cards} Karten zu zählen`,
+    best: ({ time }) => `Rekord: ${time}s`,
+    start: 'Sturm starten',
+  },
+
+  quizConfig: {
+    title: 'Die Entschlüsselung',
+    sub: 'Erkenne den Hi-Lo-Wert jeder Karte bevor die nächste erscheint',
+    cardCount: 'Anzahl Karten',
+    hint: 'Niedrig (2-6) → +1 · Neutral (7-9) → 0 · Hoch (10-A) → −1',
+    start: 'Die Entschlüsselung beginnen',
+  },
+
+  quizResult: {
+    title: 'Die Entschlüsselung — Sitzung abgeschlossen',
+    perfect: 'Fehlerlos. Die Erkennung gehört dir.',
+    good: 'Solide. Weiter schärfen.',
+    ok: 'Der Reflex nimmt Form an.',
+    poor: 'Übung formt den Instinkt. Nochmal versuchen.',
+  },
+
+  quiz: {
+    ansLow: '+1 (Niedrig: 2-6)',
+    ansNeutral: '0 (Neutral: 7-9)',
+    ansHigh: '−1 (Hoch: 10-A)',
   },
 
   tutorial: {

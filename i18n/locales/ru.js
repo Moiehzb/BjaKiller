@@ -1,4 +1,4 @@
-// ─── Русский ──────────────────────────────────────────────────────
+﻿// ─── Русский ──────────────────────────────────────────────────────
 // Mirror of fr.js — keep the key structure identical across locales.
 // Редакционный тон: сдержанный, посвятительный — Тайная Академия Счётчиков.
 // Имена собственные НЕ переводятся: ранги (Cuivre…Adamantium), скины, достижения.
@@ -68,6 +68,7 @@ const ru = {
   modeName: {
     training: 'Зал Обучения', ranked: 'Врата Гильдии', promo: 'Повышение',
     placement: 'Посвящение', casino: 'Испытание', daily: 'Ежедневный Ритуал',
+    speedrun: 'Буря', quiz: 'Дешифровка',
   },
 
   ranks: {
@@ -120,6 +121,7 @@ const ru = {
     dailyDoneWin: ({ score }) => `✓ Выполнено · ${score} оч.`,
     dailyDoneLoss: '✗ Не выполнено',
     dailyComeBack: 'Возвращайтесь завтра',
+    dailyLocked: 'Запечатано — сначала пройди Посвящение',
     settings: 'Скрипторий',
     settingsSub: 'Параметры · Сброс',
     currentStreak: ({ streak }) => `Текущая серия: ${streak}`,
@@ -316,6 +318,8 @@ const ru = {
     countdownPromo: 'ПОВЫШЕНИЕ',
     countdownPlacement: ({ n, total }) => `ПОСВЯЩЕНИЕ ${n}/${total}`,
     countdownTraining: 'ЗАЛ ОБУЧЕНИЯ',
+    countdownSpeedrun: 'БУРЯ',
+    countdownQuiz: 'ДЕШИФРОВКА',
     countdownRanked: 'ВРАТА ГИЛЬДИИ',
     go: 'СЧИТАТЬ',
     cardsTime: ({ cards: c, tl }) => `${c} ${cards(c)} · ${tl}с`,
@@ -356,6 +360,10 @@ const ru = {
     abandonBody1: 'Выход засчитывается как поражение.',
     abandonMmr: '−25 ОМР',
     abandonBody2: ' будут вычтены немедленно.',
+    tapCard: 'Нажми карту для перехода',
+    speedrunResult: ({ time }) => `Время: ${time}s`,
+    speedrunBest: ({ time }) => `Рекорд: ${time}s`,
+    speedrunNewBest: 'Новый рекорд!',
     abandon: 'Покинуть',
   },
 
@@ -369,15 +377,34 @@ const ru = {
   },
 
   challenges: {
-    frame_perfect: { name: 'Frame Perfect', desc: '1 колода — 0,40с/карта или сложнее — счётчик закрыт' },
-    no_mercy: { name: 'No Mercy', desc: 'Пройдите врата Or → Émeraude с первой попытки — счётчик закрыт' },
-    the_wall: { name: 'The Wall', desc: '6 колод — 90%+ проникновения — 0,50с/карта или меньше — счётчик закрыт' },
-    blind_run: { name: 'Blind Run', desc: '8 колод — 0,45с/карта или сложнее — счётчик закрыт' },
-    iron_streak: { name: 'Iron Streak', desc: '10 побед подряд — среднее 0,55с/карта или меньше — счётчик закрыт' },
-    full_burn: { name: 'Full Burn', desc: '8 колод — 95%+ проникновения — счётчик закрыт' },
-    casino_complete: { name: 'Casino Ready', desc: 'Пройдите Испытание полностью' },
+    frame_perfect: { name: 'Kairos', desc: '1 колода — 0,40с/карта или сложнее — счётчик закрыт' },
+    flash: { name: 'Fulgur', desc: '2 колоды · 50% пен. · 52 карты · менее 25с — счётчик закрыт' },
+    the_wall: { name: 'Непреодолимое', desc: '6 колод — 90%+ проникновения — 0,50с/карта или меньше — счётчик закрыт' },
+    blind_run: { name: 'Переправа', desc: '8 колод — 0,45с/карта или сложнее — счётчик закрыт' },
+    iron_streak: { name: 'Цепь', desc: '10 побед подряд — среднее 0,55с/карта или меньше — счётчик закрыт' },
+    full_burn: { name: 'Великий Пожар', desc: '8 колод — 95%+ проникновения — счётчик закрыт' },
+    casino_complete: { name: 'Соискатель', desc: 'Пройдите Испытание полностью' },
   },
 
+
+  trainingSubMode: {
+    title: 'Зал Обучения', sub: 'Выбери путь тренировки',
+    standardTitle: 'Кузница', standardSub: 'Свободная конфигурация, пауза разрешена — куй рефлексы без давления ранга.',
+    speedrunTitle: 'Буря', speedrunSub: 'Карта за картой · секундомер · итоговый счёт',
+    quizTitle: 'Дешифровка', quizSub: 'Определи Hi-Lo значение каждой карты: +1, 0 или −1',
+  },
+  speedrunConfig: {
+    title: 'Буря', sub: 'Карта за картой нажатием · секундомер · итоговый счёт',
+    cards: ({ cards }) => `${cards} карт`, best: ({ time }) => `${time}с`, start: 'Войти в Бурю',
+  },
+  quizConfig: {
+    title: 'Дешифровка', sub: 'Раскрой Hi-Lo значение каждой карты до следующей',
+    cardCount: 'Количество карт', hint: 'Низкие (2–6) → +1 · Нейтральные (7–9) → 0 · Высокие (10–A) → −1', start: 'Войти в Дешифровку',
+  },
+  quizResult: {
+    title: 'Дешифровка — сеанс завершён', perfect: 'Безупречно. Признание заслужено.', good: 'Уверенно. Продолжай оттачивать.', ok: 'Рефлекс формируется.', poor: 'Практика строит инстинкт. Ещё раз.',
+  },
+  quiz: { ansLow: '+1 (2-6)', ansNeutral: '0 (7-9)', ansHigh: '−1 (10-A)' },
   tutorial: {
     skip: 'Пропустить',
     welcome: {

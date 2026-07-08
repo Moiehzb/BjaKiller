@@ -52,12 +52,15 @@ const computeLoop = (buf) => {
   const data = buf.getChannelData(0);
   const n = data.length;
   const thr = 0.003;
-  let start = 0, end = n - 1;
-  while (start < n && Math.abs(data[start]) < thr) start++;
-  while (end > start && Math.abs(data[end]) < thr) end--;
-  _loop.start = Math.max(0, start - 1) / buf.sampleRate;
+  // loopStart = 0 (mesure 1 — début absolu du morceau).
+  // Sur mobile, trimmer le silence en tête introduit un léger offset qui
+  // cause un blanc lors du rebouclage. On part toujours de 0.
+  _loop.start = 0;
+  // loopEnd = dernier échantillon audible (coupe le silence encodeur en queue).
+  let end = n - 1;
+  while (end > 0 && Math.abs(data[end]) < thr) end--;
   _loop.end = Math.min(n - 1, end + 1) / buf.sampleRate;
-  if (!(_loop.end > _loop.start)) { _loop.start = 0; _loop.end = buf.duration; }
+  if (!(_loop.end > 0)) _loop.end = buf.duration;
 };
 
 const load = () => {
@@ -80,7 +83,7 @@ const startSource = () => {
   s.loopStart = _loop.start;
   s.loopEnd = _loop.end;
   s.connect(gain());
-  s.start(0, _loop.start);
+  s.start(0, 0);
   _src = s;
 };
 
