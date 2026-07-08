@@ -1,5 +1,6 @@
 {
   "permissions": {
+    "defaultMode": "default",
     "allow": [
       "PowerShell(winget upgrade *)",
       "PowerShell(node --version)",
