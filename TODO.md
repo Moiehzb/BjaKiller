@@ -5,6 +5,9 @@
 
 ## 🛠️ Features en attente (backlog)
 
+### Réparer la boucle de musique (`music.js`)
+La musique du lobby présente une micro-coupure audible au moment du bouclage (`AudioBufferSourceNode.loop`). Pistes à explorer : rognage plus précis du silence en queue/tête du buffer OGG, ou utilisation d'une double source (crossfade seamless à la fin du buffer pour masquer la couture).
+
 ### Publication Play Store — tester les achats à 4,99 € sans payer (checklist, dans l'ordre)
 Le code du paywall est branché (Play Billing). Les achats ne marchent **que** via une app connue de la Play Console, installée depuis le Play Store. Le mécanisme « testeur de licence » permet de tester avec le vrai prix affiché mais une carte de test (jamais débité).
 
