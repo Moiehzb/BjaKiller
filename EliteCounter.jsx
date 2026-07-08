@@ -1628,6 +1628,8 @@ export default function EliteCounter() {
   // ── Deck end ───────────────────────────────────────────────────
   useEffect(() => {
     if (deck.length > 0 && currentIndex === deck.length && gameState === 'playing') {
+      // Quiz ends after the user answers the last card (handled in answerQuiz)
+      if (gameModeRef.current === 'quiz') return;
       clearInterval(timerRef.current);
       clearInterval(autoPlayRef.current);
       const ft = Date.now() - startTime;
@@ -1773,9 +1775,18 @@ export default function EliteCounter() {
     setQuizResult({ correct, expected, got: answer });
     setQuizScore(q => ({ correct: q.correct + (correct ? 1 : 0), total: q.total + 1 }));
     if (correct) { snd(playCorrect); vibrateWin(); } else { snd(playWrong); vibrateLose(); }
+    const isLastCard = currentIndex === deck.length;
+    const capturedStart = startTime;
     setTimeout(() => {
       setQuizResult(null);
-      setCurrentIndex(i => i + 1);
+      if (isLastCard) {
+        clearInterval(timerRef.current);
+        clearInterval(autoPlayRef.current);
+        setFinalTime(Date.now() - capturedStart);
+        setGameState('finished');
+      } else {
+        setCurrentIndex(i => i + 1);
+      }
     }, 700);
   };
 
@@ -2230,7 +2241,13 @@ export default function EliteCounter() {
     setCasinoActive(false);
     setGameState('idle');
     setQuizResult(null);
-    setNav('lobby');
+    // After a training game, return to the sub-mode picker (not lobby)
+    if (nav === 'game' && ['training', 'speedrun', 'quiz'].includes(gameModeRef.current)) {
+      setTrainSubMode(null);
+      setNav('mode-training');
+    } else {
+      setNav('lobby');
+    }
     flushPendingAchievements();
   };
 
@@ -2726,7 +2743,7 @@ export default function EliteCounter() {
                       )}
                     </div>
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 1 }}>{isSecret ? t('shop.secretName') : (t('skins.' + sk.id + '.name') || sk.name)}</div>
+                      <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 1 }}>{isSecret ? t('shop.secretName') : sk.name}</div>
                       <div style={{ fontSize: 12, color: G.textSecondary }}>{isSecret ? t('shop.secretDesc') : sk.price === 0 ? t('shop.free') : <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>{t('shop.priceCoins', { price: sk.price })}<Coin size={11} /></span>}</div>
                     </div>
                     {isSecret ? null : active
@@ -2768,7 +2785,7 @@ export default function EliteCounter() {
                       {!owned && <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Lock size={15} color={G.goldLight} /></div>}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 1, color: owned ? sk.accent : G.textPrimary }}>{t('skins.' + sk.id + '.name') || sk.name}</div>
+                      <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 1, color: owned ? sk.accent : G.textPrimary }}>{sk.name}</div>
                       <div style={{ fontSize: 12, color: G.textSecondary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{owned ? t('shop.tagline.' + sk.id) : price}</div>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
@@ -2922,7 +2939,7 @@ export default function EliteCounter() {
                   <div style={{ background: 'rgba(201,162,75,.06)', border: `1px solid ${G.borderGold}`, borderRadius: 8, padding: '10px 14px', marginBottom: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
                     <div style={{ fontSize: 13, color: G.gold, display: 'flex', alignItems: 'center', gap: 6 }}><Gem size={13} /> {t('stats.topSkin')}</div>
                     <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontFamily: 'Cinzel, serif', fontSize: 15, fontWeight: 700, color: G.goldLight }}>{t('skins.' + topSkinId + '.name') || skinNameById(topSkinId)}</div>
+                      <div style={{ fontFamily: 'Cinzel, serif', fontSize: 15, fontWeight: 700, color: G.goldLight }}>{skinNameById(topSkinId)}</div>
                       <div style={{ fontSize: 11, color: G.textSecondary }}>{t('stats.topSkinGames', { n: topSkinCount })}</div>
                     </div>
                   </div>
