@@ -5,6 +5,10 @@
 
 ## 🛠️ Features en attente (backlog)
 
+### Assets Play Store (à préparer avant soumission)
+- [ ] Screenshots (4–8) — à faire depuis navigateur ou émulateur
+- [ ] Feature graphic (1024×500 px) — bannière affichée en haut de la fiche Play Store
+- [ ] Descriptions courte + longue FR/EN pour la fiche Play Store
 
 ### Publication Play Store — tester les achats à 4,99 € sans payer (checklist, dans l'ordre)
 Le code du paywall est branché (Play Billing). Les achats ne marchent **que** via une app connue de la Play Console, installée depuis le Play Store. Le mécanisme « testeur de licence » permet de tester avec le vrai prix affiché mais une carte de test (jamais débité).
@@ -30,6 +34,8 @@ Le code du paywall est branché (Play Billing). Les achats ne marchent **que** v
 - [ ] App 2 séparée : mode table réaliste style Card Counter Lite
 
 ## ✅ Fait
+
+- [x] **Politique de confidentialité (2026-07-21)** — `docs/privacy.html` bilingue FR/EN, hébergée sur GitHub Pages : `https://moiehzb.github.io/BjaKiller/privacy.html`. À coller dans Play Console → Policy → App content → Privacy policy (ou pendant le wizard de création d'app).
 
 - [x] **Boucle musique lobby (2026-07-20)** — `computeLoop()` recalculé : `loopEnd` fixé à `pré-roll + 120 × 2.0 s` (bar boundary exact) au lieu du dernier échantillon audible. La queue du luth en mesure 121 ne crée plus de micro-pause.
 
