@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Politique de confidentialité — Hi-Lo Academy I</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0d0a1a;
+      color: #d4c9a8;
+      font-family: Georgia, 'Times New Roman', serif;
+      line-height: 1.8;
+      padding: 2rem 1rem;
+    }
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-family: 'Palatino Linotype', Palatino, serif;
+      font-size: 1.6rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #c9a24b;
+      margin-bottom: 0.4rem;
+    }
+    .subtitle {
+      font-size: 0.85rem;
+      color: #8a7fa8;
+      margin-bottom: 2.5rem;
+      letter-spacing: 0.05em;
+    }
+    h2 {
+      font-family: 'Palatino Linotype', Palatino, serif;
+      font-size: 1rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #c9a24b;
+      margin-top: 2rem;
+      margin-bottom: 0.6rem;
+    }
+    p { margin-bottom: 0.8rem; }
+    a { color: #c9a24b; }
+    .lang-switch {
+      margin-bottom: 2rem;
+      font-size: 0.85rem;
+    }
+    .lang-switch a {
+      color: #8a7fa8;
+      text-decoration: none;
+      margin-right: 1rem;
+    }
+    .lang-switch a.active { color: #c9a24b; text-decoration: underline; }
+    section { display: none; }
+    section.active { display: block; }
+    .updated {
+      font-size: 0.8rem;
+      color: #5a5070;
+      margin-top: 3rem;
+      border-top: 1px solid #1e1830;
+      padding-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <h1>Hi-Lo Academy I</h1>
+  <p class="subtitle">Politique de confidentialité · Privacy Policy</p>
+
+  <div class="lang-switch">
+    <a href="#" class="active" onclick="setLang('fr');return false;">Français</a>
+    <a href="#" onclick="setLang('en');return false;">English</a>
+  </div>
+
+  <!-- FRANÇAIS -->
+  <section id="fr" class="active">
+    <h2>Collecte de données</h2>
+    <p>
+      Hi-Lo Academy I ne collecte aucune donnée personnelle. L'application
+      fonctionne entièrement hors ligne. Aucune information n'est transmise
+      à nos serveurs — nous n'en possédons aucun.
+    </p>
+
+    <h2>Stockage local</h2>
+    <p>
+      La progression de jeu (rang, statistiques, préférences) est enregistrée
+      uniquement sur votre appareil, dans le stockage local de l'application
+      (<code>localStorage</code>). Ces données restent sur votre appareil et
+      peuvent être effacées à tout moment depuis les réglages de l'application
+      ou en désinstallant celle-ci.
+    </p>
+
+    <h2>Achats intégrés</h2>
+    <p>
+      L'application propose des achats optionnels via Google Play. Les
+      transactions sont gérées intégralement par Google. Nous ne recevons,
+      ne stockons ni ne traitons aucune donnée de paiement.
+      Consultez la <a href="https://policies.google.com/privacy" target="_blank">politique de confidentialité de Google</a>
+      pour plus d'informations.
+    </p>
+
+    <h2>Publicités</h2>
+    <p>L'application ne contient aucune publicité.</p>
+
+    <h2>Services tiers</h2>
+    <p>
+      Aucun SDK d'analyse, de suivi ou de publicité n'est intégré à
+      l'application (pas de Firebase, pas d'AdMob, pas de services de
+      crash reporting).
+    </p>
+
+    <h2>Enfants</h2>
+    <p>
+      L'application n'est pas destinée aux enfants de moins de 13 ans et
+      ne collecte délibérément aucune donnée les concernant.
+    </p>
+
+    <h2>Contact</h2>
+    <p>
+      Pour toute question :
+      <a href="mailto:axel.jouannic@gmail.com">axel.jouannic@gmail.com</a>
+    </p>
+  </section>
+
+  <!-- ENGLISH -->
+  <section id="en">
+    <h2>Data Collection</h2>
+    <p>
+      Hi-Lo Academy I does not collect any personal data. The application
+      runs entirely offline. No information is transmitted to any server —
+      we do not operate any.
+    </p>
+
+    <h2>Local Storage</h2>
+    <p>
+      Game progress (rank, statistics, preferences) is stored exclusively
+      on your device, in the application's local storage (<code>localStorage</code>).
+      This data remains on your device and can be deleted at any time from
+      the in-app settings or by uninstalling the application.
+    </p>
+
+    <h2>In-App Purchases</h2>
+    <p>
+      The application offers optional purchases through Google Play.
+      Transactions are managed entirely by Google. We do not receive,
+      store, or process any payment data.
+      See <a href="https://policies.google.com/privacy" target="_blank">Google's Privacy Policy</a>
+      for more information.
+    </p>
+
+    <h2>Advertising</h2>
+    <p>The application contains no advertising.</p>
+
+    <h2>Third-Party Services</h2>
+    <p>
+      No analytics, tracking, or advertising SDKs are included in the
+      application (no Firebase, no AdMob, no crash reporting services).
+    </p>
+
+    <h2>Children</h2>
+    <p>
+      The application is not directed at children under 13 and does not
+      knowingly collect any data from them.
+    </p>
+
+    <h2>Contact</h2>
+    <p>
+      For any questions:
+      <a href="mailto:axel.jouannic@gmail.com">axel.jouannic@gmail.com</a>
+    </p>
+  </section>
+
+  <p class="updated">Dernière mise à jour · Last updated: 2026-07-21</p>
+
+</div>
+<script>
+  function setLang(lang) {
+    document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.lang-switch a').forEach(a => a.classList.remove('active'));
+    document.getElementById(lang).classList.add('active');
+    document.querySelector('.lang-switch a[onclick*="' + lang + '"]').classList.add('active');
+  }
+</script>
+</body>
+</html>
