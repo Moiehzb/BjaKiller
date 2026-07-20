@@ -46,20 +46,31 @@ const gain = () => {
   return _gain;
 };
 
-// Bornes de boucle : on cherche le 1er et le dernier échantillon audibles pour
-// couper le silence numérique (padding d'encodage, queue de reverb éteinte).
+// Bornes de boucle : loopStart = 0 (mobile), loopEnd = exactement 120 mesures
+// après le premier son audible du fichier. On ne cherche plus le dernier
+// échantillon audible car le luth résonne légèrement dans la mesure 121,
+// créant une micro-pause avant le rebouclage.
+const LOOP_BARS    = 120;
+const LOOP_BAR_DUR = 2.0; // noire pointée = 60 bpm en 6/8 → mesure = 2.0 s
+
 const computeLoop = (buf) => {
   const data = buf.getChannelData(0);
-  const n = data.length;
-  const thr = 0.003;
-  // loopStart = 0 (mesure 1 — début absolu du morceau).
-  // Sur mobile, trimmer le silence en tête introduit un léger offset qui
-  // cause un blanc lors du rebouclage. On part toujours de 0.
+  const n    = buf.length;
+  const sr   = buf.sampleRate;
+  const thr  = 0.003;
+
+  // Trouver le pré-roll (silence encodeur en tête).
+  let firstAudible = 0;
+  while (firstAudible < n && Math.abs(data[firstAudible]) < thr) firstAudible++;
+
+  // loopStart = 0 : on part toujours du début absolu (mobile — trimmer le
+  // silence en tête introduit un offset qui cause un blanc au rebouclage).
   _loop.start = 0;
-  // loopEnd = dernier échantillon audible (coupe le silence encodeur en queue).
-  let end = n - 1;
-  while (end > 0 && Math.abs(data[end]) < thr) end--;
-  _loop.end = Math.min(n - 1, end + 1) / buf.sampleRate;
+
+  // loopEnd = début de la mesure 121 dans le fichier = pré-roll + 120 × 2.0 s.
+  // Coupe avant la queue du luth, jointure au bar boundary.
+  const endSample = Math.round(firstAudible + LOOP_BARS * LOOP_BAR_DUR * sr);
+  _loop.end = Math.min(endSample, n - 1) / sr;
   if (!(_loop.end > 0)) _loop.end = buf.duration;
 };
 
