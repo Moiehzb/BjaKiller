@@ -12,8 +12,8 @@ La musique du lobby présente une micro-coupure audible au moment du bouclage (`
 Le code du paywall est branché (Play Billing). Les achats ne marchent **que** via une app connue de la Play Console, installée depuis le Play Store. Le mécanisme « testeur de licence » permet de tester avec le vrai prix affiché mais une carte de test (jamais débité).
 
 **Étapes utilisateur (manuelles) :**
-- [ ] 1. Créer un **compte développeur Google Play** (25 $ une fois) sur play.google.com/console — vérification d'identité par Google : compter 1–2 jours. *(À lancer en premier, c'est le seul vrai délai.)*
-- [ ] 2. Créer le **profil de paiement marchand** (Console → Paramètres) — obligatoire pour vendre des produits payants (c'est là que Google verse les revenus)
+- [x] 1. Créer un **compte développeur Google Play** (25 $ une fois) — vérification d'identité en cours
+- [x] 2. Créer le **profil de paiement marchand** (Console → Paramètres) ✓
 - [ ] 3. Créer l'app dans la console : « Hi-Lo Academy I », package `com.blackjackacademy.app`
 - [ ] 4. Uploader l'**AAB signé** en piste **Test interne** (l'AAB est préparé par Claude, voir plus bas — dispo en quelques minutes, pas de review complète)
 - [ ] 5. Créer les **10 produits in-app** (Monétiser → Produits → Produits intégrés) : **non consommables**, **4,99 €**, IDs **exacts** : `sp_steampunk`, `sp_cyber`, `sp_vapor`, `sp_eldritch`, `sp_norse`, `sp_synth`, `sp_noir`, `sp_cosmos`, `sp_bio`, `sp_graffiti` — puis les **activer**
@@ -25,7 +25,7 @@ Le code du paywall est branché (Play Billing). Les achats ne marchent **que** v
 **Étapes Claude (demander quand prêt — « go keystore ») :**
 - [x] Générer le **keystore de signature** release → `android/hilo-academy.jks` (alias `hilo-academy`) — ⚠️ **À sauvegarder précieusement** avec `android/key.properties`
 - [x] Configurer la signature release dans Gradle + builder l'**AAB** signé → `Hi-Lo-Academy.aab` (12,3 Mo) prêt à uploader
-- [ ] Supprimer le code admin `adminmagueule` avant publication publique
+- [x] Supprimer les codes cheat (`adminmagueule`, `Ouaisleskin`) avant publication
 
 ## 🔮 Fin de roadmap — ne jamais mentionner quand on demande quoi faire
 

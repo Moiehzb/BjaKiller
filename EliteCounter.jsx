@@ -3191,18 +3191,7 @@ export default function EliteCounter() {
               <div style={{ color: G.textSecondary, fontSize: 13, margin: '10px 0 14px', lineHeight: 1.5 }}>{t('settings.resetWarnPre')}<strong style={{ color: G.textPrimary }}>RESET</strong>{t('settings.resetWarnPost')}</div>
               <input style={{ width: '100%', background: 'rgba(255,255,255,.04)', border: `1px solid ${G.border}`, borderRadius: 8, padding: '11px 14px', color: G.textPrimary, fontSize: 14, outline: 'none', marginBottom: 10 }}
                 value={resetText} onChange={e => {
-                  const v = e.target.value;
-                  if (v === 'adminmagueule') {
-                    patchSave({ coins: (save.coins || 0) + 10000 });
-                    setResetText('');
-                    setShowResetConfirm(false);
-                  } else if (v === 'Ouaisleskin') {
-                    patchSave({ unlockedSkins: save.unlockedSkins.includes('obsidian') ? save.unlockedSkins : [...save.unlockedSkins, 'obsidian'], activeSkin: 'obsidian' });
-                    setResetText('');
-                    setShowResetConfirm(false);
-                  } else {
-                    setResetText(v);
-                  }
+                  setResetText(e.target.value);
                 }} placeholder={t('settings.resetPlaceholder')} />
               <div style={{ display: 'flex', gap: 8 }}>
                 <button style={{ flex: 1, padding: 11, background: 'rgba(255,255,255,.05)', border: `1px solid ${G.border}`, borderRadius: 8, color: G.textSecondary, cursor: 'pointer' }}
