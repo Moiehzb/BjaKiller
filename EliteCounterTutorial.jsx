@@ -272,7 +272,7 @@ const WelcomeStep = ({ onNext, onSkip, t }) => {
 
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', paddingTop: 10 }}>
-      <div className="tlogo">BLACKJACK ACADEMY I</div>
+      <div className="tlogo">HI-LO ACADEMY I</div>
       <div className="tlogsub">{t('tutorial.welcome.logoSub')}</div>
 
       {/* Card fan */}
