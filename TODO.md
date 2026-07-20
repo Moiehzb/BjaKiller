@@ -5,8 +5,6 @@
 
 ## 🛠️ Features en attente (backlog)
 
-### Réparer la boucle de musique (`music.js`)
-La musique du lobby présente une micro-coupure audible au moment du bouclage (`AudioBufferSourceNode.loop`). Pistes à explorer : rognage plus précis du silence en queue/tête du buffer OGG, ou utilisation d'une double source (crossfade seamless à la fin du buffer pour masquer la couture).
 
 ### Publication Play Store — tester les achats à 4,99 € sans payer (checklist, dans l'ordre)
 Le code du paywall est branché (Play Billing). Les achats ne marchent **que** via une app connue de la Play Console, installée depuis le Play Store. Le mécanisme « testeur de licence » permet de tester avec le vrai prix affiché mais une carte de test (jamais débité).
@@ -32,6 +30,8 @@ Le code du paywall est branché (Play Billing). Les achats ne marchent **que** v
 - [ ] App 2 séparée : mode table réaliste style Card Counter Lite
 
 ## ✅ Fait
+
+- [x] **Boucle musique lobby (2026-07-20)** — `computeLoop()` recalculé : `loopEnd` fixé à `pré-roll + 120 × 2.0 s` (bar boundary exact) au lieu du dernier échantillon audible. La queue du luth en mesure 121 ne crée plus de micro-pause.
 
 - [x] **Paywall réel « Le Marchand » — Google Play Billing (session 06/07/2026)**
   - Plugin `cordova-plugin-purchase@13.17.2` (Play Billing Library 9) intégré via Capacitor.
