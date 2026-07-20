@@ -1,6 +1,6 @@
 {
   "appId": "com.blackjackacademy.app",
-  "appName": "Blackjack Academy I",
+  "appName": "Hi-Lo Academy I",
   "webDir": "dist",
   "android": {
     "backgroundColor": "#0d0a1aff"

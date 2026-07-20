@@ -1,4 +1,4 @@
-// ─── Blackjack Academy I — Le Marchand : Google Play Billing ──────
+// ─── Hi-Lo Academy I — Le Marchand : Google Play Billing ──────────
 // Achats in-app réels des artefacts (non-consommables, 4,99 € pièce)
 // via cordova-plugin-purchase v13 (Play Billing Library).
 //

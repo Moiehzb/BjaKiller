@@ -249,7 +249,7 @@ export const LanguageSelectScreen = ({ current, onPick }) => (
     <div style={{ maxWidth: 420, margin: '0 auto', padding: '0 18px 48px', minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
       <div style={{ textAlign: 'center', marginBottom: 28 }}>
         <div style={{ fontFamily: "'Cinzel', serif", fontSize: 11, letterSpacing: '.34em', textTransform: 'uppercase', color: G.goldDark, marginBottom: 14, paddingLeft: '.34em' }}>
-          Blackjack Academy I
+          Hi-Lo Academy I
         </div>
         <div
           style={{

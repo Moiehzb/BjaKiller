@@ -1,4 +1,4 @@
-# Build de l'APK Android — Blackjack Academy I
+# Build de l'APK Android — Hi-Lo Academy I
 # Usage : clic droit > "Exécuter avec PowerShell", ou  ./build-apk.ps1
 # Prérequis : chaîne portable installée dans D:\android-build-tools (JDK17 + SDK)
 

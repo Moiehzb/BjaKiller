@@ -2336,7 +2336,7 @@ export default function EliteCounter() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
           <AppLogo size={30} />
-          <div className="logo">BLACKJACK ACADEMY I</div>
+          <div className="logo">HI-LO ACADEMY I</div>
         </div>
         {!minimal && (
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>

@@ -1,4 +1,4 @@
-// ─── Blackjack Academy I — Retour haptique ────────────────────
+// ─── Hi-Lo Academy I — Retour haptique ───────────────────────
 // Sur Android (APK Capacitor) : plugin natif @capacitor/haptics — la WebView
 // ignore souvent navigator.vibrate, d'où l'absence de vibration en APK.
 // Sur navigateur / desktop : repli sur l'API Web Vibration, sinon no-op.

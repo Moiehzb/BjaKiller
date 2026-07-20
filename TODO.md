@@ -1,4 +1,4 @@
-# Blackjack Academy I (ex-Elite Counter) — To-Do
+# Hi-Lo Academy I (ex-Elite Counter) — To-Do
 
 > Ce fichier est maintenu automatiquement par Claude.
 > Mis à jour quand une tâche est assignée ou complétée.
@@ -14,7 +14,7 @@ Le code du paywall est branché (Play Billing). Les achats ne marchent **que** v
 **Étapes utilisateur (manuelles) :**
 - [ ] 1. Créer un **compte développeur Google Play** (25 $ une fois) sur play.google.com/console — vérification d'identité par Google : compter 1–2 jours. *(À lancer en premier, c'est le seul vrai délai.)*
 - [ ] 2. Créer le **profil de paiement marchand** (Console → Paramètres) — obligatoire pour vendre des produits payants (c'est là que Google verse les revenus)
-- [ ] 3. Créer l'app dans la console : « Blackjack Academy I », package `com.blackjackacademy.app`
+- [ ] 3. Créer l'app dans la console : « Hi-Lo Academy I », package `com.blackjackacademy.app`
 - [ ] 4. Uploader l'**AAB signé** en piste **Test interne** (l'AAB est préparé par Claude, voir plus bas — dispo en quelques minutes, pas de review complète)
 - [ ] 5. Créer les **10 produits in-app** (Monétiser → Produits → Produits intégrés) : **non consommables**, **4,99 €**, IDs **exacts** : `sp_steampunk`, `sp_cyber`, `sp_vapor`, `sp_eldritch`, `sp_norse`, `sp_synth`, `sp_noir`, `sp_cosmos`, `sp_bio`, `sp_graffiti` — puis les **activer**
 - [ ] 6. S'ajouter en **testeur de licence** (Console, page d'accueil → Paramètres → Test de licence → son Gmail) → la feuille de paiement affichera 4,99 € avec « Carte de test, toujours approuvée »
@@ -23,8 +23,8 @@ Le code du paywall est branché (Play Billing). Les achats ne marchent **que** v
 - 💡 Re-tester un achat déjà fait : le rembourser dans la console (Gestion des commandes → Rembourser) → l'app le reverra comme non possédé
 
 **Étapes Claude (demander quand prêt — « go keystore ») :**
-- [ ] Générer le **keystore de signature** release (⚠️ à sauvegarder précieusement : perdu = plus aucune MàJ possible de l'app)
-- [ ] Configurer la signature release dans Gradle + builder l'**AAB** (`bundleRelease`) prêt à uploader
+- [x] Générer le **keystore de signature** release → `android/hilo-academy.jks` (alias `hilo-academy`) — ⚠️ **À sauvegarder précieusement** avec `android/key.properties`
+- [x] Configurer la signature release dans Gradle + builder l'**AAB** signé → `Hi-Lo-Academy.aab` (12,3 Mo) prêt à uploader
 - [ ] Supprimer le code admin `adminmagueule` avant publication publique
 
 ## 🔮 Fin de roadmap — ne jamais mentionner quand on demande quoi faire
@@ -61,7 +61,7 @@ Le code du paywall est branché (Play Billing). Les achats ne marchent **que** v
   - **Volume réglable** (GainNode) : `save.musicVolume` (défaut 0.35) + slider dans le Scriptorium (icône `Music`, %). Clé i18n `settings.music` ajoutée aux 14 locales.
   - **Tuto → Training** : `onComplete` du tuto first-launch fait `setNav('mode-training')` en plus de `tutorialDone` (le skip laisse au lobby, tout débloqué).
 
-- [x] **Refonte DA « Académie Secrète des Compteurs » + rebranding Blackjack Academy I — session 02/07/2026**
+- [x] **Refonte DA « Académie Secrète des Compteurs » + rebranding Hi-Lo Academy I — session 02/07/2026**
   - **Palette** : objet `G` refait (fonds violets profonds `#0d0a1a`/`#13102a`/`#1a1535`, or `#c9a24b`, ambre `#d4813a`, teal `#2dd4bf`, textes parchemin/lavande) — appliqué à EliteCounter.jsx + miroirs Tutorial/LanguageSelect + index.html.
   - **Typo** : Cinzel (titres, labels caps letter-spacing .22–.28em) + EB Garamond (corps) — Google Fonts en `<link>` (index.html) + `@import` des feuilles injectées. Playfair Display/Inter supprimés.
   - **Rangs renommés** : Bronze→**Cuivre**, Silver→**Argent**, Gold→**Or**, Platinum→**Émeraude**, Diamond→**Saphir**, Master→**Adamantium** (noms propres identiques dans les 4 langues, couleurs assorties). Gates relabellisées (« Cuivre → Argent »…). Emojis-médailles remplacés par le sceau SVG `RankSigil` (pentagone facetté teinté).

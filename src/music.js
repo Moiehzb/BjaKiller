@@ -1,4 +1,4 @@
-// ─── Blackjack Academy I — Lobby background music ─────────────
+// ─── Hi-Lo Academy I — Lobby background music ─────────────────
 // Joue le morceau du lobby « Le Seuil » (mix LMMS exporté en OGG).
 // Fichier : public/music/le_hall.ogg  → servi à /music/le_hall.ogg
 //
