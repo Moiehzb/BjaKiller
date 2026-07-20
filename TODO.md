@@ -3,6 +3,10 @@
 > Ce fichier est maintenu automatiquement par Claude.
 > Mis à jour quand une tâche est assignée ou complétée.
 
+## ⚡ À faire au prochain lancement (priorité)
+
+- [ ] **Tester l'accès mémoire** : essayer d'écrire dans `C:\Users\PC1\.claude\projects\D--CLAUDE-CODE-CS-CODE-blackjack-academy-I\memory\`. Si ça marche → sauvegarder l'URL de la politique de conf (`https://moiehzb.github.io/BjaKiller/privacy.html`). Si ça échoue → les règles allow n'ont pas overridé les deny, il faudra retravailler les permissions.
+
 ## 🛠️ Features en attente (backlog)
 
 ### Assets Play Store (à préparer avant soumission)
