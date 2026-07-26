@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>HI-LO ACADEMY II — A (croupier/joueur) + B (éventail détaillé)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=EB+Garamond:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bgDeep:#0d0a1a; --bgCard:#13102a; --bgPanel:#1a1535;
+    --border:#2e2654; --gold:#c9a24b; --goldLight:#e8c97a; --goldDark:#8a6820;
+    --textPrimary:#f0e6cc; --textSecondary:#a896c8; --textMuted:#5c4f7a;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:radial-gradient(ellipse at top,#1a1535,var(--bgDeep) 70%);
+    min-height:100vh; font-family:'EB Garamond',serif; color:var(--textPrimary);
+    -webkit-font-smoothing:antialiased; padding:48px 24px 80px; text-align:center;
+  }
+  .wrap{max-width:880px;margin:0 auto}
+  h1{
+    font-family:'Cinzel',serif; font-weight:700; letter-spacing:.14em;
+    text-transform:uppercase; font-size:23px; margin:0 0 8px; color:var(--goldLight);
+  }
+  .sub{color:var(--textSecondary); font-size:15px; max-width:640px; margin:0 auto 30px; line-height:1.55}
+  .sub b{color:var(--gold)}
+  .cols{display:flex;gap:40px;justify-content:center;flex-wrap:wrap;align-items:flex-start}
+  .col{display:flex;flex-direction:column;align-items:center;gap:12px;max-width:340px}
+  .tag{font-family:'Cinzel',serif;letter-spacing:.1em;font-size:13px;text-transform:uppercase;color:var(--goldLight)}
+  .desc{color:var(--textSecondary);font-size:13px;line-height:1.5;min-height:56px}
+  .hero{
+    width:236px;height:236px;border-radius:52px;
+    background:radial-gradient(ellipse at 32% 24%, #1a1535 0%, #0d0a1a 72%);
+    border:1px solid rgba(201,162,75,.35);
+    box-shadow:inset 0 1px 0 rgba(232,201,122,.16),
+               inset 0 0 46px rgba(15,80,60,.4), 0 16px 40px rgba(0,0,0,.55);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .hero svg{width:200px;height:200px;display:block}
+  .strip{display:flex;align-items:flex-end;justify-content:center;gap:12px;margin:16px 0 4px}
+  .mini{
+    border-radius:22%;
+    background:radial-gradient(ellipse at 32% 24%, #1a1535 0%, #0d0a1a 74%);
+    border:1px solid rgba(201,162,75,.28);
+    box-shadow:inset 0 1px 0 rgba(232,201,122,.12), 0 4px 12px rgba(0,0,0,.45);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .mini svg{width:84%;height:84%;display:block}
+  .sizes{color:var(--textMuted);font-size:10.5px;letter-spacing:.12em}
+  footer{color:var(--textMuted);font-size:13px;margin-top:48px;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>HI-LO ACADEMY II</h1>
+  <p class="sub">À gauche, l'option <b>A</b> revisitée : un <b>croupier</b> (haut) face à <b>un joueur</b> (bas),
+    arc de table, jetons — épurée et lisible. À droite, l'<b>éventail B</b> avec des vraies cartes :
+    <b>valeur + enseigne</b> dans chaque carte et léger recouvrement pour l'épaisseur. Filigrane II derrière.</p>
+
+  <div class="cols">
+    <div class="col">
+      <div class="hero"><svg viewBox="0 0 128 128"><use href="#eyeTable"/></svg></div>
+      <div class="tag">A — Croupier vs joueur</div>
+      <div class="desc">Croupier en haut (carte + face cachée dorée), joueur en bas avec <b>A♠ + J♠</b> — le « blackjack » originel qui a donné son nom au jeu. Easter egg maison.</div>
+      <div class="strip" data-icon="eyeTable"></div>
+      <div class="sizes">72 · 52 · 40 · 30 · 24 px</div>
+    </div>
+    <div class="col">
+      <div class="hero"><svg viewBox="0 0 128 128"><use href="#eyeFan"/></svg></div>
+      <div class="tag">B — L'éventail détaillé</div>
+      <div class="desc">4 cartes avec index (valeur + pique/cœur) et carte de tête à gros pique. Le recouvrement donne l'épaisseur d'une vraie main.</div>
+      <div class="strip" data-icon="eyeFan"></div>
+      <div class="sizes">72 · 52 · 40 · 30 · 24 px</div>
+    </div>
+  </div>
+
+  <footer>Dis-moi : <b>A</b> ou <b>B</b>, ajustements (enseignes, valeurs, force du filigrane),<br>
+    puis je fige en paths purs + jeu d'icônes.</footer>
+</div>
+
+<!-- ══════════ Définitions SVG ══════════ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="goldGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e8c97a"/>
+      <stop offset="0.5" stop-color="#c9a24b"/>
+      <stop offset="1" stop-color="#8a6820"/>
+    </linearGradient>
+    <radialGradient id="feltGrad" cx="44%" cy="34%" r="80%">
+      <stop offset="0" stop-color="#1a7a52"/>
+      <stop offset="0.55" stop-color="#0f5132"/>
+      <stop offset="1" stop-color="#06301d"/>
+    </radialGradient>
+    <radialGradient id="globeGrad" cx="42%" cy="36%" r="75%">
+      <stop offset="0" stop-color="#2a1f52"/>
+      <stop offset="0.6" stop-color="#160f30"/>
+      <stop offset="1" stop-color="#0b0818"/>
+    </radialGradient>
+
+    <clipPath id="eyeClip"><path d="M6 64 Q64 16 122 64 Q64 112 6 64 Z"/></clipPath>
+    <clipPath id="irisClip"><circle cx="64" cy="64" r="36"/></clipPath>
+
+    <symbol id="spade" viewBox="0 0 100 100">
+      <path d="M50 18 C50 18 24 40 24 58 C24 70 33 76 42 72 C42 78 39 84 33 88 L67 88 C61 84 58 78 58 72 C67 76 76 70 76 58 C76 40 50 18 50 18 Z" fill="currentColor"/>
+    </symbol>
+    <symbol id="heart" viewBox="0 0 100 100">
+      <path d="M50 82 C50 82 12 54 12 33 C12 19 25 13 35 18 C43 22 50 32 50 32 C50 32 57 22 65 18 C75 13 88 19 88 33 C88 54 50 82 50 82 Z" fill="currentColor"/>
+    </symbol>
+
+    <!-- ══ Filigrane II pleine hauteur ══ -->
+    <symbol id="filII" viewBox="0 0 128 128">
+      <g fill="#e8c97a" opacity="0.22">
+        <rect x="46" y="9" width="10" height="110" rx="1.5"/>
+        <rect x="39" y="9" width="24" height="7" rx="1.5"/>
+        <rect x="39" y="112" width="24" height="7" rx="1.5"/>
+        <rect x="72" y="9" width="10" height="110" rx="1.5"/>
+        <rect x="65" y="9" width="24" height="7" rx="1.5"/>
+        <rect x="65" y="112" width="24" height="7" rx="1.5"/>
+      </g>
+    </symbol>
+
+    <!-- ══ IRIS A — croupier (haut) vs joueur (bas) ══ -->
+    <symbol id="irisTable" viewBox="0 0 128 128">
+      <g clip-path="url(#irisClip)">
+        <circle cx="64" cy="64" r="36" fill="url(#feltGrad)"/>
+        <!-- ligne de donne du croupier -->
+        <path d="M40 58 Q64 47 88 58" fill="none" stroke="#e8c97a" stroke-width="1.4" opacity="0.55"/>
+
+        <!-- MAIN DU CROUPIER (haut) : 1 carte visible + 1 face cachée dorée -->
+        <g transform="rotate(-9 64 50)">
+          <rect x="53" y="40" width="14" height="19" rx="2" fill="#f4ecd6" stroke="#c9a24b" stroke-width="1"/>
+          <text x="56.5" y="46.5" font-family="Cinzel,serif" font-weight="700" font-size="6" fill="#b23b34" text-anchor="middle">7</text>
+          <g color="#b23b34"><use href="#heart" transform="translate(54.6,47.4) scale(0.055)"/></g>
+        </g>
+        <g transform="rotate(9 64 50)">
+          <rect x="61" y="40" width="14" height="19" rx="2" fill="#2a1f52" stroke="#c9a24b" stroke-width="1"/>
+          <rect x="63.5" y="42.5" width="9" height="14" rx="1.4" fill="none" stroke="#c9a24b" stroke-width="0.7" opacity="0.7"/>
+          <rect x="66.4" y="47" width="3.2" height="3.2" fill="#c9a24b" opacity="0.85" transform="rotate(45 68 48.6)"/>
+        </g>
+
+        <!-- MISE + MAIN DU JOUEUR (bas) -->
+        <ellipse cx="64" cy="82" rx="15" ry="5.5" fill="none" stroke="#e8c97a" stroke-width="1" opacity="0.5"/>
+        <!-- main du joueur = LE blackjack originel : As de pique + Valet de pique -->
+        <g transform="rotate(-9 64 84)">
+          <rect x="55" y="70" width="14" height="19" rx="2" fill="#f4ecd6" stroke="#c9a24b" stroke-width="1"/>
+          <text x="58.5" y="76.5" font-family="Cinzel,serif" font-weight="700" font-size="6" fill="#241a48" text-anchor="middle">A</text>
+          <g color="#241a48"><use href="#spade" transform="translate(56.6,77.4) scale(0.055)"/></g>
+        </g>
+        <g transform="rotate(9 64 84)">
+          <rect x="61" y="70" width="14" height="19" rx="2" fill="#f4ecd6" stroke="#c9a24b" stroke-width="1"/>
+          <text x="64.5" y="76.5" font-family="Cinzel,serif" font-weight="700" font-size="6" fill="#241a48" text-anchor="middle">J</text>
+          <g color="#241a48"><use href="#spade" transform="translate(62.6,77.4) scale(0.055)"/></g>
+        </g>
+
+        <ellipse cx="50" cy="49" rx="9" ry="5" fill="#ffffff" opacity="0.10" transform="rotate(-22 50 49)"/>
+      </g>
+    </symbol>
+
+    <!-- ══ IRIS B — éventail 4 cartes détaillées ══ -->
+    <symbol id="irisFan" viewBox="0 0 128 128">
+      <g clip-path="url(#irisClip)">
+        <circle cx="64" cy="64" r="36" fill="url(#feltGrad)"/>
+
+        <!-- carte 1 (fond) : K coeur -->
+        <g transform="rotate(-27 64 100)">
+          <rect x="56" y="46" width="16" height="28" rx="2.4" fill="#e7ddc2" stroke="#c9a24b" stroke-width="1"/>
+          <rect x="56" y="46" width="3" height="28" fill="#241a48" opacity="0.10"/>
+          <text x="60" y="53.5" font-family="Cinzel,serif" font-weight="700" font-size="6.5" fill="#b23b34" text-anchor="middle">K</text>
+          <g color="#b23b34"><use href="#heart" transform="translate(57.8,54.6) scale(0.06)"/></g>
+        </g>
+        <!-- carte 2 : 10 pique -->
+        <g transform="rotate(-9 64 100)">
+          <rect x="56" y="46" width="16" height="28" rx="2.4" fill="#efe6ce" stroke="#c9a24b" stroke-width="1"/>
+          <rect x="56" y="46" width="3" height="28" fill="#241a48" opacity="0.10"/>
+          <text x="60" y="53.5" font-family="Cinzel,serif" font-weight="700" font-size="6" fill="#241a48" text-anchor="middle">10</text>
+          <g color="#241a48"><use href="#spade" transform="translate(57.8,54.6) scale(0.06)"/></g>
+        </g>
+        <!-- carte 3 : Q coeur -->
+        <g transform="rotate(9 64 100)">
+          <rect x="56" y="46" width="16" height="28" rx="2.4" fill="#f4ecd6" stroke="#c9a24b" stroke-width="1"/>
+          <rect x="56" y="46" width="3" height="28" fill="#241a48" opacity="0.10"/>
+          <text x="60" y="53.5" font-family="Cinzel,serif" font-weight="700" font-size="6.5" fill="#b23b34" text-anchor="middle">Q</text>
+          <g color="#b23b34"><use href="#heart" transform="translate(57.8,54.6) scale(0.06)"/></g>
+        </g>
+        <!-- carte 4 (tête) : As de pique, gros symbole -->
+        <g transform="rotate(27 64 100)">
+          <rect x="56" y="46" width="16" height="28" rx="2.4" fill="#f7f0dd" stroke="#c9a24b" stroke-width="1.1"/>
+          <rect x="56" y="46" width="3" height="28" fill="#241a48" opacity="0.10"/>
+          <text x="60" y="53.5" font-family="Cinzel,serif" font-weight="700" font-size="6.5" fill="#241a48" text-anchor="middle">A</text>
+          <g color="#241a48"><use href="#spade" transform="translate(60,58) scale(0.14)"/></g>
+        </g>
+
+        <ellipse cx="50" cy="49" rx="9" ry="5" fill="#ffffff" opacity="0.12" transform="rotate(-22 50 49)"/>
+      </g>
+    </symbol>
+
+    <!-- ══ Cadre œil commun ══ -->
+    <symbol id="eyeFrame" viewBox="0 0 128 128">
+      <circle cx="64" cy="64" r="41" fill="none" stroke="#e8c97a" stroke-width="1.5" stroke-dasharray="1.6 6" opacity="0.7"/>
+      <circle cx="64" cy="64" r="36" fill="none" stroke="url(#goldGrad)" stroke-width="2.6"/>
+      <path d="M6 64 Q64 16 122 64 Q64 112 6 64 Z" fill="none" stroke="#c9a24b" stroke-width="3.2" stroke-linejoin="round"/>
+      <path d="M15 60 Q64 23 113 60" fill="none" stroke="#c9a24b" stroke-width="1" opacity="0.3"/>
+    </symbol>
+
+    <symbol id="eyeTable" viewBox="0 0 128 128">
+      <g clip-path="url(#eyeClip)"><rect x="6" y="14" width="116" height="100" fill="url(#globeGrad)"/></g>
+      <use href="#irisTable"/><use href="#eyeFrame"/><use href="#filII"/>
+    </symbol>
+    <symbol id="eyeFan" viewBox="0 0 128 128">
+      <g clip-path="url(#eyeClip)"><rect x="6" y="14" width="116" height="100" fill="url(#globeGrad)"/></g>
+      <use href="#irisFan"/><use href="#eyeFrame"/><use href="#filII"/>
+    </symbol>
+  </defs>
+</svg>
+
+<script>
+  var SIZES = [72, 52, 40, 30, 24];
+  document.querySelectorAll('.strip').forEach(function (strip) {
+    var id = strip.getAttribute('data-icon');
+    SIZES.forEach(function (s) {
+      var d = document.createElement('div');
+      d.className = 'mini';
+      d.style.width = s + 'px'; d.style.height = s + 'px';
+      d.innerHTML = '<svg viewBox="0 0 128 128"><use href="#' + id + '"/></svg>';
+      strip.appendChild(d);
+    });
+  });
+</script>
+</body>
+</html>

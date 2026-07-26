@@ -489,6 +489,15 @@ const ko = {
       enterLobby: '홀 입장',
     },
   },
+
+  academySwitcher: {
+    title1: 'HI-LO ACADEMY I',
+    desc1: 'Hi-Lo 카드 카운팅을 한 장씩 훈련: 등급, 랭크전, 오늘의 의식, 그리고 시련 — 지금 당신이 거치고 있는 아카데미.',
+    next: '다음 단계',
+    title2: 'HI-LO ACADEMY II',
+    desc2: '살아있는 테이블: 여러 카지노 테이블을 동시에 시뮬레이션, 딜러와 플레이어까지 갖춰 실전 같은 조건에서 카운트를 단련한다.',
+    cta2: 'Google Play 스토어에서 이용 가능합니다.',
+  },
 };
 
 export default ko;

@@ -489,6 +489,15 @@ const pt = {
       enterLobby: 'Entrar na Sala',
     },
   },
+
+  academySwitcher: {
+    title1: 'HI-LO ACADEMY I',
+    desc1: 'Treino de contagem Hi-Lo carta a carta: patentes, ranking, ritual do dia e a Provação — a academia que percorres aqui.',
+    next: 'O próximo passo',
+    title2: 'HI-LO ACADEMY II',
+    desc2: 'A mesa viva: várias mesas de cassino simuladas em paralelo, crupiê e jogadores, para afinar a tua contagem em condições reais.',
+    cta2: 'Disponível na Google Play Store.',
+  },
 };
 
 export default pt;

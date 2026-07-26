@@ -489,6 +489,15 @@ const ja = {
       enterLobby: 'ホールに入る',
     },
   },
+
+  academySwitcher: {
+    title1: 'HI-LO ACADEMY I',
+    desc1: 'Hi-Lo カウンティングを一枚ずつ鍛える：ランク、ランク戦、デイリーの儀式、そして試練——今あなたが歩んでいるアカデミー。',
+    next: '次のステップ',
+    title2: 'HI-LO ACADEMY II',
+    desc2: '生きたテーブル：複数のカジノテーブルを同時にシミュレート、ディーラーとプレイヤーもいる、実戦さながらの環境でカウントを磨く。',
+    cta2: 'Google Play ストアで配信中。',
+  },
 };
 
 export default ja;

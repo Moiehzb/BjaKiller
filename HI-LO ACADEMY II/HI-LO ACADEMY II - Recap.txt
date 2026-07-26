@@ -1,0 +1,54 @@
+HI-LO ACADEMY II — RECAP
+========================
+
+Note de rappel deposee dans le dossier de HI-LO Academy I.
+Le vrai projet vit ailleurs : D:\CLAUDE CODE CS CODE\blackjack-academy-II
+(dossier disque a renommer hi-lo-academy-II hors session).
+
+
+EN UNE PHRASE
+-------------
+Un simulateur de table de blackjack realiste pour entrainer les yeux et le
+cerveau au comptage Hi-Lo sur une vraie table de casino vivante — pas sur des
+cartes flash.
+
+
+CE N'EST PAS LE I
+-----------------
+- HI-LO Academy I  = jeu de comptage flash, une carte a la fois.
+- HI-LO Academy II = simulation d'une table vivante (rythme croupier, joueurs
+  NPC, vitesse et comportement realistes).
+
+
+CONCEPT
+-------
+- App payante des l'installation : 4,99 € (Google Play / App Store), pas de freemium.
+- L'utilisateur choisit 1 a 10 tables et observe les cartes distribuees comme au casino.
+- Modele table par table (round-robin) : jamais deux tables ne distribuent en
+  meme temps. Une table joue sa main du debut a la fin, puis la parole passe a
+  la suivante. Le count-check porte sur la table qui vient de finir.
+- 3 joueurs NPC par table (basic strategy simplifiee).
+- Decks configurables : 1 / 2 / 4 / 6 / 8 (defaut 6), penetration 75 %.
+- Vitesse nommee et configurable (Zen -> Blitz, ~0,7 a 2,6 s/carte, avec jitter).
+
+
+MODES DE VERIFICATION (4)
+-------------------------
+Apres chaque main / surprise 3-6 mains / fin de sabot / Wonging (signalement
+manuel des tables chaudes, seuil TC +2). Feedback immediat : count reel + ecart affiche.
+
+
+DIRECTION & DA
+--------------
+- Direction ARCADE actee (juice, sons, vibrations, palette violet/or sur le chrome).
+- Seules les tables restent vertes feutrees realistes (rail bois, cartes blanches).
+- Layout phone-first, portrait.
+- Session open-end : le joueur arrete quand il veut.
+- Journal de progression (sessionHistory + courbe SVG) = instrument de mesure.
+
+
+STACK (heritee du I)
+--------------------
+React 18 + Vite (JS pur, pas de TS) · Tailwind via CDN · Lucide · localStorage
+(cle bja2Save) · Capacitor 6 pour l'APK Android · i18n maison (FR, EN au minimum).
+Package ID : com.hiloacademy.app2.

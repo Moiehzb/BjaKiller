@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="HI-LO ACADEMY II">
+  <defs>
+    <linearGradient id="goldGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e8c97a"/>
+      <stop offset="0.5" stop-color="#c9a24b"/>
+      <stop offset="1" stop-color="#8a6820"/>
+    </linearGradient>
+    <radialGradient id="feltGrad" cx="44%" cy="34%" r="80%">
+      <stop offset="0" stop-color="#1a7a52"/>
+      <stop offset="0.55" stop-color="#0f5132"/>
+      <stop offset="1" stop-color="#06301d"/>
+    </radialGradient>
+    <radialGradient id="globeGrad" cx="42%" cy="36%" r="75%">
+      <stop offset="0" stop-color="#2a1f52"/>
+      <stop offset="0.6" stop-color="#160f30"/>
+      <stop offset="1" stop-color="#0b0818"/>
+    </radialGradient>
+
+    <clipPath id="eyeClip"><path d="M6 64 Q64 16 122 64 Q64 112 6 64 Z"/></clipPath>
+    <clipPath id="irisClip"><circle cx="64" cy="64" r="36"/></clipPath>
+
+    <symbol id="spade" viewBox="0 0 100 100">
+      <path d="M50 18 C50 18 24 40 24 58 C24 70 33 76 42 72 C42 78 39 84 33 88 L67 88 C61 84 58 78 58 72 C67 76 76 70 76 58 C76 40 50 18 50 18 Z" fill="currentColor"/>
+    </symbol>
+    <symbol id="heart" viewBox="0 0 100 100">
+      <path d="M50 82 C50 82 12 54 12 33 C12 19 25 13 35 18 C43 22 50 32 50 32 C50 32 57 22 65 18 C75 13 88 19 88 33 C88 54 50 82 50 82 Z" fill="currentColor"/>
+    </symbol>
+
+    <symbol id="filII" viewBox="0 0 128 128">
+      <g fill="#e8c97a" opacity="0.22">
+        <rect x="46" y="9" width="10" height="110" rx="1.5"/>
+        <rect x="39" y="9" width="24" height="7" rx="1.5"/>
+        <rect x="39" y="112" width="24" height="7" rx="1.5"/>
+        <rect x="72" y="9" width="10" height="110" rx="1.5"/>
+        <rect x="65" y="9" width="24" height="7" rx="1.5"/>
+        <rect x="65" y="112" width="24" height="7" rx="1.5"/>
+      </g>
+    </symbol>
+
+    <symbol id="irisTable" viewBox="0 0 128 128">
+      <g clip-path="url(#irisClip)">
+        <circle cx="64" cy="64" r="36" fill="url(#feltGrad)"/>
+        <path d="M40 58 Q64 47 88 58" fill="none" stroke="#e8c97a" stroke-width="1.4" opacity="0.55"/>
+        <g transform="rotate(-9 64 50)">
+          <rect x="53" y="40" width="14" height="19" rx="2" fill="#f4ecd6" stroke="#c9a24b" stroke-width="1"/>
+          <text x="56.5" y="46.5" font-family="Cinzel,Georgia,serif" font-weight="700" font-size="6" fill="#b23b34" text-anchor="middle">7</text>
+          <g color="#b23b34"><use href="#heart" transform="translate(54.6,47.4) scale(0.055)"/></g>
+        </g>
+        <g transform="rotate(9 64 50)">
+          <rect x="61" y="40" width="14" height="19" rx="2" fill="#2a1f52" stroke="#c9a24b" stroke-width="1"/>
+          <rect x="63.5" y="42.5" width="9" height="14" rx="1.4" fill="none" stroke="#c9a24b" stroke-width="0.7" opacity="0.7"/>
+          <rect x="66.4" y="47" width="3.2" height="3.2" fill="#c9a24b" opacity="0.85" transform="rotate(45 68 48.6)"/>
+        </g>
+        <ellipse cx="64" cy="82" rx="15" ry="5.5" fill="none" stroke="#e8c97a" stroke-width="1" opacity="0.5"/>
+        <g transform="rotate(-9 64 84)">
+          <rect x="55" y="70" width="14" height="19" rx="2" fill="#f4ecd6" stroke="#c9a24b" stroke-width="1"/>
+          <text x="58.5" y="76.5" font-family="Cinzel,Georgia,serif" font-weight="700" font-size="6" fill="#241a48" text-anchor="middle">A</text>
+          <g color="#241a48"><use href="#spade" transform="translate(56.6,77.4) scale(0.055)"/></g>
+        </g>
+        <g transform="rotate(9 64 84)">
+          <rect x="61" y="70" width="14" height="19" rx="2" fill="#f4ecd6" stroke="#c9a24b" stroke-width="1"/>
+          <text x="64.5" y="76.5" font-family="Cinzel,Georgia,serif" font-weight="700" font-size="6" fill="#241a48" text-anchor="middle">J</text>
+          <g color="#241a48"><use href="#spade" transform="translate(62.6,77.4) scale(0.055)"/></g>
+        </g>
+        <ellipse cx="50" cy="49" rx="9" ry="5" fill="#ffffff" opacity="0.10" transform="rotate(-22 50 49)"/>
+      </g>
+    </symbol>
+
+    <symbol id="eyeFrame" viewBox="0 0 128 128">
+      <circle cx="64" cy="64" r="41" fill="none" stroke="#e8c97a" stroke-width="1.5" stroke-dasharray="1.6 6" opacity="0.7"/>
+      <circle cx="64" cy="64" r="36" fill="none" stroke="url(#goldGrad)" stroke-width="2.6"/>
+      <path d="M6 64 Q64 16 122 64 Q64 112 6 64 Z" fill="none" stroke="#c9a24b" stroke-width="3.2" stroke-linejoin="round"/>
+      <path d="M15 60 Q64 23 113 60" fill="none" stroke="#c9a24b" stroke-width="1" opacity="0.3"/>
+    </symbol>
+  </defs>
+
+  <g clip-path="url(#eyeClip)"><rect x="6" y="14" width="116" height="100" fill="url(#globeGrad)"/></g>
+  <use href="#irisTable"/><use href="#eyeFrame"/><use href="#filII"/>
+</svg>

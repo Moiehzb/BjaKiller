@@ -489,6 +489,15 @@ const sq = {
       enterLobby: 'Hyni në Sallë',
     },
   },
+
+  academySwitcher: {
+    title1: 'HI-LO ACADEMY I',
+    desc1: 'Stërvitje e numërimit Hi-Lo, letër pas letre: gradat, renditja, rituali i ditës dhe Sprova — akademia që po përshkon tani.',
+    next: 'Hapi tjetër',
+    title2: 'HI-LO ACADEMY II',
+    desc2: 'Tavolina e gjallë: disa tavolina kazinoje të simuluara paralelisht, krupie dhe lojtarë, për ta mprehur numërimin tënd në kushte reale.',
+    cta2: 'Tashmë në dispozicion në Google Play Store.',
+  },
 };
 
 export default sq;

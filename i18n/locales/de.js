@@ -513,6 +513,15 @@ const de = {
       enterLobby: 'Die Halle betreten',
     },
   },
+
+  academySwitcher: {
+    title1: 'HI-LO ACADEMY I',
+    desc1: 'Hi-Lo-Zähltraining, Karte für Karte: Ränge, Rangliste, tägliches Ritual und die Prüfung — die Akademie, die du gerade durchläufst.',
+    next: 'Der nächste Schritt',
+    title2: 'HI-LO ACADEMY II',
+    desc2: 'Der lebendige Tisch: mehrere simulierte Casino-Tische parallel, Croupier und Mitspieler, um deinen Count unter realen Bedingungen zu schärfen.',
+    cta2: 'Verfügbar im Google Play Store.',
+  },
 };
 
 export default de;

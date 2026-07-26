@@ -440,6 +440,64 @@ const AppLogo = ({ size = 30 }) => {
   );
 };
 
+// ─── Logo de HI-LO ACADEMY II — l'œil vu de table (croupier vs joueur) ──
+const AppLogoII = ({ size = 30 }) => (
+  <svg width={size} height={size} viewBox="0 0 128 128" aria-hidden="true" style={{ display: 'block', flexShrink: 0 }}>
+    <defs>
+      <linearGradient id="al2Gold" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stopColor="#e8c97a" />
+        <stop offset="0.5" stopColor="#c9a24b" />
+        <stop offset="1" stopColor="#8a6820" />
+      </linearGradient>
+      <radialGradient id="al2Felt" cx="44%" cy="34%" r="80%">
+        <stop offset="0" stopColor="#1a7a52" />
+        <stop offset="0.55" stopColor="#0f5132" />
+        <stop offset="1" stopColor="#06301d" />
+      </radialGradient>
+      <radialGradient id="al2Globe" cx="42%" cy="36%" r="75%">
+        <stop offset="0" stopColor="#2a1f52" />
+        <stop offset="0.6" stopColor="#160f30" />
+        <stop offset="1" stopColor="#0b0818" />
+      </radialGradient>
+      <clipPath id="al2EyeClip"><path d="M6 64 Q64 16 122 64 Q64 112 6 64 Z" /></clipPath>
+      <clipPath id="al2IrisClip"><circle cx="64" cy="64" r="36" /></clipPath>
+    </defs>
+    {/* globe de l'œil */}
+    <g clipPath="url(#al2EyeClip)"><rect x="6" y="14" width="116" height="100" fill="url(#al2Globe)" /></g>
+    {/* iris : table de feutre, croupier (haut) vs joueur (bas) */}
+    <g clipPath="url(#al2IrisClip)">
+      <circle cx="64" cy="64" r="36" fill="url(#al2Felt)" />
+      <path d="M40 58 Q64 47 88 58" fill="none" stroke="#e8c97a" strokeWidth="1.4" opacity="0.55" />
+      {/* main du croupier : carte visible + face cachée dorée */}
+      <g transform="rotate(-9 64 50)">
+        <rect x="53" y="40" width="14" height="19" rx="2" fill="#f4ecd6" stroke="#c9a24b" strokeWidth="1" />
+        <text x="56.5" y="46.5" fontFamily="Cinzel,serif" fontWeight="700" fontSize="6" fill="#b23b34" textAnchor="middle">7</text>
+      </g>
+      <g transform="rotate(9 64 50)">
+        <rect x="61" y="40" width="14" height="19" rx="2" fill="#2a1f52" stroke="#c9a24b" strokeWidth="1" />
+        <rect x="63.5" y="42.5" width="9" height="14" rx="1.4" fill="none" stroke="#c9a24b" strokeWidth="0.7" opacity="0.7" />
+      </g>
+      {/* mise + main du joueur : As-Valet de pique (le blackjack originel) */}
+      <ellipse cx="64" cy="82" rx="15" ry="5.5" fill="none" stroke="#e8c97a" strokeWidth="1" opacity="0.5" />
+      <g transform="rotate(-9 64 84)">
+        <rect x="55" y="70" width="14" height="19" rx="2" fill="#f4ecd6" stroke="#c9a24b" strokeWidth="1" />
+        <text x="58.5" y="76.5" fontFamily="Cinzel,serif" fontWeight="700" fontSize="6" fill="#241a48" textAnchor="middle">A</text>
+      </g>
+      <g transform="rotate(9 64 84)">
+        <rect x="61" y="70" width="14" height="19" rx="2" fill="#f4ecd6" stroke="#c9a24b" strokeWidth="1" />
+        <text x="64.5" y="76.5" fontFamily="Cinzel,serif" fontWeight="700" fontSize="6" fill="#241a48" textAnchor="middle">J</text>
+      </g>
+      <ellipse cx="50" cy="49" rx="9" ry="5" fill="#ffffff" opacity="0.10" transform="rotate(-22 50 49)" />
+    </g>
+    {/* les deux ronds de l'iris */}
+    <circle cx="64" cy="64" r="41" fill="none" stroke="#e8c97a" strokeWidth="1.5" strokeDasharray="1.6 6" opacity="0.7" />
+    <circle cx="64" cy="64" r="36" fill="none" stroke="url(#al2Gold)" strokeWidth="2.6" />
+    {/* paupières */}
+    <path d="M6 64 Q64 16 122 64 Q64 112 6 64 Z" fill="none" stroke="#c9a24b" strokeWidth="3.2" strokeLinejoin="round" />
+    <path d="M15 60 Q64 23 113 60" fill="none" stroke="#c9a24b" strokeWidth="1" opacity="0.3" />
+  </svg>
+);
+
 // ─── CHALLENGES — Geometry Dash style: hard, short, retry-friendly ────
 // coins: reward credited on unlock, matched to a specific skin price.
 const CHALLENGES = [
@@ -1185,6 +1243,70 @@ const SupportPreviewModal = ({ skin, owned, active, onClose, onBuy, onEquip, t, 
   );
 };
 
+// ─── Modal « d'une académie à l'autre » — logo I ↔ logo II en slider ──
+const AcademySwitcherModal = ({ onClose, t }) => {
+  const [slide, setSlide] = useState(0);
+  const touchStartX = useRef(null);
+
+  const onTouchStart = (e) => { touchStartX.current = e.touches[0].clientX; };
+  const onTouchEnd = (e) => {
+    if (touchStartX.current === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    if (dx < -40) setSlide(1);
+    if (dx > 40) setSlide(0);
+    touchStartX.current = null;
+  };
+
+  return (
+    <div className="moverlay" style={{ alignItems: 'center', zIndex: 160 }} onClick={onClose}>
+      <div onClick={e => e.stopPropagation()} style={{ background: 'linear-gradient(180deg,#1a1535,#0d0a1a)', border: `1px solid ${G.border}`, borderRadius: 18, padding: '20px 0 22px', width: '100%', maxWidth: 340, textAlign: 'center', overflow: 'hidden' }}>
+        <div
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}
+          style={{ display: 'flex', width: '200%', transform: `translateX(${slide === 0 ? '0%' : '-50%'})`, transition: 'transform .35s ease' }}
+        >
+          {/* Slide 1 — HI-LO ACADEMY I */}
+          <div style={{ width: '50%', padding: '0 24px', flexShrink: 0 }}>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 14 }}>
+              <AppLogo size={92} />
+            </div>
+            <div style={{ fontFamily: 'Cinzel, serif', fontSize: 16, fontWeight: 700, letterSpacing: '.08em', color: G.gold, marginBottom: 10 }}>{t('academySwitcher.title1')}</div>
+            <div style={{ fontSize: 13, color: G.textSecondary, lineHeight: 1.55 }}>{t('academySwitcher.desc1')}</div>
+          </div>
+          {/* Slide 2 — HI-LO ACADEMY II */}
+          <div style={{ width: '50%', padding: '0 24px', flexShrink: 0 }}>
+            <div style={{ fontFamily: 'Cinzel, serif', fontSize: 11, fontWeight: 700, letterSpacing: '.16em', textTransform: 'uppercase', color: G.teal || '#2dd4bf', marginBottom: 12 }}>{t('academySwitcher.next')}</div>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 14 }}>
+              <AppLogoII size={92} />
+            </div>
+            <div style={{ fontFamily: 'Cinzel, serif', fontSize: 16, fontWeight: 700, letterSpacing: '.08em', color: G.gold, marginBottom: 10 }}>{t('academySwitcher.title2')}</div>
+            <div style={{ fontSize: 13, color: G.textSecondary, lineHeight: 1.55, marginBottom: 12 }}>{t('academySwitcher.desc2')}</div>
+            <div style={{ fontSize: 12, color: G.gold, fontWeight: 700 }}>{t('academySwitcher.cta2')}</div>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 6, margin: '18px 0' }}>
+          {[0, 1].map(i => (
+            <span key={i} onClick={() => setSlide(i)} style={{ width: 6, height: 6, borderRadius: '50%', background: i === slide ? G.gold : G.border, cursor: 'pointer' }} />
+          ))}
+        </div>
+
+        <div style={{ display: 'flex', gap: 8, padding: '0 24px' }}>
+          <button
+            onClick={() => slide === 1 ? setSlide(0) : onClose()}
+            style={{ width: 40, flexShrink: 0, background: 'rgba(255,255,255,.05)', border: `1px solid ${G.border}`, borderRadius: 9, color: G.textPrimary, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          ><ChevronLeft size={16} /></button>
+          <button onClick={onClose} style={{ flex: 1, padding: '11px', background: 'rgba(255,255,255,.05)', border: `1px solid ${G.border}`, borderRadius: 9, color: G.textPrimary, cursor: 'pointer', fontSize: 13 }}>{t('common.close')}</button>
+          <button
+            onClick={() => slide === 0 ? setSlide(1) : onClose()}
+            style={{ width: 40, flexShrink: 0, background: 'rgba(255,255,255,.05)', border: `1px solid ${G.border}`, borderRadius: 9, color: G.textPrimary, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          ><ChevronRight size={16} /></button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const VoidGoldChain = () => {
   // Arc centré sur (56, 4), rayon 46 — 12 maillons tangentiels uniquement.
   const links = [
@@ -1466,6 +1588,7 @@ export default function EliteCounter() {
   const [resetText, setResetText] = useState('');
   const [showPlacementHistory, setShowPlacementHistory] = useState(false);
   const [showRankLadder, setShowRankLadder] = useState(false);
+  const [showAcademySwitcher, setShowAcademySwitcher] = useState(false);
 
   const timerRef = useRef(null);
   const autoPlayRef = useRef(null);
@@ -2277,6 +2400,7 @@ export default function EliteCounter() {
     // 1) Modals (du plus imbriqué au moins imbriqué)
     if (showResetConfirm)     { setShowResetConfirm(false); return true; }
     if (previewSkin)          { setPreviewSkin(null);       return true; }
+    if (showAcademySwitcher)  { setShowAcademySwitcher(false); return true; }
     if (showRankLadder)       { setShowRankLadder(false);   return true; }
     if (showPlacementHistory) { setShowPlacementHistory(false); return true; }
     if (showStats)            { setShowStats(false);        return true; }
@@ -2334,7 +2458,10 @@ export default function EliteCounter() {
   const renderHeader = (minimal = false, showTutoBtn = false) => (
     <div className="hd">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+        <div
+          style={{ display: 'flex', alignItems: 'center', gap: 9, cursor: minimal ? 'default' : 'pointer' }}
+          onClick={minimal ? undefined : () => { snd(playClick); setShowAcademySwitcher(true); }}
+        >
           <AppLogo size={30} />
           <div className="logo">HI-LO ACADEMY I</div>
         </div>
@@ -2653,6 +2780,10 @@ export default function EliteCounter() {
               })()}
             </div>
           </div>
+        )}
+
+        {showAcademySwitcher && (
+          <AcademySwitcherModal onClose={() => setShowAcademySwitcher(false)} t={t} />
         )}
 
         {showRankLadder && (

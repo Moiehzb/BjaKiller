@@ -490,6 +490,15 @@ const it = {
       enterLobby: 'Entra nella Sala',
     },
   },
+
+  academySwitcher: {
+    title1: 'HI-LO ACADEMY I',
+    desc1: 'Allenamento al conteggio Hi-Lo carta per carta: ranghi, classifica, rituale del giorno e la Prova — l\'accademia che stai attraversando ora.',
+    next: 'Il passo successivo',
+    title2: 'HI-LO ACADEMY II',
+    desc2: 'Il tavolo vivo: più tavoli da casinò simulati in parallelo, croupier e giocatori, per affinare il conteggio in condizioni reali.',
+    cta2: 'Disponibile sul Google Play Store.',
+  },
 };
 
 export default it;

@@ -504,6 +504,15 @@ const fr = {
     ansNeutral: '0 (Neutre : 79)',
     ansHigh: '1 (Haute : 10A)',
   },
+
+  academySwitcher: {
+    title1: 'HI-LO ACADEMY I',
+    desc1: 'L\'entraînement au comptage Hi-Lo carte par carte : rangs, classement, rituel du jour et l\'Épreuve — l\'académie que tu parcours ici.',
+    next: 'L\'étape suivante',
+    title2: 'HI-LO ACADEMY II',
+    desc2: 'La table vivante : plusieurs tables de casino simulées en parallèle, croupier et joueurs, pour aiguiser ton compte dans des conditions réelles.',
+    cta2: 'Disponible sur le Google Play Store.',
+  },
 };
 
 export default fr;

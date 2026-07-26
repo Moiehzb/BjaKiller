@@ -511,6 +511,15 @@ const en = {
       enterLobby: 'Enter the Hall',
     },
   },
+
+  academySwitcher: {
+    title1: 'HI-LO ACADEMY I',
+    desc1: 'Hi-Lo counting drills, one card at a time: ranks, ranked ladder, daily ritual and the Trial — the academy you\'re walking through right now.',
+    next: 'The next step',
+    title2: 'HI-LO ACADEMY II',
+    desc2: 'The living table: several simulated casino tables running in parallel, dealer and players, to sharpen your count under real conditions.',
+    cta2: 'Available on the Google Play Store.',
+  },
 };
 
 export default en;

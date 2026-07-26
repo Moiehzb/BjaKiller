@@ -489,6 +489,15 @@ const zh = {
       enterLobby: '进入大厅',
     },
   },
+
+  academySwitcher: {
+    title1: 'HI-LO ACADEMY I',
+    desc1: 'Hi-Lo 算牌逐张训练：段位、排位、每日仪式与试炼——你正在经历的学院。',
+    next: '下一步',
+    title2: 'HI-LO ACADEMY II',
+    desc2: '鲜活牌桌：多张模拟赌场牌桌同时进行，荷官与玩家俱全，在真实条件下磨练算牌。',
+    cta2: '现已在 Google Play 商店上架。',
+  },
 };
 
 export default zh;

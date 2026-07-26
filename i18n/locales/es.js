@@ -511,6 +511,15 @@ const es = {
       enterLobby: 'Entrar en el Vestíbulo',
     },
   },
+
+  academySwitcher: {
+    title1: 'HI-LO ACADEMY I',
+    desc1: 'Entrenamiento de conteo Hi-Lo carta a carta: rangos, clasificación, ritual del día y la Prueba — la academia que recorres aquí.',
+    next: 'El siguiente paso',
+    title2: 'HI-LO ACADEMY II',
+    desc2: 'La mesa viva: varias mesas de casino simuladas en paralelo, crupier y jugadores, para afinar tu conteo en condiciones reales.',
+    cta2: 'Disponible en Google Play Store.',
+  },
 };
 
 export default es;
