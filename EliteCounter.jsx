@@ -2561,18 +2561,28 @@ export default function EliteCounter() {
   const renderCrumbs = () => {
     return (
       <div className="crumb">
-        {crumbs.map((c, i) => (
-          <React.Fragment key={i}>
-            {i > 0 && <span className="sep">›</span>}
-            <span
-              className={i === crumbs.length - 1 ? 'ca' : ''}
-              style={i === 0 && nav !== 'lobby' ? { cursor: 'pointer' } : undefined}
-              onClick={i === 0 && nav !== 'lobby' ? () => { snd(playClick); goBack(); } : undefined}
-            >
-              {c}
-            </span>
-          </React.Fragment>
-        ))}
+        {crumbs.map((c, i) => {
+          // Chaque maillon non-final est cliquable comme raccourci vers ce niveau :
+          // « Le Hall » ramène toujours au lobby, un maillon de sous-mode (ex. « Salle
+          // d'Étude » au-dessus de « La Rafale ») revient au picker de sous-modes.
+          const isLast = i === crumbs.length - 1;
+          const action = isLast ? null
+            : i === 0 ? () => { snd(playClick); goBack(); }
+            : (nav === 'mode-training' && trainSubMode) ? () => { snd(playClick); setTrainSubMode(null); }
+            : null;
+          return (
+            <React.Fragment key={i}>
+              {i > 0 && <span className="sep">›</span>}
+              <span
+                className={isLast ? 'ca' : ''}
+                style={action ? { cursor: 'pointer' } : undefined}
+                onClick={action || undefined}
+              >
+                {c}
+              </span>
+            </React.Fragment>
+          );
+        })}
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
           <button onClick={() => { snd(playClick); setShowTutorialReplay(true); }} title={t('header.tuto')}
             style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,.06)', border: `1px solid ${G.border}`, borderRadius: 6, padding: '4px 10px', cursor: 'pointer', color: G.textSecondary, fontSize: 11, fontWeight: 600, letterSpacing: '.04em' }}>
@@ -2587,6 +2597,19 @@ export default function EliteCounter() {
       </div>
     );
   };
+
+  // Modals attachés au logo / au bouton langue — doivent s'ouvrir peu importe
+  // l'écran courant, pas seulement le lobby (voir renderHeader/renderCrumbs).
+  const renderCommonOverlays = () => (
+    <>
+      {showAcademySwitcher && (
+        <AcademySwitcherModal onClose={() => setShowAcademySwitcher(false)} t={t} />
+      )}
+      {showLangModal && (
+        <LanguageModal current={lang} onPick={setLang} onClose={() => setShowLangModal(false)} t={t} />
+      )}
+    </>
+  );
 
   // ── MMR bar color ──────────────────────────────────────────────
   const mmrColor = save.mmr >= 80 ? G.gold : save.mmr >= 50 ? G.green : '#2dd4bf';
@@ -2603,6 +2626,7 @@ export default function EliteCounter() {
         <style>{css}</style>
         {renderHeader()}
         {renderCrumbs()}
+        {renderCommonOverlays()}
 
         <div className="lobby">
           {/* Rank badge + MMR */}
@@ -2903,10 +2927,6 @@ export default function EliteCounter() {
               })()}
             </div>
           </div>
-        )}
-
-        {showAcademySwitcher && (
-          <AcademySwitcherModal onClose={() => setShowAcademySwitcher(false)} t={t} />
         )}
 
         {showRankLadder && (
@@ -3488,9 +3508,6 @@ export default function EliteCounter() {
           </div>
         )}
 
-        {showLangModal && (
-          <LanguageModal current={lang} onPick={setLang} onClose={() => setShowLangModal(false)} t={t} />
-        )}
       </div>
     );
   }
@@ -3513,6 +3530,7 @@ export default function EliteCounter() {
         <style>{css}</style>
         {renderHeader()}
         {renderCrumbs()}
+        {renderCommonOverlays()}
         <div className="cfg">
           <button className="back" onClick={() => { snd(playClick); goBack(); }} style={{ marginBottom: 14 }}><ChevronLeft size={13} /> {t('common.back')}</button>
 
@@ -3632,6 +3650,7 @@ export default function EliteCounter() {
           <style>{css}</style>
           {renderHeader()}
           {renderCrumbs()}
+          {renderCommonOverlays()}
           <div className="cfg">
             <button className="back" onClick={() => { snd(playClick); if (!save.studyHallOnboarded) patchSave({ studyHallOnboarded: true }); goBack(); }} style={{ marginBottom: 14 }}><ChevronLeft size={13} /> {t('common.back')}</button>
             <div style={{ fontFamily: 'Cinzel, serif', fontSize: 21, fontWeight: 700, marginBottom: 3 }}>{t('trainingSubMode.title')}</div>
@@ -3689,6 +3708,7 @@ export default function EliteCounter() {
           <style>{css}</style>
           {renderHeader()}
           {renderCrumbs()}
+          {renderCommonOverlays()}
           <div className="cfg">
             <button className="back" onClick={() => { snd(playClick); setTrainSubMode(null); }} style={{ marginBottom: 14 }}><ChevronLeft size={13} /> {t('common.back')}</button>
             <div style={{ fontFamily: 'Cinzel, serif', fontSize: 21, fontWeight: 700, marginBottom: 3 }}>{t('trainingConfig.title')}</div>
@@ -3746,6 +3766,7 @@ export default function EliteCounter() {
           <style>{css}</style>
           {renderHeader()}
           {renderCrumbs()}
+          {renderCommonOverlays()}
           <div className="cfg">
             <button className="back" onClick={() => { snd(playClick); setTrainSubMode(null); }} style={{ marginBottom: 14 }}><ChevronLeft size={13} /> {t('common.back')}</button>
             <div style={{ fontFamily: 'Cinzel, serif', fontSize: 21, fontWeight: 700, marginBottom: 3 }}>{t('speedrunConfig.title')}</div>
@@ -3792,6 +3813,7 @@ export default function EliteCounter() {
           <style>{css}</style>
           {renderHeader()}
           {renderCrumbs()}
+          {renderCommonOverlays()}
           <div className="cfg">
             <button className="back" onClick={() => { snd(playClick); setTrainSubMode(null); }} style={{ marginBottom: 14 }}><ChevronLeft size={13} /> {t('common.back')}</button>
             <div style={{ fontFamily: 'Cinzel, serif', fontSize: 21, fontWeight: 700, marginBottom: 3 }}>{t('quizConfig.title')}</div>
@@ -3829,6 +3851,7 @@ export default function EliteCounter() {
         <style>{css}</style>
         {renderHeader()}
         {renderCrumbs()}
+        {renderCommonOverlays()}
         <div className="cfg">
           <button className="back" onClick={() => { snd(playClick); goBack(); }} style={{ marginBottom: 14 }}><ChevronLeft size={13} /> {t('common.back')}</button>
           <div style={{ fontFamily: 'Cinzel, serif', fontSize: 21, fontWeight: 700, marginBottom: 4 }}>{t('casinoConfig.title')}</div>
