@@ -13,10 +13,7 @@
 - [x] **Préconiser "Le Déchiffrement" au 1er passage (2026-09-05)** — carte **Déchiffrement** mise en avant sur l'écran de sous-mode (`trainSubMode === null`, EliteCounter.jsx) tant que `save.studyHallOnboarded === false` (défaut dans `DEFAULT_SAVE`) : glow doré pulsé (`.card.beginner-glow` / `@keyframes study-glow`) + mini-badge `trainingSubMode.beginnerHint` (« Pour débuter », FR only pour l'instant). Flag passé à `true` au clic sur n'importe quelle carte (Forge/Rafale/Déchiffrement) ou au retour → le glow ne réapparaît plus jamais ensuite. Build OK, **à vérifier au retour**.
 
 ### Navigation / HUD
-- [ ] Logo en haut à gauche (`AppLogo` dans `renderHeader`) : le clic ouvre `AcademySwitcherModal` (slider Academy I ↔ II), mais seulement dans le lobby (`renderHeader(false,...)` a le onClick, `renderHeader(true)` en mode "minimal" utilisé ailleurs le désactive) — le rendre cliquable dans tous les modes/écrans, pas que le hall.
-- [ ] Fil d'Ariane sous le logo (`crumbMap`) : afficher aussi "La Forge" (sous-mode standard de la Salle d'Étude) et les autres sous-modes (Rafale, Déchiffrement) quand on y est, comme c'est déjà fait pour Ranked/Épreuve/Rituel.
-- [ ] HUD en haut à droite (rang actuel, pièces d'or, langue, accès tuto) : disparaît hors du lobby (`renderHeader` en mode `minimal`, et `renderCrumbs()` qui ne montre les boutons tuto/langue que si `nav === 'lobby'`) — il doit rester visible dans tous les modes (Salle d'Étude, Ranked, etc.).
-- [ ] Le texte "Le Hall" du fil d'Ariane doit être cliquable comme raccourci "retour à l'accueil" (`setNav('lobby')`), utilisable depuis n'importe quel mode — comme un bouton maison.
+- [x] ~~Logo cliquable partout, fil d'Ariane avec sous-modes, HUD toujours visible, "Le Hall" cliquable~~ → fait (voir ✅ Fait).
 
 ### Hauts Faits (achievements)
 - [x] ~~Afficher la récompense de chaque haut fait dans la liste des Hauts Faits~~ → fait (voir ✅ Fait).
@@ -59,6 +56,12 @@ Le code du paywall est branché (Play Billing). Les achats ne marchent **que** v
 - [ ] App 2 séparée : mode table réaliste style Card Counter Lite
 
 ## ✅ Fait
+
+- [x] **Navigation / HUD — session 05/09/2026 (implémenté + build OK, à vérifier au retour)**
+  - **Logo cliquable partout** : `renderHeader` simplifié (plus de mode `minimal`) — le clic sur `AppLogo` ouvre `AcademySwitcherModal` dans tous les écrans (Salle d'Étude, Ranked, L'Épreuve), pas seulement le lobby.
+  - **Fil d'Ariane avec sous-modes** : `crumbMap['mode-training']` ajoute désormais un 3e maillon (« La Forge », « La Rafale », « Le Déchiffrement ») dès qu'un sous-mode est sélectionné, réutilise les clés i18n existantes (`trainingSubMode.standardTitle`, `modeName.speedrun/quiz`) — aucune nouvelle clé.
+  - **HUD toujours visible** : rang, pièces, bouton Tuto et bouton Langue ne sont plus masqués hors du lobby (`renderHeader` affiche toujours le bloc de droite ; `renderCrumbs` affiche toujours les boutons Tuto/Langue, plus seulement si `nav === 'lobby'`).
+  - **« Le Hall » cliquable** : 1er maillon du fil d'Ariane cliquable (curseur pointeur) hors du lobby → `goBack()` (même comportement que le bouton retour Android), raccourci maison depuis n'importe quel mode.
 
 - [x] **Hauts Faits — Sceau du Compteur Certifié + récompenses + « Le Test Avancé » (2026-09-05)** *(implémenté + build OK + vérifié au navigateur)*
   - **Sceau de certification (nouveau)** : un médaillon d'or festonné (`CertifiedSeal`, SVG pur DA — façon sceau de cire + coche de vérification) apparaît en haut à droite, **à gauche du rang**, dès qu'au moins un Haut Fait est débloqué. Discret + léger halo pulsé (`.certbadge` / `@keyframes seal-glow`). Clic → modal `badgeModal` (« Sceau de la Guilde » / « Compteur Certifié ») : félicitations sobres (ton DA, pas de « Bravo »), nombre de Hauts Faits scellés, **dernier Haut Fait obtenu**, et bouton « Voir mes Hauts Faits » → ouvre la liste. Nouvel état `showBadgeModal`, helpers `achName()`/`achReward()`.

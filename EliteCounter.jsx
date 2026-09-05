@@ -2517,7 +2517,9 @@ export default function EliteCounter() {
   const crumbMap = {
     lobby: [t('crumbs.home')],
     'mode-ranked': [t('crumbs.home'), t('crumbs.ranked')],
-    'mode-training': [t('crumbs.home'), t('crumbs.training')],
+    'mode-training': trainSubMode
+      ? [t('crumbs.home'), t('crumbs.training'), trainSubMode === 'standard' ? t('trainingSubMode.standardTitle') : trainSubMode === 'speedrun' ? t('modeName.speedrun') : t('modeName.quiz')]
+      : [t('crumbs.home'), t('crumbs.training')],
     'mode-casino': [t('crumbs.home'), t('crumbs.casino')],
     game: [t('crumbs.home'), gameModeRef.current === 'training' ? t('crumbs.training') : gameModeRef.current === 'speedrun' ? t('modeName.speedrun') : gameModeRef.current === 'quiz' ? t('modeName.quiz') : gameModeRef.current === 'casino' ? t('crumbs.casino') : gameModeRef.current === 'daily' ? t('modeName.daily') : t('crumbs.ranked'), t('crumbs.game')],
   };
@@ -2532,28 +2534,26 @@ export default function EliteCounter() {
     ? { skin: t('achievementsModal.secretReward') }
     : { coins: (CHALLENGES.find(c => c.id === id)?.coins) || 0 };
 
-  const renderHeader = (minimal = false, showTutoBtn = false) => (
+  const renderHeader = () => (
     <div className="hd">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div
-          style={{ display: 'flex', alignItems: 'center', gap: 9, cursor: minimal ? 'default' : 'pointer' }}
-          onClick={minimal ? undefined : () => { snd(playClick); setShowAcademySwitcher(true); }}
+          style={{ display: 'flex', alignItems: 'center', gap: 9, cursor: 'pointer' }}
+          onClick={() => { snd(playClick); setShowAcademySwitcher(true); }}
         >
           <AppLogo size={30} />
           <div className="logo">HI-LO ACADEMY I</div>
         </div>
-        {!minimal && (
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            {(save.unlockedAchievements || []).includes('advanced_test') && (
-              <button className="certbadge" title={t('badgeModal.title')} aria-label={t('badgeModal.title')}
-                onClick={() => { snd(playClick); setShowBadgeModal(true); }}>
-                <CertifiedSeal size={22} glow={false} />
-              </button>
-            )}
-            <div className="pill" style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }} onClick={() => { snd(playClick); setShowRankLadder(true); }}><RankSigil color={displayRank.color} size={13} /> {displayRank.name}</div>
-            <div className="pill" style={{ display: 'flex', alignItems: 'center', gap: 5 }}><Coin size={13} /> {save.coins}</div>
-          </div>
-        )}
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          {(save.unlockedAchievements || []).includes('advanced_test') && (
+            <button className="certbadge" title={t('badgeModal.title')} aria-label={t('badgeModal.title')}
+              onClick={() => { snd(playClick); setShowBadgeModal(true); }}>
+              <CertifiedSeal size={22} glow={false} />
+            </button>
+          )}
+          <div className="pill" style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }} onClick={() => { snd(playClick); setShowRankLadder(true); }}><RankSigil color={displayRank.color} size={13} /> {displayRank.name}</div>
+          <div className="pill" style={{ display: 'flex', alignItems: 'center', gap: 5 }}><Coin size={13} /> {save.coins}</div>
+        </div>
       </div>
     </div>
   );
@@ -2564,22 +2564,26 @@ export default function EliteCounter() {
         {crumbs.map((c, i) => (
           <React.Fragment key={i}>
             {i > 0 && <span className="sep">›</span>}
-            <span className={i === crumbs.length - 1 ? 'ca' : ''}>{c}</span>
+            <span
+              className={i === crumbs.length - 1 ? 'ca' : ''}
+              style={i === 0 && nav !== 'lobby' ? { cursor: 'pointer' } : undefined}
+              onClick={i === 0 && nav !== 'lobby' ? () => { snd(playClick); goBack(); } : undefined}
+            >
+              {c}
+            </span>
           </React.Fragment>
         ))}
-        {nav === 'lobby' && (
-          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-            <button onClick={() => { snd(playClick); setShowTutorialReplay(true); }} title={t('header.tuto')}
-              style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,.06)', border: `1px solid ${G.border}`, borderRadius: 6, padding: '4px 10px', cursor: 'pointer', color: G.textSecondary, fontSize: 11, fontWeight: 600, letterSpacing: '.04em' }}>
-              {t('header.tuto')}
-            </button>
-            <button onClick={() => { snd(playClick); setShowLangModal(true); }} title={t('header.language')}
-              style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,.06)', border: `1px solid ${G.border}`, borderRadius: 6, padding: '4px 9px', cursor: 'pointer', color: G.textSecondary }}>
-              <Globe size={12} />
-              <Flag code={lang} size={18} />
-            </button>
-          </div>
-        )}
+        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+          <button onClick={() => { snd(playClick); setShowTutorialReplay(true); }} title={t('header.tuto')}
+            style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,.06)', border: `1px solid ${G.border}`, borderRadius: 6, padding: '4px 10px', cursor: 'pointer', color: G.textSecondary, fontSize: 11, fontWeight: 600, letterSpacing: '.04em' }}>
+            {t('header.tuto')}
+          </button>
+          <button onClick={() => { snd(playClick); setShowLangModal(true); }} title={t('header.language')}
+            style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,.06)', border: `1px solid ${G.border}`, borderRadius: 6, padding: '4px 9px', cursor: 'pointer', color: G.textSecondary }}>
+            <Globe size={12} />
+            <Flag code={lang} size={18} />
+          </button>
+        </div>
       </div>
     );
   };
@@ -2597,7 +2601,7 @@ export default function EliteCounter() {
     return (
       <div className="r">
         <style>{css}</style>
-        {renderHeader(false, true)}
+        {renderHeader()}
         {renderCrumbs()}
 
         <div className="lobby">
@@ -3507,7 +3511,7 @@ export default function EliteCounter() {
     return (
       <div className="r">
         <style>{css}</style>
-        {renderHeader(true)}
+        {renderHeader()}
         {renderCrumbs()}
         <div className="cfg">
           <button className="back" onClick={() => { snd(playClick); goBack(); }} style={{ marginBottom: 14 }}><ChevronLeft size={13} /> {t('common.back')}</button>
@@ -3626,7 +3630,7 @@ export default function EliteCounter() {
       return (
         <div className="r">
           <style>{css}</style>
-          {renderHeader(true)}
+          {renderHeader()}
           {renderCrumbs()}
           <div className="cfg">
             <button className="back" onClick={() => { snd(playClick); if (!save.studyHallOnboarded) patchSave({ studyHallOnboarded: true }); goBack(); }} style={{ marginBottom: 14 }}><ChevronLeft size={13} /> {t('common.back')}</button>
@@ -3683,7 +3687,7 @@ export default function EliteCounter() {
       return (
         <div className="r">
           <style>{css}</style>
-          {renderHeader(true)}
+          {renderHeader()}
           {renderCrumbs()}
           <div className="cfg">
             <button className="back" onClick={() => { snd(playClick); setTrainSubMode(null); }} style={{ marginBottom: 14 }}><ChevronLeft size={13} /> {t('common.back')}</button>
@@ -3740,7 +3744,7 @@ export default function EliteCounter() {
       return (
         <div className="r">
           <style>{css}</style>
-          {renderHeader(true)}
+          {renderHeader()}
           {renderCrumbs()}
           <div className="cfg">
             <button className="back" onClick={() => { snd(playClick); setTrainSubMode(null); }} style={{ marginBottom: 14 }}><ChevronLeft size={13} /> {t('common.back')}</button>
@@ -3786,7 +3790,7 @@ export default function EliteCounter() {
       return (
         <div className="r">
           <style>{css}</style>
-          {renderHeader(true)}
+          {renderHeader()}
           {renderCrumbs()}
           <div className="cfg">
             <button className="back" onClick={() => { snd(playClick); setTrainSubMode(null); }} style={{ marginBottom: 14 }}><ChevronLeft size={13} /> {t('common.back')}</button>
@@ -3823,7 +3827,7 @@ export default function EliteCounter() {
     return (
       <div className="r">
         <style>{css}</style>
-        {renderHeader(true)}
+        {renderHeader()}
         {renderCrumbs()}
         <div className="cfg">
           <button className="back" onClick={() => { snd(playClick); goBack(); }} style={{ marginBottom: 14 }}><ChevronLeft size={13} /> {t('common.back')}</button>
