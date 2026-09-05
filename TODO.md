@@ -3,10 +3,6 @@
 > Ce fichier est maintenu automatiquement par Claude.
 > Mis à jour quand une tâche est assignée ou complétée.
 
-## ⚡ À faire au prochain lancement (priorité)
-
-- [ ] **Tester l'accès mémoire** : essayer d'écrire dans `C:\Users\PC1\.claude\projects\D--CLAUDE-CODE-CS-CODE-blackjack-academy-I\memory\`. Si ça marche → sauvegarder l'URL de la politique de conf (`https://moiehzb.github.io/BjaKiller/privacy.html`). Si ça échoue → les règles allow n'ont pas overridé les deny, il faudra retravailler les permissions.
-
 ## 🎯 Retours UI/Gameplay — session 05/09/2026 (à faire)
 
 ### Onboarding Salle d'Étude
@@ -53,6 +49,8 @@ Le code du paywall est branché (Play Billing). Les achats ne marchent **que** v
 - [ ] App 2 séparée : mode table réaliste style Card Counter Lite
 
 ## ✅ Fait
+
+- [x] **Accès mémoire testé (2026-09-05)** — écriture confirmée dans `C:\Users\PC1\.claude\projects\D--CLAUDE-CODE-CS-CODE-blackjack-academy-I\memory\` (les règles allow overrident bien les deny). URL de la politique de confidentialité sauvegardée en mémoire (`reference_privacy_policy.md`).
 
 - [x] **Rituel du jour — rattrapage de série (2026-09-05)** *(implémenté + build OK, à vérifier au retour)*
   - **Écart d'1 jour** (joue tous les jours) : inchangé, 1 tentative, gagne → série +1, perd → série à 0.
