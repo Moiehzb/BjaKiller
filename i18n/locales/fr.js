@@ -489,6 +489,7 @@ const fr = {
     standardTitle: 'La Forge', standardSub: 'Configuration libre, pause permise — forgez vos automatismes sans pression de rang.',
     speedrunTitle: 'La Rafale', speedrunSub: 'Cartes au toucher · chrono · compte final',
     quizTitle: 'Le Déchiffrement', quizSub: 'Identifie la valeur Hi-Lo de chaque carte : +1, 0 ou −1',
+    beginnerHint: 'Pour débuter',
   },
 
   speedrunConfig: {

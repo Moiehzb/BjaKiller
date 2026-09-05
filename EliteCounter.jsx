@@ -1078,6 +1078,8 @@ const css = `
   @keyframes star-twink { 0%,100%{opacity:.1;transform:scale(.7)} 50%{opacity:1;transform:scale(1.4)} }
   @keyframes bio-pulse { 0%,100%{box-shadow:0 0 8px rgba(0,255,68,.35),0 0 20px rgba(0,255,68,.08)} 50%{box-shadow:0 0 20px rgba(0,255,68,.65),0 0 45px rgba(0,255,68,.2)} }
   @keyframes amber-pulse { 0%,100%{box-shadow:0 0 8px rgba(255,170,0,.35),0 0 20px rgba(255,170,0,.08)} 50%{box-shadow:0 0 20px rgba(255,170,0,.65),0 0 45px rgba(255,170,0,.2)} }
+  @keyframes study-glow { 0%,100%{box-shadow:0 0 0 1px ${G.borderGold},0 0 10px rgba(201,162,75,.25)} 50%{box-shadow:0 0 0 1px ${G.gold},0 0 22px rgba(232,201,122,.55)} }
+  .card.beginner-glow { animation:study-glow 2.6s ease-in-out infinite; }
   @keyframes sys-flicker { 0%,92%,100%{opacity:1} 93%{opacity:.4} 95%{opacity:.9} 98%{opacity:.25} }
   @keyframes drip-grow { 0%{height:0;opacity:.9} 70%{opacity:.6} 100%{height:46px;opacity:0} }
 `;
@@ -1536,6 +1538,8 @@ const DEFAULT_SAVE = {
   trainPen: 75,
   trainTime: 94,
   trainShowCount: false,
+
+  studyHallOnboarded: false, // met en avant "Le Déchiffrement" au tout 1er passage sur l'écran de sous-mode
 };
 
 export default function EliteCounter() {
@@ -3625,11 +3629,11 @@ export default function EliteCounter() {
           {renderHeader(true)}
           {renderCrumbs()}
           <div className="cfg">
-            <button className="back" onClick={() => { snd(playClick); goBack(); }} style={{ marginBottom: 14 }}><ChevronLeft size={13} /> {t('common.back')}</button>
+            <button className="back" onClick={() => { snd(playClick); if (!save.studyHallOnboarded) patchSave({ studyHallOnboarded: true }); goBack(); }} style={{ marginBottom: 14 }}><ChevronLeft size={13} /> {t('common.back')}</button>
             <div style={{ fontFamily: 'Cinzel, serif', fontSize: 21, fontWeight: 700, marginBottom: 3 }}>{t('trainingSubMode.title')}</div>
             <div style={{ fontSize: 13, color: G.textSecondary, marginBottom: 22 }}>{t('trainingSubMode.sub')}</div>
 
-            <div className="card feat" onClick={() => { snd(playClick); setTrainSubMode('standard'); }}
+            <div className="card feat" onClick={() => { snd(playClick); if (!save.studyHallOnboarded) patchSave({ studyHallOnboarded: true }); setTrainSubMode('standard'); }}
               style={{ marginBottom: 12 }}>
               <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
                 <div className="ci" style={{ display: 'flex' }}><BookOpen size={22} color={G.gold} /></div>
@@ -3641,7 +3645,7 @@ export default function EliteCounter() {
               <ChevronRight className="chev" size={17} />
             </div>
 
-            <div className="card" onClick={() => { snd(playClick); setTrainSubMode('speedrun'); }}
+            <div className="card" onClick={() => { snd(playClick); if (!save.studyHallOnboarded) patchSave({ studyHallOnboarded: true }); setTrainSubMode('speedrun'); }}
               style={{ marginBottom: 12 }}>
               <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
                 <div className="ci" style={{ display: 'flex' }}><Zap size={22} color={G.gold} /></div>
@@ -3653,11 +3657,16 @@ export default function EliteCounter() {
               <ChevronRight className="chev" size={17} />
             </div>
 
-            <div className="card" onClick={() => { snd(playClick); setTrainSubMode('quiz'); }}>
+            <div className={`card${!save.studyHallOnboarded ? ' beginner-glow' : ''}`} onClick={() => { snd(playClick); if (!save.studyHallOnboarded) patchSave({ studyHallOnboarded: true }); setTrainSubMode('quiz'); }}>
               <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
                 <div className="ci" style={{ display: 'flex' }}><ScrollText size={22} color={G.gold} /></div>
                 <div>
-                  <div className="ct">{t('trainingSubMode.quizTitle')}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div className="ct">{t('trainingSubMode.quizTitle')}</div>
+                    {!save.studyHallOnboarded && (
+                      <span style={{ fontFamily: 'Cinzel, serif', fontSize: 9, letterSpacing: '.08em', textTransform: 'uppercase', color: G.gold, background: 'rgba(201,162,75,.15)', border: `1px solid ${G.borderGold}`, borderRadius: 20, padding: '2px 7px', whiteSpace: 'nowrap' }}>{t('trainingSubMode.beginnerHint')}</span>
+                    )}
+                  </div>
                   <div className="cs">{t('trainingSubMode.quizSub')}</div>
                 </div>
               </div>
