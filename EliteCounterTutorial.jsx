@@ -129,6 +129,10 @@ const tutCss = `
   .flash-ok  { animation:tFlashOk  .38s ease; }
   .flash-err { animation:tFlashErr .34s ease; }
 
+  /* Reference bar attention flash (wrong answer in identification quiz) */
+  @keyframes refBarFlash { 0%,100%{ box-shadow:0 0 0 0 rgba(201,162,75,0); } 30%,70%{ box-shadow:0 0 0 3px rgba(201,162,75,.45); } }
+  .refbar-flash > div { animation:refBarFlash .5s ease 2; }
+
   /* Score banner */
   .qscore { border-radius:12px; padding:14px 16px; margin-bottom:14px; }
   .qscore.great { background:rgba(39,174,96,.08); border:1px solid rgba(39,174,96,.25); }
@@ -352,11 +356,6 @@ const HiLoLearnStep = ({ onNext, onBack, t }) => {
         </div>
       ))}
 
-      <div className="tip-gold">
-        <strong>{t('tutorial.hilo.tipTitle')}</strong>
-        {t('tutorial.hilo.tipBody')}
-      </div>
-
       <div style={{ flex: 1 }} />
       <button className="tbtn-g" style={{ marginTop: 20 }} onClick={() => { playClick(); onNext(); }}>
         {t('tutorial.hilo.next')}
@@ -368,8 +367,8 @@ const HiLoLearnStep = ({ onNext, onBack, t }) => {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // STEP 2 — Quiz interactif : identification carte par carte
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-const HiLoRefBar = () => (
-  <div style={{ display: 'flex', gap: 6, marginBottom: 14 }}>
+const HiLoRefBar = ({ flash }) => (
+  <div className={flash ? 'refbar-flash' : ''} style={{ display: 'flex', gap: 6, marginBottom: 14 }}>
     {[
       { range: '2 – 6',  val: '+1', color: G.green },
       { range: '7 – 9',  val: '0',  color: G.textSecondary },
@@ -543,7 +542,7 @@ const HiLoQuizStep = ({ onNext, onBack, t }) => {
       </div>
 
       {/* Rappel Hi-Lo */}
-      <HiLoRefBar />
+      <HiLoRefBar flash={!!(answered && !answered.correct)} />
 
       {/* Card — the key on the wrapper remounts on each new card → t-deal replays */}
       <div className="quiz-card-zone">
@@ -678,11 +677,6 @@ const CountQuizStep = ({ onNext, onBack, t }) => {
         <p className="tp">
           {t('tutorial.count.introP')}
         </p>
-
-        <div className="tip-gold">
-          <strong>{t('tutorial.count.tipTitle')}</strong>
-          {t('tutorial.count.tipBody')}
-        </div>
 
         <div style={{ flex: 1 }} />
         <button className="tbtn-g" style={{ marginTop: 24 }} onClick={() => { playChip(); startWatching(); }}>

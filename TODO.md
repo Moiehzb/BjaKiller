@@ -9,11 +9,6 @@
 
 ## 🎯 Retours UI/Gameplay — session 05/09/2026 (à faire)
 
-### Tuto
-- [ ] "Identification — carte par carte" : quand le joueur se trompe, la ligne qui montre les valeurs des cartes doit briller/clignoter un court instant pour attirer l'œil dessus.
-- [ ] Slide 2 "Le système Hi-Lo" : supprimer le bloc "intuition" (pas compréhensible, la plupart des gens ne regardent que les images).
-- [ ] Slide "Compte courant" : supprimer le bloc "la méthode" (même raison).
-
 ### Onboarding Salle d'Étude
 - [ ] **Préconiser "Le Déchiffrement" au 1er passage** : juste après le tuto (`save.tutorialDone === true`), à la **première** ouverture de l'écran de choix de sous-mode de la Salle d'Étude (`trainSubMode === null`, cartes La Forge / La Rafale / Le Déchiffrement, ~`EliteCounter.jsx:3512+`), mettre en avant la carte **Déchiffrement** (`setTrainSubMode('quiz')`) car c'est le plus débutant-friendly : petit glow doré pulsé (box-shadow `${G.borderGold}` façon `orbPulse`) + éventuellement mini-label "Pour débuter". **Uniquement cette occasion** : ajouter un flag `save.studyHallOnboarded` (défaut `false` dans `DEFAULT_SAVE`), le passer à `true` dès que l'écran a été vu (ou au 1er clic sur une carte / au retour) → le glow ne réapparaît plus jamais ensuite.
 
@@ -64,6 +59,12 @@ Le code du paywall est branché (Play Billing). Les achats ne marchent **que** v
 - [ ] App 2 séparée : mode table réaliste style Card Counter Lite
 
 ## ✅ Fait
+
+- [x] **Retours UI — Tuto (2026-09-05)** *(implémenté + build OK, à vérifier au retour)*
+  - **« Identification — carte par carte »** : réponse fausse → la barre de rappel Hi-Lo (2–6/7–9/10–A) clignote brièvement (glow doré, 2 pulses) pour attirer l'œil dessus (`HiLoRefBar`, prop `flash`, `EliteCounterTutorial.jsx`).
+  - **Slide 2 « Le système Hi-Lo »** : bloc « L'intuition » (`tutorial.hilo.tipTitle/tipBody`) supprimé du rendu.
+  - **Slide « Compte courant »** : bloc « La méthode » (`tutorial.count.tipTitle/tipBody`) supprimé du rendu.
+  - Clés i18n laissées en données mortes (mêmes conventions que les slides précédents).
 
 - [x] **Retours UI — Déchiffrement + slide « Les trois Voies » (2026-09-05)** *(implémenté + build OK, à vérifier au retour)*
   - **Le Déchiffrement (Salle d'Étude)** : rangée de boutons +1/0/−1 remontée du bord bas (`padding-bottom: calc(34px + safe-area-inset-bottom)`) — évite le déclenchement du geste « accueil » sur mobile. Passage à la carte suivante accéléré sur bonne réponse : 350 ms (vs 700 ms), l'erreur garde 700 ms pour laisser lire la bonne valeur (`answerQuiz`, EliteCounter.jsx).
