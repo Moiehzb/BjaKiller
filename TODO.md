@@ -56,10 +56,10 @@ Le code du paywall est branché (Play Billing). Les achats ne marchent **que** v
 
 - [x] **Rituel du jour — rattrapage de série (2026-09-05)** *(implémenté + build OK, à vérifier au retour)*
   - **Écart d'1 jour** (joue tous les jours) : inchangé, 1 tentative, gagne → série +1, perd → série à 0.
-  - **Écart de 2 jours** (1 jour sauté) : jour de rattrapage — **2 tentatives** ce jour-là pour reconstituer la série (deck différent entre les 2 essais, config du jour inchangée). Réussite → série reconstituée (+1 depuis la valeur d'avant la coupure) et la 2e tentative n'est plus nécessaire. Échec des 2 → série perdue définitivement.
+  - **Écart de 2 jours** (1 jour sauté) : rattrapage — comme si le rituel manqué n'avait pas été annulé. **2 tentatives obligatoires** ce jour-là : la 1re = le rituel d'hier (le réussir remet la série à jour), la 2e = celui d'aujourd'hui, à faire dans tous les cas. Chacune suit la règle normale (gagne +1 / perd → 0) en chaîne — **il faut gagner les deux** pour que la série traverse la coupure intacte ; perdre l'une ou l'autre la remet à zéro immédiatement.
   - **Écart de 3 jours ou plus** : série perdue définitivement dès le retour, pas de rattrapage, repart normalement (1 tentative).
-  - Nouveaux champs `save.daily.dayState` (état du jour en cours) + `lastResult.recovered`/`streakLostForGood`. Carte du lobby affiche le nombre de tentatives de rattrapage restantes ; écran de résultat distingue série gardée / reconstituée / menacée (encore 1 essai) / rompue.
-  - i18n : `lobby.dailyCatchupSub`, `lobby.dailyRecovered`, `game.dailyStreakRecovered`, `game.dailyCatchupRetry` — **fr.js uniquement pour l'instant** (à propager aux 13 autres locales après validation).
+  - Nouveaux champs `save.daily.dayState` (état du jour en cours, dont `allWon`) + `lastResult.recovered`/`catchupPending`. Carte du lobby distingue le rituel de rattrapage (1er) du second rituel obligatoire ; écran de résultat distingue série gardée / reconstituée / rompue, + rappel s'il reste le rituel du jour à faire.
+  - i18n : `lobby.dailyCatchupSub`, `lobby.dailyCatchupSecondSub`, `lobby.dailyRecovered`, `game.dailyStreakRecovered`, `game.dailyCatchupPending` — **fr.js uniquement pour l'instant** (à propager aux 13 autres locales après validation).
 
 - [x] **Navigation / HUD — session 05/09/2026 (implémenté + build OK, à vérifier au retour)**
   - **Logo cliquable partout** : `renderHeader` simplifié (plus de mode `minimal`) — le clic sur `AppLogo` ouvre `AcademySwitcherModal` dans tous les écrans (Salle d'Étude, Ranked, L'Épreuve), pas seulement le lobby.

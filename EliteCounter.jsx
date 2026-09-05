@@ -639,7 +639,11 @@ const dayIndexFromKey = (key) => {
 // État du Rituel du jour pour la date `today` : combien de tentatives sont
 // possibles aujourd'hui, et si on est en fenêtre de rattrapage de série.
 // - écart de 1 jour depuis le dernier rituel joué : jour normal, 1 tentative.
-// - écart de 2 jours (1 jour sauté) : rattrapage, 2 tentatives pour reconstituer la série.
+// - écart de 2 jours (1 jour sauté) : rattrapage — c'est comme si le rituel manqué n'avait
+//   pas été annulé : 1re tentative = le rituel d'hier (le réussir remet la série à jour),
+//   2e tentative = celui d'aujourd'hui, obligatoire aussi. Chacune suit la règle normale
+//   (gagne = +1, perd = série à 0), en chaîne — il faut donc gagner les deux pour que la
+//   série traverse la coupure intacte.
 // - écart de 3 jours ou plus : série perdue définitivement, retour à 1 tentative normale.
 const getDailyDayState = (daily, today) => {
   const d = daily || DEFAULT_SAVE.daily;
@@ -656,6 +660,7 @@ const getDailyDayState = (daily, today) => {
     maxAttempts: catchup ? 2 : 1,
     catchup,
     streakBeforeToday: permanentLoss ? 0 : priorStreak,
+    allWon: true, // aucune tentative ratée aujourd'hui pour l'instant
   };
 };
 
@@ -2042,18 +2047,17 @@ export default function EliteCounter() {
     const d = save.daily || DEFAULT_SAVE.daily;
     const state = dailyRef.current?.dayState || getDailyDayState(d, key);
     const attemptsAfter = state.attempts + 1;
-    const catchupExhausted = state.catchup && attemptsAfter >= state.maxAttempts;
-
-    let newStreak;
-    if (won) newStreak = state.streakBeforeToday + 1; // succès direct, ou série reconstituée en rattrapage
-    else if (state.catchup && !catchupExhausted) newStreak = state.streakBeforeToday; // encore une tentative de rattrapage aujourd'hui
-    else newStreak = 0; // échec normal, ou rattrapage épuisé → série perdue définitivement
-
-    const recovered = won && state.catchup;
-    const streakLostForGood = !won && (catchupExhausted || !state.catchup);
+    // 1re tentative du jour : part du streak d'avant la coupure. 2e tentative (rattrapage) :
+    // enchaîne sur le résultat de la 1re, comme si c'était le jour suivant — il faut donc
+    // gagner les deux pour que la série traverse la coupure intacte.
+    const baseStreak = state.attempts === 0 ? state.streakBeforeToday : (d.streak || 0);
+    const newStreak = won ? baseStreak + 1 : 0;
+    const allWonSoFar = (state.allWon !== false) && won;
+    const recovered = state.catchup && attemptsAfter >= state.maxAttempts && allWonSoFar; // les 2 tentatives de rattrapage réussies
+    const catchupPending = state.catchup && attemptsAfter < state.maxAttempts; // le rituel d'aujourd'hui reste à faire
     const coinBonus = won ? 30 + Math.min(newStreak, 10) * 10 : 0; // habitude récompensée, plafonnée
-    const result = { key, won, score, error, trueCount, answer, decks: dailyRef.current?.decks, special: !!dailyRef.current?.special, recovered, streakLostForGood, catchupAttemptsLeft: state.maxAttempts - attemptsAfter };
-    const newDayState = { day: key, attempts: won ? state.maxAttempts : attemptsAfter, maxAttempts: state.maxAttempts, catchup: state.catchup, streakBeforeToday: state.streakBeforeToday };
+    const result = { key, won, score, error, trueCount, answer, decks: dailyRef.current?.decks, special: !!dailyRef.current?.special, recovered, catchupPending };
+    const newDayState = { day: key, attempts: attemptsAfter, maxAttempts: state.maxAttempts, catchup: state.catchup, streakBeforeToday: state.streakBeforeToday, allWon: allWonSoFar };
     // patch fonctionnel : cumule les coins par-dessus le patch principal de checkAnswer.
     patchSave(prev => ({
       coins: (prev.coins || 0) + coinBonus,
@@ -2745,7 +2749,6 @@ export default function EliteCounter() {
             const dCfg = getDailyConfig(daySeed(), save.rankId, save.subRank);
             const isSpecial = !dDone && dCfg.special;
             const dailyLocked = !save.placementDone;
-            const catchupLeft = dState.maxAttempts - dState.attempts;
             return (
               <div className="card"
                 onClick={dailyLocked ? undefined : () => { snd(playClick); if (dDone) setShowStats(true); else startDaily(); }}
@@ -2768,7 +2771,9 @@ export default function EliteCounter() {
                         : dDone
                           ? (dRes?.recovered ? t('lobby.dailyRecovered') : dRes?.won ? t('lobby.dailyDoneWin', { score: dRes.score }) : t('lobby.dailyDoneLoss')) + ' · ' + t('lobby.dailyComeBack')
                           : dState.catchup
-                            ? t('lobby.dailyCatchupSub', { decks: dCfg.decks, secs: dCfg.timeLimit, left: catchupLeft })
+                            ? (dState.attempts === 0
+                                ? t('lobby.dailyCatchupSub', { decks: dCfg.decks, secs: dCfg.timeLimit })
+                                : t('lobby.dailyCatchupSecondSub', { decks: dCfg.decks, secs: dCfg.timeLimit }))
                             : t('lobby.dailyReadySub', { decks: dCfg.decks, secs: dCfg.timeLimit })}
                     </div>
                   </div>
@@ -4173,11 +4178,11 @@ export default function EliteCounter() {
                               ? t('game.dailyStreakRecovered', { n: save.daily.streak })
                               : lr.won
                                 ? t('game.dailyStreakKept', { n: save.daily.streak })
-                                : !lr.streakLostForGood
-                                  ? t('game.dailyCatchupRetry')
-                                  : t('game.dailyStreakLost')}
+                                : t('game.dailyStreakLost')}
                           </div>
-                          <div style={{ fontSize: 11, color: G.textSecondary, textAlign: 'center' }}>{t('game.dailyComeBack')}</div>
+                          <div style={{ fontSize: 11, color: G.textSecondary, textAlign: 'center' }}>
+                            {lr.catchupPending ? t('game.dailyCatchupPending') : t('game.dailyComeBack')}
+                          </div>
                         </div>
                       );
                     })()}
