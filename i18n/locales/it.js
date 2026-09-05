@@ -112,6 +112,16 @@ const it = {
     secretDescUnlocked: "5/5 porte superate nell'Iniziazione",
     toastLabel: 'Impresa',
     challengeDone: 'Prova compiuta',
+    reward: 'Ricompensa',
+    secretReward: 'Artefatto «Obsidian Void»',
+  },
+
+  badgeModal: {
+    seal: 'Sigillo della Gilda',
+    title: 'Contatore Certificato',
+    body: ({ count }) => `Questo sigillo attesta il tuo valore dinanzi alla Gilda. ${count} ${count > 1 ? 'Imprese sigillate' : 'Impresa sigillata'} nel tuo nome — portalo con te, ti distingue dai semplici giocatori.`,
+    latestLabel: 'Ultima Impresa',
+    cta: 'Vedi le mie Imprese',
   },
 
   placementModal: {
@@ -353,7 +363,8 @@ const it = {
 
   challenges: {
     frame_perfect: { name: 'Kairos', desc: '1 mazzo — 0,40s/carta o più difficile — contatore sigillato' },
-    flash: { name: 'Fulgur', desc: '2 mazzi · 50% pen. · 52 carte · meno di 25s — contatore sigillato' },
+    flash: { name: 'Fulgur', desc: '2 mazzi · 50% pen. · 0,45s/carta o meno · contatore sigillato — fuori da La Tempesta' },
+    advanced_test: { name: 'La Prova Avanzata', desc: 'La Tempesta · 2 mazzi · 50% pen. · meno di 25s — contatore sigillato' },
     the_wall: { name: 'L\'Invalicabile', desc: '6 mazzi — 90%+ penetrazione — 0,50s/carta o meno — contatore sigillato' },
     blind_run: { name: 'L\'Attraversamento', desc: '8 mazzi — 0,45s/carta o più difficile — contatore sigillato' },
     iron_streak: { name: 'La Catena', desc: '10 vittorie consecutive — media 0,55s/carta o meno — contatore sigillato' },

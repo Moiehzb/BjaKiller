@@ -112,6 +112,16 @@ const fr = {
     secretDescUnlocked: '5/5 portes franchies à l\'Initiation',
     toastLabel: 'Haut Fait',
     challengeDone: 'Épreuve accomplie',
+    reward: 'Récompense',
+    secretReward: 'Artefact « Obsidian Void »',
+  },
+
+  badgeModal: {
+    seal: 'Sceau de la Guilde',
+    title: 'Compteur Certifié',
+    body: ({ count }) => `Ce sceau atteste de ta valeur devant la Guilde. ${count} Haut${count > 1 ? 's' : ''} Fait${count > 1 ? 's' : ''} scellé${count > 1 ? 's' : ''} à ton nom — porte-le, il te distingue des simples joueurs.`,
+    latestLabel: 'Dernier Haut Fait',
+    cta: 'Voir mes Hauts Faits',
   },
 
   placementModal: {
@@ -353,7 +363,8 @@ const fr = {
 
   challenges: {
     frame_perfect: { name: 'Kairos', desc: '1 deck — 0.40s/carte ou plus dur — compteur scellé' },
-    flash: { name: 'Fulgur', desc: '2 decks · 50% pén. · 52 cartes · moins de 25s — compteur scellé' },
+    flash: { name: 'Fulgur', desc: '2 decks · 50% pén. · 0.45s/carte ou moins · compteur scellé — hors Rafale' },
+    advanced_test: { name: 'Le Test Avancé', desc: 'La Rafale · 2 decks · 50% pén. · moins de 25s — compteur scellé' },
     the_wall: { name: 'L\'Infranchissable', desc: '6 decks — 90%+ pénétration — 0.50s/carte ou moins — compteur scellé' },
     blind_run: { name: 'La Traversée', desc: '8 decks — 0.45s/carte ou plus dur — compteur scellé' },
     iron_streak: { name: 'La Chaîne', desc: '10 victoires consécutives — 0.55s/carte moy. ou moins — compteur scellé' },

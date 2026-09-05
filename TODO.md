@@ -19,8 +19,8 @@
 - [ ] Le texte "Le Hall" du fil d'Ariane doit être cliquable comme raccourci "retour à l'accueil" (`setNav('lobby')`), utilisable depuis n'importe quel mode — comme un bouton maison.
 
 ### Hauts Faits (achievements)
-- [ ] Afficher la récompense de chaque haut fait dans la liste des Hauts Faits (actuellement invisible dans l'UI).
-- [ ] Nouveau haut fait "Le Test Avancé" : réussir La Rafale (mode speedrun) en 2 decks / 50 % pénétration en moins de 25 secondes.
+- [x] ~~Afficher la récompense de chaque haut fait dans la liste des Hauts Faits~~ → fait (voir ✅ Fait).
+- [x] ~~Nouveau haut fait "Le Test Avancé"~~ → fait (voir ✅ Fait).
 
 ### Rituel du jour (défi quotidien)
 - [ ] Revoir le système de streak (`save.daily`) : si le joueur ne joue pas un jour, il perd la série — MAIS peut la récupérer en réussissant 2 Rituels du jour le lendemain de la perte (jour J+1 après une série perdue = droit à 2 tentatives ce jour-là pour la reconstituer). Si plus de 2 jours sans jouer, la série est perdue définitivement, sans rattrapage possible.
@@ -59,6 +59,13 @@ Le code du paywall est branché (Play Billing). Les achats ne marchent **que** v
 - [ ] App 2 séparée : mode table réaliste style Card Counter Lite
 
 ## ✅ Fait
+
+- [x] **Hauts Faits — Sceau du Compteur Certifié + récompenses + « Le Test Avancé » (2026-09-05)** *(implémenté + build OK + vérifié au navigateur)*
+  - **Sceau de certification (nouveau)** : un médaillon d'or festonné (`CertifiedSeal`, SVG pur DA — façon sceau de cire + coche de vérification) apparaît en haut à droite, **à gauche du rang**, dès qu'au moins un Haut Fait est débloqué. Discret + léger halo pulsé (`.certbadge` / `@keyframes seal-glow`). Clic → modal `badgeModal` (« Sceau de la Guilde » / « Compteur Certifié ») : félicitations sobres (ton DA, pas de « Bravo »), nombre de Hauts Faits scellés, **dernier Haut Fait obtenu**, et bouton « Voir mes Hauts Faits » → ouvre la liste. Nouvel état `showBadgeModal`, helpers `achName()`/`achReward()`.
+  - **Récompenses affichées dans la liste** : chaque Haut Fait montre désormais sa récompense (« RÉCOMPENSE » + pièces d'or ; l'exploit secret « The Architect » affiche l'artefact « Obsidian Void »).
+  - **Nouveau Haut Fait « Le Test Avancé »** (`advanced_test`, 🎖️, 500 pièces) : réussir **La Rafale** (speedrun) · 2 decks · 50 % pén. · < 25 s · compteur scellé. Débloquable **uniquement en Rafale** (`ctx.mode === 'speedrun' && ctx.cards === 52 && speedrunTime <= 25`).
+  - **Fulgur déplacé hors Rafale** (demande utilisateur) : ne se débloque plus en speedrun ; devient le même exploit dans une **vraie partie chronométrée** (2 decks · 50 % · ≤ 0.45 s/carte · scellé, hors Rafale). Les deux ne se chevauchent plus.
+  - i18n : `achievementsModal.reward`/`secretReward`, bloc `badgeModal` (5 clés), `challenges.advanced_test`, MAJ `challenges.flash.desc` — **14 locales, parité OK (431 clés)**.
 
 - [x] **Retours UI — Tuto (2026-09-05)** *(implémenté + build OK, à vérifier au retour)*
   - **« Identification — carte par carte »** : réponse fausse → la barre de rappel Hi-Lo (2–6/7–9/10–A) clignote brièvement (glow doré, 2 pulses) pour attirer l'œil dessus (`HiLoRefBar`, prop `flash`, `EliteCounterTutorial.jsx`).

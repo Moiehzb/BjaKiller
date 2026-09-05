@@ -112,6 +112,16 @@ const sq = {
     secretDescUnlocked: '5/5 porta të kaluara në Iniciim',
     toastLabel: 'Arritje',
     challengeDone: 'Prove e kryer',
+    reward: 'Shpërblim',
+    secretReward: 'Artefakt «Obsidian Void»',
+  },
+
+  badgeModal: {
+    seal: 'Vula e Repartit',
+    title: 'Numërues i Çertifikuar',
+    body: ({ count }) => `Kjo vulë dëshmon vlerën tënde para Repartit. ${count} ${count > 1 ? 'Arritje të vulosura' : 'Arritje e vulosur'} në emrin tënd — mbaje me vete, të dallon nga lojtarët e thjeshtë.`,
+    latestLabel: 'Arritja e fundit',
+    cta: 'Shiko Arritjet e mia',
   },
 
   placementModal: {
@@ -353,7 +363,8 @@ const sq = {
 
   challenges: {
     frame_perfect: { name: 'Kairos', desc: '1 dek — 0.40s/kartë ose më e vështirë — numëruesi i bllokuar' },
-    flash: { name: 'Fulgur', desc: '2 deste · 50% depërtim · 52 karta · nën 25s — numëruesi i vulosur' },
+    flash: { name: 'Fulgur', desc: '2 deste · 50% depërtim · 0.45s/kartë ose më pak · numëruesi i vulosur — jashtë Stuhisë' },
+    advanced_test: { name: 'Prova e Avancuar', desc: 'Stuhia · 2 deste · 50% depërtim · nën 25s — numëruesi i vulosur' },
     the_wall: { name: 'E Pakalueshja', desc: '6 dek — 90%+ penetrim — 0.50s/kartë ose më pak — numëruesi i bllokuar' },
     blind_run: { name: 'Kalimi', desc: '8 dek — 0.45s/kartë ose më e vështirë — numëruesi i bllokuar' },
     iron_streak: { name: 'Zinxhiri', desc: '10 fitore radhazi — mesatare 0.55s/kartë ose më pak — numëruesi i bllokuar' },

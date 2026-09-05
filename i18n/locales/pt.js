@@ -112,6 +112,16 @@ const pt = {
     secretDescUnlocked: '5/5 portais superados na Iniciação',
     toastLabel: 'Feito',
     challengeDone: 'Prova concluída',
+    reward: 'Recompensa',
+    secretReward: 'Artefato «Obsidian Void»',
+  },
+
+  badgeModal: {
+    seal: 'Selo da Guilda',
+    title: 'Contador Certificado',
+    body: ({ count }) => `Este selo atesta o teu valor perante a Guilda. ${count} ${count > 1 ? 'Feitos selados' : 'Feito selado'} em teu nome — usa-o; distingue-te dos meros jogadores.`,
+    latestLabel: 'Último Feito',
+    cta: 'Ver meus Feitos',
   },
 
   placementModal: {
@@ -353,7 +363,8 @@ const pt = {
 
   challenges: {
     frame_perfect: { name: 'Kairos', desc: '1 baralho — 0,40s/carta ou mais difícil — contador selado' },
-    flash: { name: 'Fulgur', desc: '2 baralhos · 50% pen. · 52 cartas · menos de 25s — contador selado' },
+    flash: { name: 'Fulgur', desc: '2 baralhos · 50% pen. · 0,45s/carta ou menos · contador selado — fora de A Tempestade' },
+    advanced_test: { name: 'A Prova Avançada', desc: 'A Tempestade · 2 baralhos · 50% pen. · menos de 25s — contador selado' },
     the_wall: { name: 'O Intransponível', desc: '6 baralhos — 90%+ de penetração — 0,50s/carta ou menos — contador selado' },
     blind_run: { name: 'A Travessia', desc: '8 baralhos — 0,45s/carta ou mais difícil — contador selado' },
     iron_streak: { name: 'A Corrente', desc: '10 vitórias seguidas — 0,55s/carta em média ou menos — contador selado' },

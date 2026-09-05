@@ -360,6 +360,37 @@ const RankSigil = ({ color = '#c9a24b', size = 28, dim = false }) => (
   </svg>
 );
 
+// ─── Sceau du Compteur Certifié — récompense « Hauts Faits » ───────
+// Médaillon d'or festonné (façon sceau de cire / badge de certification)
+// avec une coche. Discret mais reconnaissable, dans la DA de l'Académie.
+const CertifiedSeal = ({ size = 24, glow = true }) => {
+  const teeth = 12, rOut = 22, rIn = 19, steps = teeth * 2;
+  let d = '';
+  for (let i = 0; i < steps; i++) {
+    const ang = (Math.PI * 2 * i) / steps - Math.PI / 2;
+    const r = i % 2 === 0 ? rOut : rIn;
+    const x = 24 + r * Math.cos(ang), y = 24 + r * Math.sin(ang);
+    d += (i === 0 ? 'M' : 'L') + x.toFixed(2) + ' ' + y.toFixed(2) + ' ';
+  }
+  d += 'Z';
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" aria-hidden="true"
+      style={{ display: 'block', flexShrink: 0, filter: glow ? 'drop-shadow(0 0 3px rgba(201,162,75,.6))' : 'none' }}>
+      <defs>
+        <linearGradient id="csGold" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#e8c97a" />
+          <stop offset="0.5" stopColor="#c9a24b" />
+          <stop offset="1" stopColor="#8a6820" />
+        </linearGradient>
+      </defs>
+      <path d={d} fill="url(#csGold)" stroke="#8a6820" strokeWidth="1" strokeLinejoin="round" />
+      <circle cx="24" cy="24" r="14.5" fill="#0d0a1a" fillOpacity="0.92" stroke="#e8c97a" strokeWidth="0.9" />
+      <path d="M16.6 24.3 L21.4 29.2 L31.4 18.4" fill="none" stroke="#f0d896"
+        strokeWidth="3.1" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+};
+
 // ─── Le Marchand — silhouette encapuchonnée, SVG pur (zéro emoji) ──
 const Merchant = ({ size = 46 }) => (
   <svg width={size} height={size} viewBox="0 0 48 48" aria-hidden="true" style={{ flexShrink: 0 }}>
@@ -511,9 +542,20 @@ const CHALLENGES = [
   {
     id: 'flash',
     name: 'Fulgur',
-    desc: '2 decks · 50% pén. · 52 cartes · moins de 25s — compteur scellé',
+    desc: '2 decks · 50% pén. · 0.45s/carte ou moins · compteur scellé — hors Rafale',
     icon: '⚡', coins: 500,
-    check: (ctx) => ctx.won && ctx.mode === 'speedrun' && ctx.speedrunTime <= 25 && ctx.cards === 52 && !ctx.countWasShown,
+    // Même exploit que « Le Test Avancé » mais dans une vraie partie chronométrée
+    // (Salle d'Étude / Ranked), PAS dans La Rafale (speedrun). Voir advanced_test.
+    check: (ctx) => ctx.won && ctx.mode !== 'speedrun' && ctx.mode !== 'daily' && ctx.decks === 2 && ctx.penetration === 50 && ctx.spc <= 0.45 && !ctx.countWasShown,
+  },
+  {
+    id: 'advanced_test',
+    name: 'Le Test Avancé',
+    desc: 'La Rafale · 2 decks · 50% pén. · moins de 25s — compteur scellé',
+    icon: '🎖️', coins: 500,
+    // Réservé au mode La Rafale (speedrun). 52 cartes = 2 decks à 50% de pénétration.
+    // (En speedrun, decks/pen ne sont pas fiables dans ctx — on teste le nb de cartes.)
+    check: (ctx) => ctx.won && ctx.mode === 'speedrun' && ctx.cards === 52 && ctx.speedrunTime <= 25 && !ctx.countWasShown,
   },
   {
     id: 'the_wall',
@@ -873,6 +915,10 @@ const css = `
   .logo { font-family:'Cinzel',serif; font-size:15px; font-weight:700; letter-spacing:.14em;
     background:linear-gradient(135deg,${G.goldLight},${G.gold},#8a6820); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
   .pill { background:rgba(201,162,75,.08); border:1px solid ${G.borderGold}; border-radius:20px; padding:4px 10px; font-size:12px; font-weight:500; color:${G.gold}; }
+  .certbadge { display:flex; align-items:center; justify-content:center; padding:2px; background:none; border:none; cursor:pointer; border-radius:50%; line-height:0; animation:seal-glow 3.2s ease-in-out infinite; transition:transform .15s ease; }
+  .certbadge:hover { transform:scale(1.12); }
+  .certbadge:active { transform:scale(.94); }
+  @keyframes seal-glow { 0%,100%{filter:drop-shadow(0 0 1px rgba(201,162,75,.35))} 50%{filter:drop-shadow(0 0 5px rgba(232,201,122,.7))} }
 
   .crumb { display:flex; align-items:center; gap:6px; padding:9px 20px; background:${G.bgCard}; border-bottom:1px solid ${G.border}; font-family:'Cinzel',serif; font-size:10px; color:${G.textMuted}; letter-spacing:.22em; text-transform:uppercase; overflow-x:auto; white-space:nowrap; }
   .crumb .ca { color:${G.gold}; }
@@ -1576,6 +1622,7 @@ export default function EliteCounter() {
   const [previewSkin, setPreviewSkin] = useState(null);
   const [storePrices, setStorePrices] = useState({}); // prix Play Store localisés {sp_xxx: '4,99 €'}
   const [showChallenges, setShowChallenges] = useState(false);
+  const [showBadgeModal, setShowBadgeModal] = useState(false);
   const [showAchievement, setShowAchievement] = useState(null);
   const [toastLeaving, setToastLeaving] = useState(false);
   const showAchievementToast = (ach, delay = 0) => {
@@ -2469,6 +2516,15 @@ export default function EliteCounter() {
   };
   const crumbs = crumbMap[nav] || [t('crumbs.home')];
 
+  // Nom localisé d'un haut fait (challenge ou secret) à partir de son id.
+  const achName = (id) => id === 'perfect_placement'
+    ? t('achievementsModal.secretNameUnlocked')
+    : t('challenges.' + id + '.name');
+  // Récompense d'un haut fait pour l'affichage de la liste : pièces, ou artefact (secret).
+  const achReward = (id) => id === 'perfect_placement'
+    ? { skin: t('achievementsModal.secretReward') }
+    : { coins: (CHALLENGES.find(c => c.id === id)?.coins) || 0 };
+
   const renderHeader = (minimal = false, showTutoBtn = false) => (
     <div className="hd">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -2481,6 +2537,12 @@ export default function EliteCounter() {
         </div>
         {!minimal && (
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            {(save.unlockedAchievements || []).length > 0 && (
+              <button className="certbadge" title={t('badgeModal.title')} aria-label={t('badgeModal.title')}
+                onClick={() => { snd(playClick); setShowBadgeModal(true); }}>
+                <CertifiedSeal size={22} glow={false} />
+              </button>
+            )}
             <div className="pill" style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }} onClick={() => { snd(playClick); setShowRankLadder(true); }}><RankSigil color={displayRank.color} size={13} /> {displayRank.name}</div>
             <div className="pill" style={{ display: 'flex', alignItems: 'center', gap: 5 }}><Coin size={13} /> {save.coins}</div>
           </div>
@@ -2720,6 +2782,10 @@ export default function EliteCounter() {
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 1, color: done ? G.gold : G.textPrimary }}>{t('challenges.' + ch.id + '.name')}</div>
                       <div style={{ fontSize: 11, color: G.textSecondary }}>{t('challenges.' + ch.id + '.desc')}</div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 4 }}>
+                        <span style={{ fontSize: 9.5, color: G.textMuted, textTransform: 'uppercase', letterSpacing: '.09em' }}>{t('achievementsModal.reward')}</span>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontSize: 11.5, fontWeight: 700, color: G.gold }}><Coin size={11} /> {ch.coins}</span>
+                      </div>
                     </div>
                     {done && <span style={{ color: G.green, fontSize: 16 }}>✓</span>}
                   </div>
@@ -2735,12 +2801,46 @@ export default function EliteCounter() {
                   <div style={{ fontSize: 11, color: G.textSecondary }}>
                     {(save.unlockedAchievements || []).includes('perfect_placement') ? t('achievementsModal.secretDescUnlocked') : t('achievementsModal.secretDescLocked')}
                   </div>
+                  {(save.unlockedAchievements || []).includes('perfect_placement') && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 4 }}>
+                      <span style={{ fontSize: 9.5, color: G.textMuted, textTransform: 'uppercase', letterSpacing: '.09em' }}>{t('achievementsModal.reward')}</span>
+                      <span style={{ fontSize: 11.5, fontWeight: 700, color: G.gold }}>{t('achievementsModal.secretReward')}</span>
+                    </div>
+                  )}
                 </div>
                 {(save.unlockedAchievements || []).includes('perfect_placement') && <span style={{ color: G.green, fontSize: 16 }}>✓</span>}
               </div>
             </div>
           </div>
         )}
+
+        {showBadgeModal && (() => {
+          const unlocked = save.unlockedAchievements || [];
+          const latestId = unlocked[unlocked.length - 1];
+          return (
+            <div className="moverlay" onClick={() => setShowBadgeModal(false)}>
+              <div className="mdl" onClick={e => e.stopPropagation()}>
+                <div className="mhndl" />
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', paddingTop: 4 }}>
+                  <CertifiedSeal size={66} />
+                  <div style={{ fontSize: 10, letterSpacing: '.18em', textTransform: 'uppercase', color: G.textMuted, marginTop: 12 }}>{t('badgeModal.seal')}</div>
+                  <div className="mtitle" style={{ marginTop: 4 }}>{t('badgeModal.title')}</div>
+                  <div style={{ fontSize: 13, color: G.textSecondary, lineHeight: 1.6, marginTop: 8, maxWidth: 340 }}>{t('badgeModal.body', { count: unlocked.length })}</div>
+                  {latestId && (
+                    <div style={{ marginTop: 15, padding: '10px 14px', background: 'rgba(201,162,75,.08)', border: `1px solid ${G.borderGold}`, borderRadius: 12, width: '100%', maxWidth: 340 }}>
+                      <div style={{ fontSize: 9.5, letterSpacing: '.1em', textTransform: 'uppercase', color: G.textMuted, marginBottom: 3 }}>{t('badgeModal.latestLabel')}</div>
+                      <div style={{ fontFamily: 'Cinzel, serif', fontSize: 15, fontWeight: 700, color: G.gold }}>{achName(latestId)}</div>
+                    </div>
+                  )}
+                  <button className="lbtn" style={{ marginTop: 18, width: '100%', maxWidth: 340 }}
+                    onClick={() => { snd(playClick); setShowBadgeModal(false); setShowChallenges(true); }}>
+                    {t('badgeModal.cta')}
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
 
         {showPlacementHistory && (
           <div className="moverlay" onClick={() => setShowPlacementHistory(false)}>

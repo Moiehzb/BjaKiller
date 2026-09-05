@@ -112,6 +112,16 @@ const en = {
     secretDescUnlocked: '5/5 gates cleared at the Initiation',
     toastLabel: 'Deed',
     challengeDone: 'Trial accomplished',
+    reward: 'Reward',
+    secretReward: 'Artifact “Obsidian Void”',
+  },
+
+  badgeModal: {
+    seal: 'Seal of the Guild',
+    title: 'Certified Counter',
+    body: ({ count }) => `This seal marks your standing before the Guild. ${count} Deed${count > 1 ? 's' : ''} sealed in your name — wear it; it sets you apart from mere players.`,
+    latestLabel: 'Latest Deed',
+    cta: 'View my Deeds',
   },
 
   placementModal: {
@@ -353,7 +363,8 @@ const en = {
 
   challenges: {
     frame_perfect: { name: 'Kairos', desc: '1 deck — 0.40s/card or harder — counter sealed' },
-    flash: { name: 'Fulgur', desc: '2 decks · 50% pen. · 52 cards · under 25s — counter sealed' },
+    flash: { name: 'Fulgur', desc: '2 decks · 50% pen. · 0.45s/card or less · counter sealed — outside The Tempest' },
+    advanced_test: { name: 'The Advanced Trial', desc: 'The Tempest · 2 decks · 50% pen. · under 25s — counter sealed' },
     the_wall: { name: 'The Impassable', desc: '6 decks — 90%+ penetration — 0.50s/card or less — counter sealed' },
     blind_run: { name: 'The Crossing', desc: '8 decks — 0.45s/card or harder — counter sealed' },
     iron_streak: { name: 'The Chain', desc: '10 wins in a row — 0.55s/card avg or less — counter sealed' },

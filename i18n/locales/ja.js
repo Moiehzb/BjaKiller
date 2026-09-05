@@ -112,6 +112,16 @@ const ja = {
     secretDescUnlocked: '入門で5/5の門をクリア',
     toastLabel: '功績',
     challengeDone: '試練達成',
+    reward: '報酬',
+    secretReward: 'アーティファクト「Obsidian Void」',
+  },
+
+  badgeModal: {
+    seal: 'ギルドの印',
+    title: '認定カウンター',
+    body: ({ count }) => `この印はギルドにおける貴殿の地位を示す。${count} の功績が貴殿の名に刻まれた。これを帯びよ——ただの遊び手とは一線を画す証だ。`,
+    latestLabel: '最新の功績',
+    cta: '功績を見る',
   },
 
   placementModal: {
@@ -353,7 +363,8 @@ const ja = {
 
   challenges: {
     frame_perfect: { name: 'Kairos', desc: '1デッキ — 0.40秒/枚以下 — カウンター封印' },
-    flash: { name: 'Fulgur', desc: '2デッキ · 50%ペネトレーション · 52枚 · 25秒未満 — カウンター非表示' },
+    flash: { name: 'Fulgur', desc: '2デッキ · 50%ペネトレーション · 1枚0.45秒以下 · カウンター非表示 — 嵐以外' },
+    advanced_test: { name: '上級試練', desc: '嵐 · 2デッキ · 50%ペネトレーション · 25秒未満 — カウンター非表示' },
     the_wall: { name: '越えられぬもの', desc: '6デッキ — 浸透率90%以上 — 0.50秒/枚以下 — カウンター封印' },
     blind_run: { name: '渡り', desc: '8デッキ — 0.45秒/枚以下 — カウンター封印' },
     iron_streak: { name: '鎖', desc: '10連勝 — 平均0.55秒/枚以下 — カウンター封印' },

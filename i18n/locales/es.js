@@ -112,6 +112,16 @@ const es = {
     secretDescUnlocked: '5/5 puertas superadas en la Iniciación',
     toastLabel: 'Gesta',
     challengeDone: 'Prueba cumplida',
+    reward: 'Recompensa',
+    secretReward: 'Artefacto «Obsidian Void»',
+  },
+
+  badgeModal: {
+    seal: 'Sello del Gremio',
+    title: 'Contador Certificado',
+    body: ({ count }) => `Este sello da fe de tu valía ante el Gremio. ${count} ${count > 1 ? 'Gestas selladas' : 'Gesta sellada'} a tu nombre — llévalo, te distingue de los simples jugadores.`,
+    latestLabel: 'Última Gesta',
+    cta: 'Ver mis Gestas',
   },
 
   placementModal: {
@@ -353,7 +363,8 @@ const es = {
 
   challenges: {
     frame_perfect: { name: 'Kairos', desc: '1 mazo — 0.40s/carta o más difícil — contador sellado' },
-    flash: { name: 'Fulgur', desc: '2 mazos · 50% pen. · 52 cartas · menos de 25s — contador sellado' },
+    flash: { name: 'Fulgur', desc: '2 mazos · 50% pen. · 0,45s/carta o menos · contador sellado — fuera de La Tempestad' },
+    advanced_test: { name: 'La Prueba Avanzada', desc: 'La Tempestad · 2 mazos · 50% pen. · menos de 25s — contador sellado' },
     the_wall: { name: 'Lo Infranqueable', desc: '6 mazos — 90%+ penetración — 0.50s/carta o menos — contador sellado' },
     blind_run: { name: 'La Travesía', desc: '8 mazos — 0.45s/carta o más difícil — contador sellado' },
     iron_streak: { name: 'La Cadena', desc: '10 victorias seguidas — 0.55s/carta de media o menos — contador sellado' },

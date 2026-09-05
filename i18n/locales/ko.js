@@ -112,6 +112,16 @@ const ko = {
     secretDescUnlocked: '입문에서 5/5 관문 통과',
     toastLabel: '업적',
     challengeDone: '시련 달성',
+    reward: '보상',
+    secretReward: '아티팩트 «Obsidian Void»',
+  },
+
+  badgeModal: {
+    seal: '길드의 인장',
+    title: '공인 카운터',
+    body: ({ count }) => `이 인장은 길드에서의 당신의 지위를 증명한다. ${count}개의 업적이 당신의 이름으로 봉인되었다 — 지니라, 평범한 플레이어와 당신을 구별짓는 표식이다.`,
+    latestLabel: '최근 업적',
+    cta: '내 업적 보기',
   },
 
   placementModal: {
@@ -353,7 +363,8 @@ const ko = {
 
   challenges: {
     frame_perfect: { name: 'Kairos', desc: '1덱 — 0.40초/장 이하 — 카운터 봉인' },
-    flash: { name: 'Fulgur', desc: '2덱 · 50% 침투율 · 52장 · 25초 이내 — 카운터 봉인' },
+    flash: { name: 'Fulgur', desc: '2덱 · 50% 침투율 · 카드당 0.45초 이하 · 카운터 봉인 — 폭풍 제외' },
+    advanced_test: { name: '고급 시험', desc: '폭풍 · 2덱 · 50% 침투율 · 25초 이내 — 카운터 봉인' },
     the_wall: { name: '난공불락', desc: '6덱 — 침투율 90% 이상 — 0.50초/장 이하 — 카운터 봉인' },
     blind_run: { name: '횡단', desc: '8덱 — 0.45초/장 이하 — 카운터 봉인' },
     iron_streak: { name: '사슬', desc: '10연승 — 평균 0.55초/장 이하 — 카운터 봉인' },

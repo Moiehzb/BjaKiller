@@ -112,6 +112,16 @@ const zh = {
     secretDescUnlocked: '入会考核中通过5/5关卡',
     toastLabel: '成就',
     challengeDone: '试炼完成',
+    reward: '奖励',
+    secretReward: '神器「Obsidian Void」',
+  },
+
+  badgeModal: {
+    seal: '公会印记',
+    title: '认证计数者',
+    body: ({ count }) => `此印记见证你在公会中的地位。已有 ${count} 项成就以你之名封印——佩戴它，你已不同于寻常玩家。`,
+    latestLabel: '最新成就',
+    cta: '查看我的成就',
   },
 
   placementModal: {
@@ -353,7 +363,8 @@ const zh = {
 
   challenges: {
     frame_perfect: { name: 'Kairos', desc: '1副牌 — 0.40秒/张或更难 — 计数器封锁' },
-    flash: { name: 'Fulgur', desc: '2副牌 · 50%渗透率 · 52张 · 25秒内 — 计数器隐藏' },
+    flash: { name: 'Fulgur', desc: '2副牌 · 50%渗透率 · 每张≤0.45秒 · 计数器隐藏 — 风暴之外' },
+    advanced_test: { name: '进阶试炼', desc: '风暴 · 2副牌 · 50%渗透率 · 25秒内 — 计数器隐藏' },
     the_wall: { name: '天堑', desc: '6副牌 — 穿透率90%以上 — 0.50秒/张以下 — 计数器封锁' },
     blind_run: { name: '渡关', desc: '8副牌 — 0.45秒/张或更难 — 计数器封锁' },
     iron_streak: { name: '铁链', desc: '10连胜 — 平均0.55秒/张以下 — 计数器封锁' },

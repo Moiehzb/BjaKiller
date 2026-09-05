@@ -114,6 +114,16 @@ const de = {
     secretDescUnlocked: '5/5 Tore in der Initiation durchschritten',
     toastLabel: 'Tat',
     challengeDone: 'Prüfung vollbracht',
+    reward: 'Belohnung',
+    secretReward: 'Artefakt „Obsidian Void“',
+  },
+
+  badgeModal: {
+    seal: 'Siegel der Gilde',
+    title: 'Zertifizierter Zähler',
+    body: ({ count }) => `Dieses Siegel bezeugt deinen Rang vor der Gilde. ${count} Tat${count > 1 ? 'en' : ''} auf deinen Namen besiegelt — trage es; es hebt dich von bloßen Spielern ab.`,
+    latestLabel: 'Letzte Tat',
+    cta: 'Meine Taten ansehen',
   },
 
   placementModal: {
@@ -355,7 +365,8 @@ const de = {
 
   challenges: {
     frame_perfect: { name: 'Kairos', desc: '1 Deck — 0.40s/Karte oder härter — Zähler versiegelt' },
-    flash: { name: 'Fulgur', desc: '2 Decks · 50% Pen. · 52 Karten · unter 25s — Zähler versiegelt' },
+    flash: { name: 'Fulgur', desc: '2 Decks · 50% Pen. · 0,45s/Karte oder weniger · Zähler versiegelt — außerhalb Der Sturm' },
+    advanced_test: { name: 'Die Hohe Prüfung', desc: 'Der Sturm · 2 Decks · 50% Pen. · unter 25s — Zähler versiegelt' },
     the_wall: { name: 'Das Unüberwindliche', desc: '6 Decks — 90%+ Penetration — 0.50s/Karte oder weniger — Zähler versiegelt' },
     blind_run: { name: 'Die Überquerung', desc: '8 Decks — 0.45s/Karte oder härter — Zähler versiegelt' },
     iron_streak: { name: 'Die Kette', desc: '10 Siege in Folge — 0.55s/Karte Ø oder weniger — Zähler versiegelt' },
