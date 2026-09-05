@@ -961,7 +961,7 @@ const css = `
   .gpaused { position:absolute; inset:0; background:rgba(0,0,0,.65); backdrop-filter:blur(8px); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; }
 
   /* Quiz answers — barre de réponse ancrée, détachée du bord bas */
-  .qz-ans { display:flex; gap:11px; padding:15px 16px calc(24px + env(safe-area-inset-bottom,0px)); border-top:1px solid ${G.border}; background:linear-gradient(to top,rgba(0,0,0,.30),rgba(0,0,0,0)); }
+  .qz-ans { display:flex; gap:11px; padding:15px 16px calc(56px + env(safe-area-inset-bottom,0px)); border-top:1px solid ${G.border}; background:linear-gradient(to top,rgba(0,0,0,.30),rgba(0,0,0,0)); }
   .qz-btn { flex:1; display:flex; align-items:center; justify-content:center; height:66px; border-radius:15px; border:1.5px solid ${G.border}; background:${G.bgPanel}; font-family:'Cinzel',serif; font-size:30px; font-weight:700; cursor:pointer; transition:transform .12s ease, background .14s, border-color .14s, box-shadow .14s; -webkit-tap-highlight-color:transparent; box-shadow:inset 0 1px 0 rgba(255,255,255,.04); }
   .qz-btn:active:not(:disabled) { transform:scale(.95); }
   .qz-btn:disabled { opacity:.32; cursor:default; }
