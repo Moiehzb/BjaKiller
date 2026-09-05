@@ -15,9 +15,18 @@
 - [x] ~~Afficher la récompense de chaque haut fait dans la liste des Hauts Faits~~ → fait (voir ✅ Fait).
 - [x] ~~Nouveau haut fait "Le Test Avancé"~~ → fait (voir ✅ Fait).
 
-### MMR
-- [x] **MMR variable par rang (2026-09-05)** *(implémenté + build OK, à vérifier au retour)* — `mmrPerWin`/`mmrPerLoss` ne sont plus fixes à +20/−15. Courbe « Douce +5 » (seuils conservés) : Cuivre +30/−12 (~29 % de victoires pour monter) → Adamantium +19/−35 (~65 %). Abandon **scalé par rang** (= `mmrPerLoss`, plancher 0, ne relègue jamais) au lieu de −25 fixe. Détails dans ✅ Fait.
-  - ⏳ **À propager après validation** : l'affichage de l'abandon dynamique (`lobby.rankedSub` avec param `abandon`, `rankedConfig.rankedSub` réutilise `loss`) n'est fait qu'en **fr.js** — les 13 autres locales codent encore « −25 » en dur. À corriger lors de la propagation i18n.
+### MMR — variable par rang ✅ codé (2026-09-05), reste à valider en jeu
+> Fait : `mmrPerWin`/`mmrPerLoss` ne sont plus fixes à +20/−15. Courbe « Douce +5 » (seuils conservés) — Cuivre +30/−12 (~29 % de victoires pour monter) → Adamantium +19/−35 (~65 %). Abandon scalé par rang (= `mmrPerLoss`, plancher 0, ne relègue jamais) au lieu de −25 fixe. Granularité par rang. Build OK. Détail complet dans ✅ Fait.
+
+**Table des valeurs (rappel rapide) :** Cuivre +30/−12 · Argent +28/−15 · Or +26/−17 · Émeraude +24/−21 · Saphir +21/−28 · Adamantium +19/−35.
+
+**À vérifier au retour (en jeu, FR) :**
+- [ ] Écran de config Ranked (« Les Portes de la Guilde ») : affiche bien +win / −loss / abandon corrects **selon le rang courant**.
+- [ ] Carte Ranked de l'accueil : le sous-titre affiche bien le bon abandon (plus « −25 » figé).
+- [ ] Ressenti de montée : plus rapide qu'avant partout, exigeant en haut. **Si Adamantium (ou le haut de ladder) semble encore trop lent → me dire, je baisse juste les défaites** (garde les gains, durcit à peine les seuils). À l'inverse je peux remonter/baisser toute la table.
+
+**À faire par Claude après ta validation :**
+- [ ] ⏳ **Propager l'i18n aux 13 autres locales** : l'affichage de l'abandon dynamique n'est fait qu'en **fr.js** (`lobby.rankedSub` reçoit un param `abandon` ; `rankedConfig.rankedSub` réutilise `loss`). Les 13 autres locales codent encore « −25 » en dur → à mettre à jour (règle « français d'abord »).
 
 ## 🛠️ Features en attente (backlog)
 
