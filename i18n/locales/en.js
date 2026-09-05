@@ -119,8 +119,8 @@ const en = {
   badgeModal: {
     seal: 'Seal of the Guild',
     title: 'Certified Counter',
-    body: ({ count }) => `This seal marks your standing before the Guild. ${count} Deed${count > 1 ? 's' : ''} sealed in your name — wear it; it sets you apart from mere players.`,
-    latestLabel: 'Latest Deed',
+    body: 'This seal marks the rare counters who have mastered The Tempest. You earned it by clearing The Advanced Trial — it sets you apart from mere players.',
+    latestLabel: 'Earned through',
     cta: 'View my Deeds',
   },
 
@@ -216,6 +216,9 @@ const en = {
     deckLabel: ({ n }) => `${n} deck${n > 1 ? 's' : ''}`,
     cardsCounted: 'Cards counted',
     byModeTitle: 'Games by path',
+    speedrunRecord: 'Speed record',
+    speedrunRecordSub: 'The Tempest · best time per card (from 2 decks)',
+    speedrunRecordUnit: 's/card',
   },
 
   settings: {

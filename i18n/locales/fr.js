@@ -216,6 +216,9 @@ const fr = {
     deckLabel: ({ n }) => `${n} deck${n > 1 ? 's' : ''}`,
     cardsCounted: 'Cartes comptées',
     byModeTitle: 'Parties par voie',
+    speedrunRecord: 'Record de vitesse',
+    speedrunRecordSub: 'La Rafale · meilleur temps par carte (dès 2 decks)',
+    speedrunRecordUnit: 's/carte',
   },
 
   settings: {

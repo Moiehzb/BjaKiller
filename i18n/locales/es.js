@@ -119,8 +119,8 @@ const es = {
   badgeModal: {
     seal: 'Sello del Gremio',
     title: 'Contador Certificado',
-    body: ({ count }) => `Este sello da fe de tu valía ante el Gremio. ${count} ${count > 1 ? 'Gestas selladas' : 'Gesta sellada'} a tu nombre — llévalo, te distingue de los simples jugadores.`,
-    latestLabel: 'Última Gesta',
+    body: 'Este sello distingue a los raros contadores que han dominado La Tempestad. Lo obtuviste al superar La Prueba Avanzada — te distingue de los simples jugadores.',
+    latestLabel: 'Obtenido con',
     cta: 'Ver mis Gestas',
   },
 

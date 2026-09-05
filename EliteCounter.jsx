@@ -1514,6 +1514,7 @@ const DEFAULT_SAVE = {
   // history: [{ key, won, score }] (14 derniers jours)
   daily: { lastKey: '', lastResult: null, streak: 0, bestStreak: 0, bestScore: 0, totalPlayed: 0, totalWon: 0, history: [] },
   speedrunBestTime: null, // meilleur temps en mode L'Éclair (secondes)
+  speedrunBestSpc: null,  // meilleur temps par carte (s/carte) en Rafale, dès 2 decks
 
   // Casino Killer
   casinoChallenge: {
@@ -1615,6 +1616,7 @@ export default function EliteCounter() {
   const placementTierPlayedRef = useRef(null);
   const casinoStepConfigRef = useRef(null); // config of the current casino step (decks, pen, spc)
   const dailyRef = useRef(null); // config du défi du jour en cours (seed, decks, pen, spc)
+  const speedrunDecksRef = useRef(2); // nb de decks de la Rafale en cours (decksUsed n'est pas fiable en speedrun)
 
   // ── abandon confirm dialog
   const [showAbandon, setShowAbandon] = useState(false);
@@ -1923,6 +1925,7 @@ export default function EliteCounter() {
     setQuizScore({ correct: 0, total: 0 });
     setNav('game');
     setShowCount(false);
+    speedrunDecksRef.current = speedrunDecks; // pour le record s/carte (dès 2 decks)
     // Build deck with selected decks/pen; clickMode=true (manual card advance)
     const newDeck = buildDeck(speedrunDecks, speedrunPen);
     launchGame(speedrunDecks, speedrunPen, 9999, 'speedrun', false, false, newDeck, true);
@@ -2348,6 +2351,7 @@ export default function EliteCounter() {
       ...(gameModeRef.current === 'training' && !save.trainingDone ? { trainingDone: true } : {}),
       ...(['ranked', 'placement', 'promo'].includes(gameModeRef.current) && !save.rankedDone ? { rankedDone: true } : {}),
       ...(gameModeRef.current === 'speedrun' && correct && (!save.speedrunBestTime || timeInSec < save.speedrunBestTime) ? { speedrunBestTime: timeInSec } : {}),
+      ...(gameModeRef.current === 'speedrun' && correct && speedrunDecksRef.current >= 2 && (save.speedrunBestSpc == null || spcUsed < save.speedrunBestSpc) ? { speedrunBestSpc: spcUsed } : {}),
     });
 
     if (newlyUnlocked.length > 0) {
@@ -3089,7 +3093,9 @@ export default function EliteCounter() {
             .sort((a, b) => a.decks - b.decks);
           const modeStats = s.modeStats || {};
           const cardsCounted = s.cardsCounted || 0;
-          const modeLabel = (m) => t('modeName.' + (m === 'placement' ? 'placement' : m === 'promo' ? 'promo' : m === 'ranked' ? 'ranked' : m === 'casino' ? 'casino' : m === 'daily' ? 'daily' : 'training'));
+          // Détaille les sous-modes de la Salle d'Étude (La Forge / La Rafale / Le Déchiffrement)
+          // au lieu de tout regrouper sous « Salle d'Étude ».
+          const modeLabel = (m) => m === 'training' ? t('trainingSubMode.standardTitle') : t('modeName.' + m);
 
           // Défi du jour
           const d = save.daily || {};
@@ -3284,6 +3290,20 @@ export default function EliteCounter() {
                     </div>
                   )}
                 </div>
+
+                {/* Record de vitesse — La Rafale (s/carte, dès 2 decks) */}
+                {save.speedrunBestSpc != null && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'rgba(201,162,75,.06)', border: `1px solid ${G.borderGold}`, borderRadius: 8, padding: '11px 14px', marginBottom: 14 }}>
+                    <Timer size={20} color={G.gold} />
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 10, color: G.textSecondary, letterSpacing: '.06em', textTransform: 'uppercase' }}>{t('stats.speedrunRecord')}</div>
+                      <div style={{ fontSize: 10, color: G.textMuted, marginTop: 1 }}>{t('stats.speedrunRecordSub')}</div>
+                    </div>
+                    <div style={{ fontFamily: 'Cinzel, serif', fontSize: 20, fontWeight: 700, color: G.goldLight }}>
+                      {save.speedrunBestSpc.toFixed(3)}<span style={{ fontSize: 12, color: G.textSecondary, fontFamily: 'EB Garamond, serif' }}> {t('stats.speedrunRecordUnit')}</span>
+                    </div>
+                  </div>
+                )}
 
                 {/* Rang + MMR */}
                 <div style={{ borderTop: `1px solid ${G.border}`, paddingTop: 14, marginBottom: 14 }}>

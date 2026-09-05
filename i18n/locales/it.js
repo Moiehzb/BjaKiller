@@ -119,8 +119,8 @@ const it = {
   badgeModal: {
     seal: 'Sigillo della Gilda',
     title: 'Contatore Certificato',
-    body: ({ count }) => `Questo sigillo attesta il tuo valore dinanzi alla Gilda. ${count} ${count > 1 ? 'Imprese sigillate' : 'Impresa sigillata'} nel tuo nome — portalo con te, ti distingue dai semplici giocatori.`,
-    latestLabel: 'Ultima Impresa',
+    body: 'Questo sigillo distingue i rari contatori che hanno padroneggiato La Tempesta. L\'hai ottenuto superando La Prova Avanzata — ti distingue dai semplici giocatori.',
+    latestLabel: 'Ottenuto con',
     cta: 'Vedi le mie Imprese',
   },
 

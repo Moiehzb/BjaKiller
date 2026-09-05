@@ -121,8 +121,8 @@ const de = {
   badgeModal: {
     seal: 'Siegel der Gilde',
     title: 'Zertifizierter Zähler',
-    body: ({ count }) => `Dieses Siegel bezeugt deinen Rang vor der Gilde. ${count} Tat${count > 1 ? 'en' : ''} auf deinen Namen besiegelt — trage es; es hebt dich von bloßen Spielern ab.`,
-    latestLabel: 'Letzte Tat',
+    body: 'Dieses Siegel zeichnet die seltenen Zähler aus, die Der Sturm gemeistert haben. Du hast es durch das Bestehen von Die Hohe Prüfung erlangt — es hebt dich von bloßen Spielern ab.',
+    latestLabel: 'Erlangt durch',
     cta: 'Meine Taten ansehen',
   },
 

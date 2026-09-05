@@ -119,8 +119,8 @@ const sq = {
   badgeModal: {
     seal: 'Vula e Repartit',
     title: 'Numërues i Çertifikuar',
-    body: ({ count }) => `Kjo vulë dëshmon vlerën tënde para Repartit. ${count} ${count > 1 ? 'Arritje të vulosura' : 'Arritje e vulosur'} në emrin tënd — mbaje me vete, të dallon nga lojtarët e thjeshtë.`,
-    latestLabel: 'Arritja e fundit',
+    body: 'Kjo vulë dallon numëruesit e rrallë që kanë zotëruar Stuhinë. E fitove duke kaluar Provën e Avancuar — të dallon nga lojtarët e thjeshtë.',
+    latestLabel: 'Fituar përmes',
     cta: 'Shiko Arritjet e mia',
   },
 

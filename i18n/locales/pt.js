@@ -119,8 +119,8 @@ const pt = {
   badgeModal: {
     seal: 'Selo da Guilda',
     title: 'Contador Certificado',
-    body: ({ count }) => `Este selo atesta o teu valor perante a Guilda. ${count} ${count > 1 ? 'Feitos selados' : 'Feito selado'} em teu nome — usa-o; distingue-te dos meros jogadores.`,
-    latestLabel: 'Último Feito',
+    body: 'Este selo distingue os raros contadores que dominaram A Tempestade. Obtiveste-o ao superar A Prova Avançada — distingue-te dos meros jogadores.',
+    latestLabel: 'Obtido com',
     cta: 'Ver meus Feitos',
   },
 
