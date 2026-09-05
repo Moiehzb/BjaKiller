@@ -54,6 +54,7 @@ const tutCss = `
   .tcard.md  { width:56px; height:78px; padding:5px 7px; font-size:18px; }
   .tcard.lg  { width:72px; height:102px; padding:7px 9px; font-size:24px; }
   .tcard.xl  { width:90px; height:128px; padding:9px 11px; font-size:30px; }
+  .tcard.cqm { width:48px; height:68px; padding:4px 5px; font-size:15px; border-radius:8px; }
   .tcard.red-c { color:#c53030; }
   .tcard.blk-c { color:#1a1a1a; }
   .tctop { display:flex; flex-direction:column; align-items:center; line-height:1.1; }
@@ -141,15 +142,16 @@ const tutCss = `
   .qscore-title { font-family:'Cinzel',serif; font-size:16px; margin-bottom:5px; }
   .qscore-desc  { font-size:12px; color:${G.textSecondary}; line-height:1.5; }
 
-  /* Count quiz cards row */
-  .cq-cards { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; min-height:88px; margin-bottom:18px; align-items:flex-end; }
-  .cq-wrap { display:flex; flex-direction:column; align-items:center; gap:6px; }
-  .cq-val { font-family:'Cinzel',serif; font-size:14px; font-weight:700; opacity:0; transition:opacity .38s; }
+  /* Count quiz — centered stage fills the remaining step height */
+  .cq-stage { flex:1; display:flex; flex-direction:column; justify-content:center; gap:20px; padding:10px 0 4px; }
+  .cq-cards { display:flex; gap:6px; justify-content:center; flex-wrap:wrap; align-items:flex-end; }
+  .cq-wrap { display:flex; flex-direction:column; align-items:center; gap:7px; }
+  .cq-val { font-family:'Cinzel',serif; font-size:15px; font-weight:700; opacity:0; transition:opacity .38s; }
   .cq-val.vis { opacity:1; }
   .cq-val.pos { color:${G.green}; }
   .cq-val.neg { color:${G.red}; }
   .cq-val.zer { color:${G.textSecondary}; }
-  .cq-empty { width:36px; height:52px; background:${G.bgPanel}; border:1px dashed ${G.border}; border-radius:7px; }
+  .cq-empty { width:48px; height:68px; background:${G.bgPanel}; border:1px dashed ${G.border}; border-radius:8px; }
 
   /* Count stepper */
   .cnt-stepper { display:flex; align-items:center; justify-content:center; gap:18px; margin-bottom:14px; }
@@ -667,7 +669,7 @@ const CountQuizStep = ({ onNext, onBack, t }) => {
   // ── Intro ─────────────────────────────────────────────────────
   if (phase === 'intro') {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
         <button className="tbtn-back" onClick={() => { playClick(); onBack(); }}>
           <ChevronLeft size={14} /> {t('common.back')}
         </button>
@@ -689,87 +691,90 @@ const CountQuizStep = ({ onNext, onBack, t }) => {
 
   // ── Cards row (watching + input + done) ───────────────────────
   return (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
       <button className="tbtn-back" onClick={() => { playClick(); onBack(); }}>
         <ChevronLeft size={14} /> {t('common.back')}
       </button>
 
       <div className="tlabel">{t('tutorial.count.label')}</div>
 
-      {/* Cards */}
-      <div className="cq-cards">
-        {COUNT_SEQ.map((c, i) => {
-          const valCls = c.v > 0 ? 'pos' : c.v < 0 ? 'neg' : 'zer';
-          const valTxt = c.v > 0 ? '+1' : c.v < 0 ? '−1' : '0';
-          return (
-            <div key={i} className="cq-wrap">
-              {i <= dealIdx
-                ? <TCard rank={c.rank} suit={c.suit} size="sm" anim="t-deal" />
-                : <div className="cq-empty" />
-              }
-              <div className={`cq-val ${valCls} ${showVals ? 'vis' : ''}`}>
-                {valTxt}
+      {/* Centered stage — cards + controls fill the remaining height */}
+      <div className="cq-stage">
+        {/* Cards */}
+        <div className="cq-cards">
+          {COUNT_SEQ.map((c, i) => {
+            const valCls = c.v > 0 ? 'pos' : c.v < 0 ? 'neg' : 'zer';
+            const valTxt = c.v > 0 ? '+1' : c.v < 0 ? '−1' : '0';
+            return (
+              <div key={i} className="cq-wrap">
+                {i <= dealIdx
+                  ? <TCard rank={c.rank} suit={c.suit} size="cqm" anim="t-deal" />
+                  : <div className="cq-empty" />
+                }
+                <div className={`cq-val ${valCls} ${showVals ? 'vis' : ''}`}>
+                  {valTxt}
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
+
+        {/* Watching hint */}
+        {phase === 'watching' && (
+          <div className="cnt-watching-hint" style={{ padding: 0 }}>{t('tutorial.count.watching')}</div>
+        )}
+
+        {/* Input / done controls */}
+        {(phase === 'input' || phase === 'done') && (
+          <>
+            {/* Wrong-try inline feedback */}
+            {feedback === 'wrong-try' && (
+              <div style={{ textAlign: 'center', fontSize: 13, color: G.red, fontWeight: 600 }}>
+                {t('tutorial.count.wrongTry')}
+              </div>
+            )}
+
+            {/* Result feedback */}
+            {phase === 'done' && (
+              <div className={`cnt-fb ${feedback === 'correct' ? 'ok' : 'err'}`} style={{ marginBottom: 0 }}>
+                <div className="cnt-fb-title" style={{ color: feedback === 'correct' ? G.green : G.red }}>
+                  {feedback === 'correct'
+                    ? t('tutorial.count.correctTitle', { count: COUNT_ANSWER })
+                    : t('tutorial.count.wrongTitle', { count: COUNT_ANSWER })}
+                </div>
+                <div className="cnt-fb-desc">
+                  {feedback === 'correct'
+                    ? t('tutorial.count.correctDesc')
+                    : t('tutorial.count.wrongDesc')}
+                </div>
+              </div>
+            )}
+
+            {/* Stepper */}
+            {phase === 'input' && (
+              <div className="cnt-stepper" style={{ marginBottom: 0 }}>
+                <button className="csb" onClick={() => { playClick(); setGuess((g) => Math.max(g - 1, -12)); }}>−</button>
+                <div className={`cnt-num ${countCls}`}>
+                  {guess > 0 ? `+${guess}` : guess}
+                </div>
+                <button className="csb" onClick={() => { playClick(); setGuess((g) => Math.min(g + 1, 12)); }}>+</button>
+              </div>
+            )}
+
+            {/* CTA */}
+            {phase === 'input' && (
+              <button className="tbtn-g" onClick={validate}>
+                {t('tutorial.count.validate')}
+              </button>
+            )}
+            {phase === 'done' && (
+              <button className="tbtn-g" onClick={() => { playClick(); onNext(); }}>
+                {t('tutorial.count.continue')}
+              </button>
+            )}
+          </>
+        )}
       </div>
-
-      {/* Watching hint */}
-      {phase === 'watching' && (
-        <div className="cnt-watching-hint">{t('tutorial.count.watching')}</div>
-      )}
-
-      {/* Input */}
-      {(phase === 'input' || phase === 'done') && (
-        <>
-          {/* Wrong-try inline feedback */}
-          {feedback === 'wrong-try' && (
-            <div style={{ textAlign: 'center', marginBottom: 10, fontSize: 13, color: G.red, fontWeight: 600 }}>
-              {t('tutorial.count.wrongTry')}
-            </div>
-          )}
-
-          {/* Result feedback */}
-          {phase === 'done' && (
-            <div className={`cnt-fb ${feedback === 'correct' ? 'ok' : 'err'}`}>
-              <div className="cnt-fb-title" style={{ color: feedback === 'correct' ? G.green : G.red }}>
-                {feedback === 'correct'
-                  ? t('tutorial.count.correctTitle', { count: COUNT_ANSWER })
-                  : t('tutorial.count.wrongTitle', { count: COUNT_ANSWER })}
-              </div>
-              <div className="cnt-fb-desc">
-                {feedback === 'correct'
-                  ? t('tutorial.count.correctDesc')
-                  : t('tutorial.count.wrongDesc')}
-              </div>
-            </div>
-          )}
-
-          {/* Stepper */}
-          {phase === 'input' && (
-            <div className="cnt-stepper">
-              <button className="csb" onClick={() => { playClick(); setGuess((g) => Math.max(g - 1, -12)); }}>−</button>
-              <div className={`cnt-num ${countCls}`}>
-                {guess > 0 ? `+${guess}` : guess}
-              </div>
-              <button className="csb" onClick={() => { playClick(); setGuess((g) => Math.min(g + 1, 12)); }}>+</button>
-            </div>
-          )}
-
-          {/* CTA */}
-          {phase === 'input' && (
-            <button className="tbtn-g" onClick={validate}>
-              {t('tutorial.count.validate')}
-            </button>
-          )}
-          {phase === 'done' && (
-            <button className="tbtn-g" onClick={() => { playClick(); onNext(); }}>
-              {t('tutorial.count.continue')}
-            </button>
-          )}
-        </>
-      )}
     </div>
   );
 };
