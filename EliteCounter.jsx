@@ -3291,19 +3291,22 @@ export default function EliteCounter() {
                   )}
                 </div>
 
-                {/* Record de vitesse — La Rafale (s/carte, dès 2 decks) */}
-                {save.speedrunBestSpc != null && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'rgba(201,162,75,.06)', border: `1px solid ${G.borderGold}`, borderRadius: 8, padding: '11px 14px', marginBottom: 14 }}>
-                    <Timer size={20} color={G.gold} />
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 10, color: G.textSecondary, letterSpacing: '.06em', textTransform: 'uppercase' }}>{t('stats.speedrunRecord')}</div>
-                      <div style={{ fontSize: 10, color: G.textMuted, marginTop: 1 }}>{t('stats.speedrunRecordSub')}</div>
-                    </div>
+                {/* Record de vitesse — La Rafale (s/carte, dès 2 decks). Toujours visible :
+                    affiche « — » tant qu'aucun record n'a été posé. */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'rgba(201,162,75,.06)', border: `1px solid ${G.borderGold}`, borderRadius: 8, padding: '11px 14px', marginBottom: 14 }}>
+                  <Timer size={20} color={G.gold} />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 10, color: G.textSecondary, letterSpacing: '.06em', textTransform: 'uppercase' }}>{t('stats.speedrunRecord')}</div>
+                    <div style={{ fontSize: 10, color: G.textMuted, marginTop: 1 }}>{t('stats.speedrunRecordSub')}</div>
+                  </div>
+                  {save.speedrunBestSpc != null ? (
                     <div style={{ fontFamily: 'Cinzel, serif', fontSize: 20, fontWeight: 700, color: G.goldLight }}>
                       {save.speedrunBestSpc.toFixed(3)}<span style={{ fontSize: 12, color: G.textSecondary, fontFamily: 'EB Garamond, serif' }}> {t('stats.speedrunRecordUnit')}</span>
                     </div>
-                  </div>
-                )}
+                  ) : (
+                    <div style={{ fontFamily: 'Cinzel, serif', fontSize: 22, fontWeight: 700, color: G.textMuted }}>—</div>
+                  )}
+                </div>
 
                 {/* Rang + MMR */}
                 <div style={{ borderTop: `1px solid ${G.border}`, paddingTop: 14, marginBottom: 14 }}>
