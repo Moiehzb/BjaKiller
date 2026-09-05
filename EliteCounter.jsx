@@ -1900,6 +1900,8 @@ export default function EliteCounter() {
     if (correct) { snd(playCorrect); vibrateWin(); } else { snd(playWrong); vibrateLose(); }
     const isLastCard = currentIndex === deck.length;
     const capturedStart = startTime;
+    // Bonne réponse : enchaînement rapide. Erreur : on laisse le temps de lire la bonne valeur.
+    const delay = correct ? 350 : 700;
     setTimeout(() => {
       setQuizResult(null);
       if (isLastCard) {
@@ -1910,7 +1912,7 @@ export default function EliteCounter() {
       } else {
         setCurrentIndex(i => i + 1);
       }
-    }, 700);
+    }, delay);
   };
 
   // ── Défi du jour ────────────────────────────────────────────────
@@ -4070,9 +4072,9 @@ export default function EliteCounter() {
             )}
           </div>
 
-          {/* Quiz answer buttons */}
+          {/* Quiz answer buttons — remontés du bord bas (évite le geste "accueil" sur mobile) */}
           {isQuizPlaying && gameState === 'playing' && (
-            <div style={{ padding: '12px 16px 16px', display: 'flex', gap: 10 }}>
+            <div style={{ padding: '12px 16px calc(34px + env(safe-area-inset-bottom, 0px))', display: 'flex', gap: 10 }}>
               <button onClick={() => answerQuiz(-1)} disabled={!!quizResult}
                 style={{ flex: 1, padding: '14px 0', borderRadius: 10, border: `1px solid rgba(192,57,43,.4)`, background: 'rgba(192,57,43,.1)', color: G.red, cursor: quizResult ? 'default' : 'pointer', fontSize: 15, fontWeight: 700, fontFamily: 'Cinzel, serif', opacity: quizResult ? 0.4 : 1 }}>
                 −1

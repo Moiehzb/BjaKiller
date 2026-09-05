@@ -789,7 +789,6 @@ const ModesStep = ({ onNext, onBack, t }) => {
       icon: <BookOpen size={20} color={G.gold} />,
       name: t('tutorial.modes.trainingName'),
       sub: t('tutorial.modes.trainingSub'),
-      desc: t('tutorial.modes.trainingDesc'),
       status: 'un',
       highlight: true,
     },
@@ -797,7 +796,6 @@ const ModesStep = ({ onNext, onBack, t }) => {
       icon: <DoorOpen size={20} color={G.textSecondary} />,
       name: t('tutorial.modes.rankedName'),
       sub: t('tutorial.modes.rankedSub'),
-      desc: t('tutorial.modes.rankedDesc'),
       status: 'lk',
       highlight: false,
     },
@@ -805,7 +803,6 @@ const ModesStep = ({ onNext, onBack, t }) => {
       icon: <Flame size={20} color={G.textSecondary} />,
       name: t('tutorial.modes.casinoName'),
       sub: t('tutorial.modes.casinoSub'),
-      desc: t('tutorial.modes.casinoDesc'),
       status: 'lk',
       highlight: false,
     },
@@ -828,7 +825,6 @@ const ModesStep = ({ onNext, onBack, t }) => {
           <div className="mode-icon" style={{ display: 'flex' }}>{m.icon}</div>
           <div className="mode-title">{m.name}</div>
           <div className="mode-sub">{m.sub}</div>
-          <div className="mode-desc">{m.desc}</div>
           <div className={`mode-badge ${m.status}`}>
             {m.status === 'un' ? t('tutorial.modes.available') : <Lock size={14} />}
           </div>

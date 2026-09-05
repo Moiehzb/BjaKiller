@@ -13,8 +13,6 @@
 - [ ] "Identification — carte par carte" : quand le joueur se trompe, la ligne qui montre les valeurs des cartes doit briller/clignoter un court instant pour attirer l'œil dessus.
 - [ ] Slide 2 "Le système Hi-Lo" : supprimer le bloc "intuition" (pas compréhensible, la plupart des gens ne regardent que les images).
 - [ ] Slide "Compte courant" : supprimer le bloc "la méthode" (même raison).
-- [ ] Slide "Les trois Voies" : beaucoup trop de texte pour ce que ça apporte — réduire à l'essentiel.
-- [ ] Slide "Le déchiffrement" : la zone de saisie de la valeur (+1/0/−1) est trop basse sur l'écran — sur mobile ça fait cliquer par erreur le bouton maison du téléphone, remonter/repositionner. Aussi : quand la réponse est bonne, le passage à la carte suivante doit être plus rapide (actuellement trop lent).
 
 ### Navigation / HUD
 - [ ] Logo en haut à gauche (`AppLogo` dans `renderHeader`) : le clic ouvre `AcademySwitcherModal` (slider Academy I ↔ II), mais seulement dans le lobby (`renderHeader(false,...)` a le onClick, `renderHeader(true)` en mode "minimal" utilisé ailleurs le désactive) — le rendre cliquable dans tous les modes/écrans, pas que le hall.
@@ -63,6 +61,10 @@ Le code du paywall est branché (Play Billing). Les achats ne marchent **que** v
 - [ ] App 2 séparée : mode table réaliste style Card Counter Lite
 
 ## ✅ Fait
+
+- [x] **Retours UI — Déchiffrement + slide « Les trois Voies » (2026-09-05)** *(implémenté + build OK, à vérifier au retour)*
+  - **Le Déchiffrement (Salle d'Étude)** : rangée de boutons +1/0/−1 remontée du bord bas (`padding-bottom: calc(34px + safe-area-inset-bottom)`) — évite le déclenchement du geste « accueil » sur mobile. Passage à la carte suivante accéléré sur bonne réponse : 350 ms (vs 700 ms), l'erreur garde 700 ms pour laisser lire la bonne valeur (`answerQuiz`, EliteCounter.jsx).
+  - **Slide « Les trois Voies » (tuto)** : suppression du rendu des 3 `mode-desc` (listes de specs façon fiche technique, ton « IA »). Les cartes gardent icône + nom + sous-titre évocateur + badge Ouverte/verrou ; intro et encart « L'Initiation » conservés. Réduction **uniforme sur les 17 langues** (changement de composant, zéro risque de traduction). Clés `*Desc` laissées en données mortes (`EliteCounterTutorial.jsx`).
 
 - [x] **Politique de confidentialité (2026-07-21)** — `docs/privacy.html` bilingue FR/EN, hébergée sur GitHub Pages : `https://moiehzb.github.io/BjaKiller/privacy.html`. À coller dans Play Console → Policy → App content → Privacy policy (ou pendant le wizard de création d'app).
 
