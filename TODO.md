@@ -14,6 +14,9 @@
 - [ ] Slide 2 "Le système Hi-Lo" : supprimer le bloc "intuition" (pas compréhensible, la plupart des gens ne regardent que les images).
 - [ ] Slide "Compte courant" : supprimer le bloc "la méthode" (même raison).
 
+### Onboarding Salle d'Étude
+- [ ] **Préconiser "Le Déchiffrement" au 1er passage** : juste après le tuto (`save.tutorialDone === true`), à la **première** ouverture de l'écran de choix de sous-mode de la Salle d'Étude (`trainSubMode === null`, cartes La Forge / La Rafale / Le Déchiffrement, ~`EliteCounter.jsx:3512+`), mettre en avant la carte **Déchiffrement** (`setTrainSubMode('quiz')`) car c'est le plus débutant-friendly : petit glow doré pulsé (box-shadow `${G.borderGold}` façon `orbPulse`) + éventuellement mini-label "Pour débuter". **Uniquement cette occasion** : ajouter un flag `save.studyHallOnboarded` (défaut `false` dans `DEFAULT_SAVE`), le passer à `true` dès que l'écran a été vu (ou au 1er clic sur une carte / au retour) → le glow ne réapparaît plus jamais ensuite.
+
 ### Navigation / HUD
 - [ ] Logo en haut à gauche (`AppLogo` dans `renderHeader`) : le clic ouvre `AcademySwitcherModal` (slider Academy I ↔ II), mais seulement dans le lobby (`renderHeader(false,...)` a le onClick, `renderHeader(true)` en mode "minimal" utilisé ailleurs le désactive) — le rendre cliquable dans tous les modes/écrans, pas que le hall.
 - [ ] Fil d'Ariane sous le logo (`crumbMap`) : afficher aussi "La Forge" (sous-mode standard de la Salle d'Étude) et les autres sous-modes (Rafale, Déchiffrement) quand on y est, comme c'est déjà fait pour Ranked/Épreuve/Rituel.

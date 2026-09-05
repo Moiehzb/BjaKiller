@@ -960,6 +960,18 @@ const css = `
   .gcrev { position:absolute; bottom:18px; left:50%; transform:translateX(-50%); background:rgba(201,162,75,.12); border:1px solid ${G.borderGold}; border-radius:8px; padding:5px 14px; font-size:13px; color:${G.gold}; white-space:nowrap; }
   .gpaused { position:absolute; inset:0; background:rgba(0,0,0,.65); backdrop-filter:blur(8px); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; }
 
+  /* Quiz answers — barre de réponse ancrée, détachée du bord bas */
+  .qz-ans { display:flex; gap:11px; padding:15px 16px calc(24px + env(safe-area-inset-bottom,0px)); border-top:1px solid ${G.border}; background:linear-gradient(to top,rgba(0,0,0,.30),rgba(0,0,0,0)); }
+  .qz-btn { flex:1; display:flex; align-items:center; justify-content:center; height:66px; border-radius:15px; border:1.5px solid ${G.border}; background:${G.bgPanel}; font-family:'Cinzel',serif; font-size:30px; font-weight:700; cursor:pointer; transition:transform .12s ease, background .14s, border-color .14s, box-shadow .14s; -webkit-tap-highlight-color:transparent; box-shadow:inset 0 1px 0 rgba(255,255,255,.04); }
+  .qz-btn:active:not(:disabled) { transform:scale(.95); }
+  .qz-btn:disabled { opacity:.32; cursor:default; }
+  .qz-btn.neg { border-color:rgba(192,57,43,.42); background:linear-gradient(180deg,rgba(192,57,43,.15),rgba(192,57,43,.05)); color:${G.red}; }
+  .qz-btn.neg:hover:not(:disabled) { border-color:${G.red}; box-shadow:0 0 20px rgba(192,57,43,.18); }
+  .qz-btn.zer { border-color:${G.border}; background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.015)); color:${G.textPrimary}; }
+  .qz-btn.zer:hover:not(:disabled) { border-color:${G.textMuted}; box-shadow:0 0 20px rgba(255,255,255,.06); }
+  .qz-btn.pos { border-color:rgba(45,212,191,.40); background:linear-gradient(180deg,rgba(45,212,191,.14),rgba(45,212,191,.04)); color:${G.teal}; }
+  .qz-btn.pos:hover:not(:disabled) { border-color:${G.teal}; box-shadow:0 0 20px rgba(45,212,191,.16); }
+
   /* Countdown */
   .cdwn { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; }
   .cdnum { font-family:'Cinzel',serif; font-size:88px; font-weight:700; line-height:1;
@@ -4072,21 +4084,12 @@ export default function EliteCounter() {
             )}
           </div>
 
-          {/* Quiz answer buttons — remontés du bord bas (évite le geste "accueil" sur mobile) */}
+          {/* Quiz answer buttons — barre de réponse ancrée, détachée du bord bas (évite le geste "accueil" sur mobile) */}
           {isQuizPlaying && gameState === 'playing' && (
-            <div style={{ padding: '12px 16px calc(34px + env(safe-area-inset-bottom, 0px))', display: 'flex', gap: 10 }}>
-              <button onClick={() => answerQuiz(-1)} disabled={!!quizResult}
-                style={{ flex: 1, padding: '14px 0', borderRadius: 10, border: `1px solid rgba(192,57,43,.4)`, background: 'rgba(192,57,43,.1)', color: G.red, cursor: quizResult ? 'default' : 'pointer', fontSize: 15, fontWeight: 700, fontFamily: 'Cinzel, serif', opacity: quizResult ? 0.4 : 1 }}>
-                −1
-              </button>
-              <button onClick={() => answerQuiz(0)} disabled={!!quizResult}
-                style={{ flex: 1, padding: '14px 0', borderRadius: 10, border: `1px solid ${G.border}`, background: 'rgba(255,255,255,.05)', color: G.textSecondary, cursor: quizResult ? 'default' : 'pointer', fontSize: 15, fontWeight: 700, fontFamily: 'Cinzel, serif', opacity: quizResult ? 0.4 : 1 }}>
-                0
-              </button>
-              <button onClick={() => answerQuiz(1)} disabled={!!quizResult}
-                style={{ flex: 1, padding: '14px 0', borderRadius: 10, border: `1px solid rgba(45,212,191,.4)`, background: 'rgba(45,212,191,.08)', color: G.teal, cursor: quizResult ? 'default' : 'pointer', fontSize: 15, fontWeight: 700, fontFamily: 'Cinzel, serif', opacity: quizResult ? 0.4 : 1 }}>
-                +1
-              </button>
+            <div className="qz-ans">
+              <button className="qz-btn neg" onClick={() => answerQuiz(-1)} disabled={!!quizResult}>−1</button>
+              <button className="qz-btn zer" onClick={() => answerQuiz(0)} disabled={!!quizResult}>0</button>
+              <button className="qz-btn pos" onClick={() => answerQuiz(1)} disabled={!!quizResult}>+1</button>
             </div>
           )}
         </div>
