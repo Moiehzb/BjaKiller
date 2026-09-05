@@ -7,6 +7,31 @@
 
 - [ ] **Tester l'accès mémoire** : essayer d'écrire dans `C:\Users\PC1\.claude\projects\D--CLAUDE-CODE-CS-CODE-blackjack-academy-I\memory\`. Si ça marche → sauvegarder l'URL de la politique de conf (`https://moiehzb.github.io/BjaKiller/privacy.html`). Si ça échoue → les règles allow n'ont pas overridé les deny, il faudra retravailler les permissions.
 
+## 🎯 Retours UI/Gameplay — session 05/09/2026 (à faire)
+
+### Tuto
+- [ ] "Identification — carte par carte" : quand le joueur se trompe, la ligne qui montre les valeurs des cartes doit briller/clignoter un court instant pour attirer l'œil dessus.
+- [ ] Slide 2 "Le système Hi-Lo" : supprimer le bloc "intuition" (pas compréhensible, la plupart des gens ne regardent que les images).
+- [ ] Slide "Compte courant" : supprimer le bloc "la méthode" (même raison).
+- [ ] Slide "Les trois Voies" : beaucoup trop de texte pour ce que ça apporte — réduire à l'essentiel.
+- [ ] Slide "Le déchiffrement" : la zone de saisie de la valeur (+1/0/−1) est trop basse sur l'écran — sur mobile ça fait cliquer par erreur le bouton maison du téléphone, remonter/repositionner. Aussi : quand la réponse est bonne, le passage à la carte suivante doit être plus rapide (actuellement trop lent).
+
+### Navigation / HUD
+- [ ] Logo en haut à gauche (`AppLogo` dans `renderHeader`) : le clic ouvre `AcademySwitcherModal` (slider Academy I ↔ II), mais seulement dans le lobby (`renderHeader(false,...)` a le onClick, `renderHeader(true)` en mode "minimal" utilisé ailleurs le désactive) — le rendre cliquable dans tous les modes/écrans, pas que le hall.
+- [ ] Fil d'Ariane sous le logo (`crumbMap`) : afficher aussi "La Forge" (sous-mode standard de la Salle d'Étude) et les autres sous-modes (Rafale, Déchiffrement) quand on y est, comme c'est déjà fait pour Ranked/Épreuve/Rituel.
+- [ ] HUD en haut à droite (rang actuel, pièces d'or, langue, accès tuto) : disparaît hors du lobby (`renderHeader` en mode `minimal`, et `renderCrumbs()` qui ne montre les boutons tuto/langue que si `nav === 'lobby'`) — il doit rester visible dans tous les modes (Salle d'Étude, Ranked, etc.).
+- [ ] Le texte "Le Hall" du fil d'Ariane doit être cliquable comme raccourci "retour à l'accueil" (`setNav('lobby')`), utilisable depuis n'importe quel mode — comme un bouton maison.
+
+### Hauts Faits (achievements)
+- [ ] Afficher la récompense de chaque haut fait dans la liste des Hauts Faits (actuellement invisible dans l'UI).
+- [ ] Nouveau haut fait "Le Test Avancé" : réussir La Rafale (mode speedrun) en 2 decks / 50 % pénétration en moins de 25 secondes.
+
+### Rituel du jour (défi quotidien)
+- [ ] Revoir le système de streak (`save.daily`) : si le joueur ne joue pas un jour, il perd la série — MAIS peut la récupérer en réussissant 2 Rituels du jour le lendemain de la perte (jour J+1 après une série perdue = droit à 2 tentatives ce jour-là pour la reconstituer). Si plus de 2 jours sans jouer, la série est perdue définitivement, sans rattrapage possible.
+
+### MMR
+- [ ] Revoir le système de MMR (`RANKS_DEF`, champs `mmrPerWin`/`mmrPerLoss`, actuellement fixes à +20/−15 pour tous les rangs) : le rendre variable selon le rang — très facile de monter en début de ladder (Cuivre, sans exagérer non plus) et de plus en plus strict vers la fin (Adamantium), où il ne faut presque plus se tromper pour progresser.
+
 ## 🛠️ Features en attente (backlog)
 
 ### Assets Play Store (à préparer avant soumission)
