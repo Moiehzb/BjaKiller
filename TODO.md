@@ -19,9 +19,6 @@
 - [x] ~~Afficher la récompense de chaque haut fait dans la liste des Hauts Faits~~ → fait (voir ✅ Fait).
 - [x] ~~Nouveau haut fait "Le Test Avancé"~~ → fait (voir ✅ Fait).
 
-### Rituel du jour (défi quotidien)
-- [ ] Revoir le système de streak (`save.daily`) : si le joueur ne joue pas un jour, il perd la série — MAIS peut la récupérer en réussissant 2 Rituels du jour le lendemain de la perte (jour J+1 après une série perdue = droit à 2 tentatives ce jour-là pour la reconstituer). Si plus de 2 jours sans jouer, la série est perdue définitivement, sans rattrapage possible.
-
 ### MMR
 - [ ] Revoir le système de MMR (`RANKS_DEF`, champs `mmrPerWin`/`mmrPerLoss`, actuellement fixes à +20/−15 pour tous les rangs) : le rendre variable selon le rang — très facile de monter en début de ladder (Cuivre, sans exagérer non plus) et de plus en plus strict vers la fin (Adamantium), où il ne faut presque plus se tromper pour progresser.
 
@@ -56,6 +53,13 @@ Le code du paywall est branché (Play Billing). Les achats ne marchent **que** v
 - [ ] App 2 séparée : mode table réaliste style Card Counter Lite
 
 ## ✅ Fait
+
+- [x] **Rituel du jour — rattrapage de série (2026-09-05)** *(implémenté + build OK, à vérifier au retour)*
+  - **Écart d'1 jour** (joue tous les jours) : inchangé, 1 tentative, gagne → série +1, perd → série à 0.
+  - **Écart de 2 jours** (1 jour sauté) : jour de rattrapage — **2 tentatives** ce jour-là pour reconstituer la série (deck différent entre les 2 essais, config du jour inchangée). Réussite → série reconstituée (+1 depuis la valeur d'avant la coupure) et la 2e tentative n'est plus nécessaire. Échec des 2 → série perdue définitivement.
+  - **Écart de 3 jours ou plus** : série perdue définitivement dès le retour, pas de rattrapage, repart normalement (1 tentative).
+  - Nouveaux champs `save.daily.dayState` (état du jour en cours) + `lastResult.recovered`/`streakLostForGood`. Carte du lobby affiche le nombre de tentatives de rattrapage restantes ; écran de résultat distingue série gardée / reconstituée / menacée (encore 1 essai) / rompue.
+  - i18n : `lobby.dailyCatchupSub`, `lobby.dailyRecovered`, `game.dailyStreakRecovered`, `game.dailyCatchupRetry` — **fr.js uniquement pour l'instant** (à propager aux 13 autres locales après validation).
 
 - [x] **Navigation / HUD — session 05/09/2026 (implémenté + build OK, à vérifier au retour)**
   - **Logo cliquable partout** : `renderHeader` simplifié (plus de mode `minimal`) — le clic sur `AppLogo` ouvre `AcademySwitcherModal` dans tous les écrans (Salle d'Étude, Ranked, L'Épreuve), pas seulement le lobby.

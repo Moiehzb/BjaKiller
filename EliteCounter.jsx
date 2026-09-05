@@ -628,6 +628,36 @@ const mulberry32 = (seed) => () => {
 const dayKey = (d = new Date()) => `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
 // Graine numérique du jour (AAAAMMJJ) — pilote deck + config.
 const daySeed = (d = new Date()) => d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+// Index entier de jour (UTC minuit) à partir d'une clé "AAAA-M-J" — sert à mesurer l'écart en jours.
+const dayIndexFromKey = (key) => {
+  if (!key) return null;
+  const [y, m, d] = key.split('-').map(Number);
+  if (!y || !m || !d) return null;
+  return Math.floor(Date.UTC(y, m - 1, d) / 86400000);
+};
+
+// État du Rituel du jour pour la date `today` : combien de tentatives sont
+// possibles aujourd'hui, et si on est en fenêtre de rattrapage de série.
+// - écart de 1 jour depuis le dernier rituel joué : jour normal, 1 tentative.
+// - écart de 2 jours (1 jour sauté) : rattrapage, 2 tentatives pour reconstituer la série.
+// - écart de 3 jours ou plus : série perdue définitivement, retour à 1 tentative normale.
+const getDailyDayState = (daily, today) => {
+  const d = daily || DEFAULT_SAVE.daily;
+  if (d.dayState && d.dayState.day === today) return d.dayState; // déjà calculé aujourd'hui (2e tentative de rattrapage)
+  const lastIdx = dayIndexFromKey(d.lastKey);
+  const todayIdx = dayIndexFromKey(today);
+  const gap = (lastIdx == null || todayIdx == null) ? null : todayIdx - lastIdx;
+  const priorStreak = d.streak || 0;
+  const permanentLoss = gap !== null && gap >= 3 && priorStreak > 0;
+  const catchup = gap === 2 && priorStreak > 0;
+  return {
+    day: today,
+    attempts: 0,
+    maxAttempts: catchup ? 2 : 1,
+    catchup,
+    streakBeforeToday: permanentLoss ? 0 : priorStreak,
+  };
+};
 
 // Réglages du défi. Jour normal : court (≤ 45 s), un poil plus simple que la
 // ranked du joueur. Jour spécial (tous les 42 jours) : 8 decks mais temps/carte
@@ -1511,10 +1541,12 @@ const DEFAULT_SAVE = {
   // cardsCounted: total de cartes vues à vie (toutes parties confondues)
   stats: { correct: 0, total: 0, bestTime: null, recentResults: [], skinGames: {}, deckStats: {}, modeStats: {}, cardsCounted: 0 },
 
-  // Défi du jour — deck identique pour tous chaque jour, 1 tentative/jour.
-  // lastResult: { key, won, score, error, trueCount, answer, decks }
+  // Défi du jour — deck identique pour tous chaque jour, 1 tentative/jour
+  // (2 en rattrapage de série, voir getDailyDayState).
+  // lastResult: { key, won, score, error, trueCount, answer, decks, recovered, streakLostForGood }
   // history: [{ key, won, score }] (14 derniers jours)
-  daily: { lastKey: '', lastResult: null, streak: 0, bestStreak: 0, bestScore: 0, totalPlayed: 0, totalWon: 0, history: [] },
+  // dayState: { day, attempts, maxAttempts, catchup, streakBeforeToday } — état du jour en cours
+  daily: { lastKey: '', lastResult: null, streak: 0, bestStreak: 0, bestScore: 0, totalPlayed: 0, totalWon: 0, history: [], dayState: null },
   speedrunBestTime: null, // meilleur temps en mode L'Éclair (secondes)
   speedrunBestSpc: null,  // meilleur temps par carte (s/carte) en Rafale, dès 2 decks
 
@@ -1985,12 +2017,16 @@ export default function EliteCounter() {
 
   // ── Défi du jour ────────────────────────────────────────────────
   const startDaily = () => {
-    if (!save || save.daily?.lastKey === dayKey()) return; // déjà joué aujourd'hui
+    if (!save) return;
+    const today = dayKey();
+    const state = getDailyDayState(save.daily, today);
+    if (state.attempts >= state.maxAttempts) return; // plus de tentative aujourd'hui
     const seed = daySeed();
     const cfg = getDailyConfig(seed, save.rankId, save.subRank);
-    // Deck seedé indépendamment de la config (graine dérivée) → déterministe.
-    const deck = buildDeck(cfg.decks, cfg.penetration, mulberry32(seed ^ 0x9e3779b9));
-    dailyRef.current = cfg;
+    // Config stable pour la journée ; seul le tirage du deck change entre la
+    // 1re et la 2e tentative de rattrapage (sinon même deck = triche mémorisée).
+    const deck = buildDeck(cfg.decks, cfg.penetration, mulberry32(seed ^ 0x9e3779b9 ^ (state.attempts * 0x2545f491)));
+    dailyRef.current = { ...cfg, dayState: state };
     gameModeRef.current = 'daily';
     rankUsedRef.current = null;
     setShowCount(false); // compteur toujours caché sur le défi
@@ -2002,11 +2038,22 @@ export default function EliteCounter() {
     const key = dayKey();
     const error = answer - trueCount;
     const score = dailyScore(error);
-    const won = score >= 0; // score négatif (écart ≥ 2) = défi manqué → streak perdue
+    const won = score >= 0; // score négatif (écart ≥ 2) = tentative manquée
     const d = save.daily || DEFAULT_SAVE.daily;
-    const newStreak = won ? (d.streak || 0) + 1 : 0;
+    const state = dailyRef.current?.dayState || getDailyDayState(d, key);
+    const attemptsAfter = state.attempts + 1;
+    const catchupExhausted = state.catchup && attemptsAfter >= state.maxAttempts;
+
+    let newStreak;
+    if (won) newStreak = state.streakBeforeToday + 1; // succès direct, ou série reconstituée en rattrapage
+    else if (state.catchup && !catchupExhausted) newStreak = state.streakBeforeToday; // encore une tentative de rattrapage aujourd'hui
+    else newStreak = 0; // échec normal, ou rattrapage épuisé → série perdue définitivement
+
+    const recovered = won && state.catchup;
+    const streakLostForGood = !won && (catchupExhausted || !state.catchup);
     const coinBonus = won ? 30 + Math.min(newStreak, 10) * 10 : 0; // habitude récompensée, plafonnée
-    const result = { key, won, score, error, trueCount, answer, decks: dailyRef.current?.decks, special: !!dailyRef.current?.special };
+    const result = { key, won, score, error, trueCount, answer, decks: dailyRef.current?.decks, special: !!dailyRef.current?.special, recovered, streakLostForGood, catchupAttemptsLeft: state.maxAttempts - attemptsAfter };
+    const newDayState = { day: key, attempts: won ? state.maxAttempts : attemptsAfter, maxAttempts: state.maxAttempts, catchup: state.catchup, streakBeforeToday: state.streakBeforeToday };
     // patch fonctionnel : cumule les coins par-dessus le patch principal de checkAnswer.
     patchSave(prev => ({
       coins: (prev.coins || 0) + coinBonus,
@@ -2020,6 +2067,7 @@ export default function EliteCounter() {
         totalPlayed: (d.totalPlayed || 0) + 1,
         totalWon: (d.totalWon || 0) + (won ? 1 : 0),
         history: [...(d.history || []).slice(-13), { key, won, score }],
+        dayState: newDayState,
       },
     }));
     if (coinBonus > 0) setEarnedCoins(c => c + coinBonus);
@@ -2690,12 +2738,14 @@ export default function EliteCounter() {
 
           {/* Défi du jour — difficulté calée sur le rang, 1 tentative/jour */}
           {(() => {
-            const dDone = save.daily?.lastKey === dayKey();
+            const dState = getDailyDayState(save.daily, dayKey());
+            const dDone = dState.attempts >= dState.maxAttempts;
             const dStreak = save.daily?.streak || 0;
             const dRes = save.daily?.lastResult;
             const dCfg = getDailyConfig(daySeed(), save.rankId, save.subRank);
             const isSpecial = !dDone && dCfg.special;
             const dailyLocked = !save.placementDone;
+            const catchupLeft = dState.maxAttempts - dState.attempts;
             return (
               <div className="card"
                 onClick={dailyLocked ? undefined : () => { snd(playClick); if (dDone) setShowStats(true); else startDaily(); }}
@@ -2716,8 +2766,10 @@ export default function EliteCounter() {
                       {dailyLocked
                         ? t('lobby.dailyLocked')
                         : dDone
-                          ? (dRes?.won ? t('lobby.dailyDoneWin', { score: dRes.score }) : t('lobby.dailyDoneLoss')) + ' · ' + t('lobby.dailyComeBack')
-                          : t('lobby.dailyReadySub', { decks: dCfg.decks, secs: dCfg.timeLimit })}
+                          ? (dRes?.recovered ? t('lobby.dailyRecovered') : dRes?.won ? t('lobby.dailyDoneWin', { score: dRes.score }) : t('lobby.dailyDoneLoss')) + ' · ' + t('lobby.dailyComeBack')
+                          : dState.catchup
+                            ? t('lobby.dailyCatchupSub', { decks: dCfg.decks, secs: dCfg.timeLimit, left: catchupLeft })
+                            : t('lobby.dailyReadySub', { decks: dCfg.decks, secs: dCfg.timeLimit })}
                     </div>
                   </div>
                 </div>
@@ -4117,7 +4169,13 @@ export default function EliteCounter() {
                             <span style={{ fontFamily: 'Cinzel, serif', fontSize: 22, fontWeight: 700, color: lr.score >= 0 ? G.goldLight : G.red }}>{lr.score}</span>
                           </div>
                           <div style={{ fontSize: 12, color: lr.won ? G.green : G.red, textAlign: 'center', marginBottom: 4 }}>
-                            {lr.won ? t('game.dailyStreakKept', { n: save.daily.streak }) : t('game.dailyStreakLost')}
+                            {lr.recovered
+                              ? t('game.dailyStreakRecovered', { n: save.daily.streak })
+                              : lr.won
+                                ? t('game.dailyStreakKept', { n: save.daily.streak })
+                                : !lr.streakLostForGood
+                                  ? t('game.dailyCatchupRetry')
+                                  : t('game.dailyStreakLost')}
                           </div>
                           <div style={{ fontSize: 11, color: G.textSecondary, textAlign: 'center' }}>{t('game.dailyComeBack')}</div>
                         </div>
