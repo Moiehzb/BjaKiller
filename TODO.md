@@ -16,7 +16,8 @@
 - [x] ~~Nouveau haut fait "Le Test Avancé"~~ → fait (voir ✅ Fait).
 
 ### MMR
-- [ ] Revoir le système de MMR (`RANKS_DEF`, champs `mmrPerWin`/`mmrPerLoss`, actuellement fixes à +20/−15 pour tous les rangs) : le rendre variable selon le rang — très facile de monter en début de ladder (Cuivre, sans exagérer non plus) et de plus en plus strict vers la fin (Adamantium), où il ne faut presque plus se tromper pour progresser.
+- [x] **MMR variable par rang (2026-09-05)** *(implémenté + build OK, à vérifier au retour)* — `mmrPerWin`/`mmrPerLoss` ne sont plus fixes à +20/−15. Courbe « Douce +5 » (seuils conservés) : Cuivre +30/−12 (~29 % de victoires pour monter) → Adamantium +19/−35 (~65 %). Abandon **scalé par rang** (= `mmrPerLoss`, plancher 0, ne relègue jamais) au lieu de −25 fixe. Détails dans ✅ Fait.
+  - ⏳ **À propager après validation** : l'affichage de l'abandon dynamique (`lobby.rankedSub` avec param `abandon`, `rankedConfig.rankedSub` réutilise `loss`) n'est fait qu'en **fr.js** — les 13 autres locales codent encore « −25 » en dur. À corriger lors de la propagation i18n.
 
 ## 🛠️ Features en attente (backlog)
 
@@ -49,6 +50,13 @@ Le code du paywall est branché (Play Billing). Les achats ne marchent **que** v
 - [ ] App 2 séparée : mode table réaliste style Card Counter Lite
 
 ## ✅ Fait
+
+- [x] **MMR variable par rang + abandon scalé (2026-09-05)** *(implémenté + build OK, à vérifier au retour)*
+  - **Avant** : `mmrPerWin`/`mmrPerLoss` fixes à +20/−15 pour les 6 rangs → seuil de progression identique partout (~43 % de victoires).
+  - **Après** : valeurs **variables par rang** dans `RANKS_DEF` — base « Douce » avec **+5 MMR sur chaque victoire** et défaites remontées pour **conserver les mêmes seuils** (seuil = perte / (gain + perte)) : Cuivre +30/−12 (~29 %), Argent +28/−15 (~35 %), Or +26/−17 (~40 %), Émeraude +24/−21 (~47 %), Saphir +21/−28 (~57 %), Adamantium +19/−35 (~65 %). Montée quasi garantie en bas de ladder, exigeante en haut, et **plus rapide qu'avant** (fini le +20 uniforme).
+  - **Abandon scalé par rang** : pénalité d'abandon = `mmrPerLoss` du rang (−12 à Cuivre … −35 à Adamantium) au lieu de −25 fixe. Plancher 0, ne relègue jamais (inchangé). `applyMMRChange`, EliteCounter.jsx.
+  - **Granularité par rang** (pas par sous-rang) : les 3 sous-rangs partagent la même paire ; la logique lisait déjà `rank.mmrPerWin/Loss`, aucune table supplémentaire.
+  - **i18n (fr.js only)** : `lobby.rankedSub` (nouveau param `abandon`) et `rankedConfig.rankedSub` (réutilise `loss`) affichent l'abandon dynamique. Les 13 autres locales codent encore « −25 » → à propager après validation.
 
 - [x] **Accès mémoire testé (2026-09-05)** — écriture confirmée dans `C:\Users\PC1\.claude\projects\D--CLAUDE-CODE-CS-CODE-blackjack-academy-I\memory\` (les règles allow overrident bien les deny). URL de la politique de confidentialité sauvegardée en mémoire (`reference_privacy_policy.md`).
 

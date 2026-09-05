@@ -80,7 +80,7 @@ const fr = {
     rankedLocked: 'Scellé — achève d\'abord une séance en Salle d\'Étude',
     rankedPlacementSub: ({ left }) =>
       `${left} partie${s(left)} restante${s(left)} · Abandon = −MMR`,
-    rankedSub: ({ rank, desc }) => `${rank} · ${desc} · Abandon = −25 MMR`,
+    rankedSub: ({ rank, desc, abandon }) => `${rank} · ${desc} · Abandon = ${abandon} MMR`,
     casinoSub: 'Cinq cercles · aucune erreur tolérée',
     casinoLocked: 'Scellé — présente-toi d\'abord aux Portes de la Guilde',
     achievements: 'Hauts Faits',
@@ -246,7 +246,7 @@ const fr = {
       `Partie ${n}/${total} · ${type === 'recovery' ? 'Rattrapage' : 'Porte de la Guilde'}`,
     promoSub: ({ from, to }) => `Une victoire pour passer ${from} → ${to}`,
     rankedSub: ({ rank, win, loss }) =>
-      `${rank} · +${win} MMR · ${loss} MMR · Abandon −25 MMR`,
+      `${rank} · +${win} MMR · ${loss} MMR · Abandon ${loss} MMR`,
     progress: ({ n, total }) => `Progression · ${n}/${total}`,
     decks: 'Decks',
     penetration: 'Pénétration',

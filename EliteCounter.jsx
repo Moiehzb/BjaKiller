@@ -728,17 +728,22 @@ const dailyScore = (error) => 1000 - Math.abs(error) * 501;
 
 // ─── RANK SYSTEM ─────────────────────────────────────────────────
 // Source de vérité par rang : id, name, icon, color, decks, mmrPerWin/Loss.
+// mmrPerWin / mmrPerLoss VARIENT par rang : montée facile en début de ladder
+// (Cuivre +30/−12) et de plus en plus stricte vers la fin (Adamantium +19/−35).
+// Le seuil de progression = perte/(gain+perte) : ~29 % de victoires à Cuivre,
+// ~65 % à Adamantium (calé sur la courbe « Douce », gains +5 plus rapides).
+// L'abandon coûte mmrPerLoss du rang (plancher 0, ne relègue jamais) — cf applyMMRChange.
 // NOTE : penetration / secPerCard / mmrToPromo / desc sont OBSOLÈTES — la pénétration
 // et la vitesse sont désormais dérivées du sous-rang (voir getRankConfig / TIER_SPC).
 // Rangs de la Guilde — noms propres NON traduits (identiques dans toutes les langues).
 // Les emojis-médailles sont remplacés par le sceau SVG <RankSigil color={rank.color} />.
 const RANKS_DEF = [
-  { id: 1, name: 'Cuivre',     color: '#b87333', decks: 1, penetration: 75, secPerCard: 0.80, mmrPerWin: 20, mmrPerLoss: -15, mmrToPromo: 100, desc: '1 deck · 0.80s/carte' },
-  { id: 2, name: 'Argent',     color: '#a8aabc', decks: 2, penetration: 75, secPerCard: 0.70, mmrPerWin: 20, mmrPerLoss: -15, mmrToPromo: 100, desc: '2 decks · 0.70s/carte' },
-  { id: 3, name: 'Or',         color: '#c9a24b', decks: 4, penetration: 75, secPerCard: 0.62, mmrPerWin: 20, mmrPerLoss: -15, mmrToPromo: 100, desc: '4 decks · 0.62s/carte' },
-  { id: 4, name: 'Émeraude',   color: '#2ecc71', decks: 6, penetration: 75, secPerCard: 0.55, mmrPerWin: 20, mmrPerLoss: -15, mmrToPromo: 100, desc: '6 decks · 0.55s/carte' },
-  { id: 5, name: 'Saphir',     color: '#4a7de8', decks: 8, penetration: 80, secPerCard: 0.50, mmrPerWin: 20, mmrPerLoss: -15, mmrToPromo: 100, desc: '8 decks · 0.50s/carte' },
-  { id: 6, name: 'Adamantium', color: '#9b59b6', decks: 8, penetration: 85, secPerCard: 0.45, mmrPerWin: 20, mmrPerLoss: -15, mmrToPromo: null, desc: '8 decks · 0.45s/carte — Rang final' },
+  { id: 1, name: 'Cuivre',     color: '#b87333', decks: 1, penetration: 75, secPerCard: 0.80, mmrPerWin: 30, mmrPerLoss: -12, mmrToPromo: 100, desc: '1 deck · 0.80s/carte' },
+  { id: 2, name: 'Argent',     color: '#a8aabc', decks: 2, penetration: 75, secPerCard: 0.70, mmrPerWin: 28, mmrPerLoss: -15, mmrToPromo: 100, desc: '2 decks · 0.70s/carte' },
+  { id: 3, name: 'Or',         color: '#c9a24b', decks: 4, penetration: 75, secPerCard: 0.62, mmrPerWin: 26, mmrPerLoss: -17, mmrToPromo: 100, desc: '4 decks · 0.62s/carte' },
+  { id: 4, name: 'Émeraude',   color: '#2ecc71', decks: 6, penetration: 75, secPerCard: 0.55, mmrPerWin: 24, mmrPerLoss: -21, mmrToPromo: 100, desc: '6 decks · 0.55s/carte' },
+  { id: 5, name: 'Saphir',     color: '#4a7de8', decks: 8, penetration: 80, secPerCard: 0.50, mmrPerWin: 21, mmrPerLoss: -28, mmrToPromo: 100, desc: '8 decks · 0.50s/carte' },
+  { id: 6, name: 'Adamantium', color: '#9b59b6', decks: 8, penetration: 85, secPerCard: 0.45, mmrPerWin: 19, mmrPerLoss: -35, mmrToPromo: null, desc: '8 decks · 0.45s/carte — Rang final' },
 ];
 
 // Les noms de rangs restent en français (noms propres, identiques partout).
@@ -2239,7 +2244,7 @@ export default function EliteCounter() {
     // Promotion  : 100 MMR atteint après une victoire → palier+1, on arrive à 10 MMR.
     // Défaite >0 : MMR descend (plancher 0), pas de relégation.
     // Défaite à 0: relégation palier−1 → on arrive à 100 MMR (puis ça redescend normalement).
-    // Abandon    : pénalité sèche −25 MMR, ne relègue jamais.
+    // Abandon    : pénalité = mmrPerLoss du rang (plancher 0), ne relègue jamais.
     const tier = tierIndex(save.rankId, save.subRank);
 
     if (won && !abandon) {
@@ -2255,8 +2260,8 @@ export default function EliteCounter() {
         setMmrDelta(rank.mmrPerWin);
       }
     } else if (abandon) {
-      patchSave({ mmr: Math.max(0, save.mmr - 25) });
-      setMmrDelta(-25);
+      patchSave({ mmr: Math.max(0, save.mmr + rank.mmrPerLoss) });
+      setMmrDelta(rank.mmrPerLoss);
     } else if (save.mmr === 0) {
       // Défaite à 0 → relégation (sauf si déjà Cuivre I, plancher absolu).
       if (tier <= 0) {
@@ -2810,7 +2815,7 @@ export default function EliteCounter() {
                     ? t('lobby.rankedLocked')
                     : !save.placementDone
                       ? t('lobby.rankedPlacementSub', { left: PLACEMENT_TOTAL - save.placementGames })
-                      : t('lobby.rankedSub', { rank: rankLabel(), desc: t('ranks.descShort', { decks: curRankCfg.decks, spc: curRankCfg.secPerCard }) + (isMaxTier ? ' — ' + t('ranks.finalRank') : '') })}
+                      : t('lobby.rankedSub', { rank: rankLabel(), desc: t('ranks.descShort', { decks: curRankCfg.decks, spc: curRankCfg.secPerCard }) + (isMaxTier ? ' — ' + t('ranks.finalRank') : ''), abandon: currentRank.mmrPerLoss })}
                 </div>
               </div>
             </div>
