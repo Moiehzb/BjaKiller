@@ -215,6 +215,9 @@ const ar = {
     deckLabel: ({ n }) => `${n} رزمة`,
     cardsCounted: 'أوراق مَعدودة',
     byModeTitle: 'الألعاب حسب المسار',
+    speedrunRecord: 'سجل السرعة',
+    speedrunRecordSub: 'العاصفة · أفضل وقت لكل ورقة (من رزمتين)',
+    speedrunRecordUnit: 'ث/ورقة',
   },
 
   settings: {

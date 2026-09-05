@@ -216,6 +216,9 @@ const mn = {
     deckLabel: ({ n }) => `${n} дэк`,
     cardsCounted: 'Тоологдсон картууд',
     byModeTitle: 'Замаар тоглоом',
+    speedrunRecord: 'Хурдны рекорд',
+    speedrunRecordSub: 'Шуурга · картад ногдох шилдэг хугацаа (2 дэкээс)',
+    speedrunRecordUnit: 'с/карт',
   },
 
   settings: {

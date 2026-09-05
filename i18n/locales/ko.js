@@ -216,6 +216,9 @@ const ko = {
     deckLabel: ({ n }) => `${n}덱`,
     cardsCounted: '계산한 카드',
     byModeTitle: '경로별 게임 수',
+    speedrunRecord: '속도 기록',
+    speedrunRecordSub: '폭풍 · 카드당 최고 기록 (2덱 이상)',
+    speedrunRecordUnit: '초/장',
   },
 
   settings: {

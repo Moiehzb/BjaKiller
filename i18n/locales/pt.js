@@ -216,6 +216,9 @@ const pt = {
     deckLabel: ({ n }) => `${n} baralho${s(n)}`,
     cardsCounted: 'Cartas contadas',
     byModeTitle: 'Partidas por caminho',
+    speedrunRecord: 'Recorde de velocidade',
+    speedrunRecordSub: 'A Tempestade · melhor tempo por carta (a partir de 2 baralhos)',
+    speedrunRecordUnit: 's/carta',
   },
 
   settings: {

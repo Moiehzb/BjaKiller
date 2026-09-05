@@ -216,6 +216,9 @@ const sq = {
     deckLabel: ({ n }) => `${n} dek`,
     cardsCounted: 'Karta të numëruara',
     byModeTitle: 'Lojëra sipas rrugës',
+    speedrunRecord: 'Rekord shpejtësie',
+    speedrunRecordSub: 'Stuhia · koha më e mirë për kartë (nga 2 dek)',
+    speedrunRecordUnit: 's/kartë',
   },
 
   settings: {

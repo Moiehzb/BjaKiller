@@ -42,7 +42,8 @@
       "PowerShell($bytes = New-Object byte[] 18; [Security.Cryptography.RNGCryptoServiceProvider]::Create\\(\\).GetBytes\\($bytes\\); [Convert]::ToBase64String\\($bytes\\) -replace '[+/=]', 'x')",
       "Bash(npm run *)",
       "Read(//tmp/**)",
-      "PowerShell($c = Get-NetTCPConnection -LocalPort 5175 -State Listen -ErrorAction SilentlyContinue; if \\($c\\) { Stop-Process -Id $c.OwningProcess -Force; \"stopped PID $\\($c.OwningProcess\\)\" } else { \"no listener on 5175\" })"
+      "PowerShell($c = Get-NetTCPConnection -LocalPort 5175 -State Listen -ErrorAction SilentlyContinue; if \\($c\\) { Stop-Process -Id $c.OwningProcess -Force; \"stopped PID $\\($c.OwningProcess\\)\" } else { \"no listener on 5175\" })",
+      "Bash(grep -v \"^.*//\")"
     ],
     "defaultMode": "default"
   },

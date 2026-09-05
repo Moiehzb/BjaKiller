@@ -216,6 +216,9 @@ const hi = {
     deckLabel: ({ n }) => `${n} डेक`,
     cardsCounted: 'गिने गए पत्ते',
     byModeTitle: 'मार्ग द्वारा खेल',
+    speedrunRecord: 'गति रिकॉर्ड',
+    speedrunRecordSub: 'तूफ़ान · प्रति पत्ता सर्वश्रेष्ठ समय (2 डेक से)',
+    speedrunRecordUnit: 'से/पत्ता',
   },
 
   settings: {

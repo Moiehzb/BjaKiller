@@ -216,6 +216,9 @@ const es = {
     deckLabel: ({ n }) => `${n} mazo${n > 1 ? 's' : ''}`,
     cardsCounted: 'Cartas contadas',
     byModeTitle: 'Partidas por vía',
+    speedrunRecord: 'Récord de velocidad',
+    speedrunRecordSub: 'La Tempestad · mejor tiempo por carta (desde 2 mazos)',
+    speedrunRecordUnit: 's/carta',
   },
 
   settings: {

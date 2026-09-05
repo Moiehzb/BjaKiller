@@ -216,6 +216,9 @@ const ja = {
     deckLabel: ({ n }) => `${n}デッキ`,
     cardsCounted: 'カウント枚数',
     byModeTitle: '道別ゲーム数',
+    speedrunRecord: 'スピード記録',
+    speedrunRecordSub: '嵐 · 1枚あたりのベストタイム（2デッキ以上）',
+    speedrunRecordUnit: '秒/枚',
   },
 
   settings: {

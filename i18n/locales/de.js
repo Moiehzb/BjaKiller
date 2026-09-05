@@ -218,6 +218,9 @@ const de = {
     deckLabel: ({ n }) => `${n} Deck${n > 1 ? 's' : ''}`,
     cardsCounted: 'Gezählte Karten',
     byModeTitle: 'Spiele nach Pfad',
+    speedrunRecord: 'Geschwindigkeitsrekord',
+    speedrunRecordSub: 'Der Sturm · beste Zeit pro Karte (ab 2 Decks)',
+    speedrunRecordUnit: 's/Karte',
   },
 
   settings: {

@@ -216,6 +216,9 @@ const zh = {
     deckLabel: ({ n }) => `${n}副牌`,
     cardsCounted: '已计牌数',
     byModeTitle: '各道路对局数',
+    speedrunRecord: '速度记录',
+    speedrunRecordSub: '风暴 · 每张牌最佳时间（2副牌起）',
+    speedrunRecordUnit: '秒/张',
   },
 
   settings: {

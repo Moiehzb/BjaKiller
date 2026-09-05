@@ -241,6 +241,9 @@ const ru = {
     deckLabel: ({ n }) => `${n} ${decks(n)}`,
     cardsCounted: 'Подсчитано карт',
     byModeTitle: 'Игры по путям',
+    speedrunRecord: 'Рекорд скорости',
+    speedrunRecordSub: 'Буря · лучшее время на карту (от 2 колод)',
+    speedrunRecordUnit: 'с/карта',
   },
 
   settings: {
