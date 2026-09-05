@@ -119,8 +119,8 @@ const fr = {
   badgeModal: {
     seal: 'Sceau de la Guilde',
     title: 'Compteur Certifié',
-    body: ({ count }) => `Ce sceau atteste de ta valeur devant la Guilde. ${count} Haut${count > 1 ? 's' : ''} Fait${count > 1 ? 's' : ''} scellé${count > 1 ? 's' : ''} à ton nom — porte-le, il te distingue des simples joueurs.`,
-    latestLabel: 'Dernier Haut Fait',
+    body: 'Ce sceau distingue les rares compteurs qui ont maîtrisé La Rafale. Tu l\'as obtenu en réussissant Le Test Avancé — il te distingue des simples joueurs.',
+    latestLabel: 'Obtenu grâce à',
     cta: 'Voir mes Hauts Faits',
   },
 

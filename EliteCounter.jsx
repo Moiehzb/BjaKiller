@@ -549,15 +549,6 @@ const CHALLENGES = [
     check: (ctx) => ctx.won && ctx.mode !== 'speedrun' && ctx.mode !== 'daily' && ctx.decks === 2 && ctx.penetration === 50 && ctx.spc <= 0.45 && !ctx.countWasShown,
   },
   {
-    id: 'advanced_test',
-    name: 'Le Test Avancé',
-    desc: 'La Rafale · 2 decks · 50% pén. · moins de 25s — compteur scellé',
-    icon: '🎖️', coins: 500,
-    // Réservé au mode La Rafale (speedrun). 52 cartes = 2 decks à 50% de pénétration.
-    // (En speedrun, decks/pen ne sont pas fiables dans ctx — on teste le nb de cartes.)
-    check: (ctx) => ctx.won && ctx.mode === 'speedrun' && ctx.cards === 52 && ctx.speedrunTime <= 25 && !ctx.countWasShown,
-  },
-  {
     id: 'the_wall',
     name: 'The Wall',
     desc: '6 decks — 90%+ pénétration — 0.50s/carte ou moins — compteur caché',
@@ -592,6 +583,17 @@ const CHALLENGES = [
     desc: 'Terminer le Run en entier',
     icon: '🎰', coins: 2500,
     check: (ctx) => ctx.casinoChallengeComplete,
+  },
+  {
+    // Placé en dernier (juste avant le secret « ??? ») car sa récompense est spéciale :
+    // pas d'or, mais LE Sceau du Compteur Certifié (le badge). Voir renderHeader.
+    id: 'advanced_test',
+    name: 'Le Test Avancé',
+    desc: 'La Rafale · 2 decks · 50% pén. · moins de 25s — compteur scellé',
+    icon: '🎖️', coins: 0,
+    // Réservé au mode La Rafale (speedrun). 52 cartes = 2 decks à 50% de pénétration.
+    // (En speedrun, decks/pen ne sont pas fiables dans ctx — on teste le nb de cartes.)
+    check: (ctx) => ctx.won && ctx.mode === 'speedrun' && ctx.cards === 52 && ctx.speedrunTime <= 25 && !ctx.countWasShown,
   },
 ];
 
@@ -2425,13 +2427,10 @@ export default function EliteCounter() {
     setCasinoActive(false);
     setGameState('idle');
     setQuizResult(null);
-    // After a training game, return to the sub-mode picker (not lobby)
-    if (nav === 'game' && ['training', 'speedrun', 'quiz'].includes(gameModeRef.current)) {
-      setTrainSubMode(null);
-      setNav('mode-training');
-    } else {
-      setNav('lobby');
-    }
+    // « Menu » ramène toujours au Hall (lobby), y compris après une partie de la
+    // Salle d'Étude — on réinitialise juste le sous-mode pour repartir propre.
+    setTrainSubMode(null);
+    setNav('lobby');
     flushPendingAchievements();
   };
 
@@ -2537,7 +2536,7 @@ export default function EliteCounter() {
         </div>
         {!minimal && (
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            {(save.unlockedAchievements || []).length > 0 && (
+            {(save.unlockedAchievements || []).includes('advanced_test') && (
               <button className="certbadge" title={t('badgeModal.title')} aria-label={t('badgeModal.title')}
                 onClick={() => { snd(playClick); setShowBadgeModal(true); }}>
                 <CertifiedSeal size={22} glow={false} />
@@ -2784,7 +2783,11 @@ export default function EliteCounter() {
                       <div style={{ fontSize: 11, color: G.textSecondary }}>{t('challenges.' + ch.id + '.desc')}</div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 4 }}>
                         <span style={{ fontSize: 9.5, color: G.textMuted, textTransform: 'uppercase', letterSpacing: '.09em' }}>{t('achievementsModal.reward')}</span>
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontSize: 11.5, fontWeight: 700, color: G.gold }}><Coin size={11} /> {ch.coins}</span>
+                        {ch.id === 'advanced_test' ? (
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11.5, fontWeight: 700, color: G.gold }}><CertifiedSeal size={13} glow={false} /> {t('badgeModal.seal')}</span>
+                        ) : (
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontSize: 11.5, fontWeight: 700, color: G.gold }}><Coin size={11} /> {ch.coins}</span>
+                        )}
                       </div>
                     </div>
                     {done && <span style={{ color: G.green, fontSize: 16 }}>✓</span>}
@@ -2814,10 +2817,7 @@ export default function EliteCounter() {
           </div>
         )}
 
-        {showBadgeModal && (() => {
-          const unlocked = save.unlockedAchievements || [];
-          const latestId = unlocked[unlocked.length - 1];
-          return (
+        {showBadgeModal && (
             <div className="moverlay" onClick={() => setShowBadgeModal(false)}>
               <div className="mdl" onClick={e => e.stopPropagation()}>
                 <div className="mhndl" />
@@ -2825,13 +2825,11 @@ export default function EliteCounter() {
                   <CertifiedSeal size={66} />
                   <div style={{ fontSize: 10, letterSpacing: '.18em', textTransform: 'uppercase', color: G.textMuted, marginTop: 12 }}>{t('badgeModal.seal')}</div>
                   <div className="mtitle" style={{ marginTop: 4 }}>{t('badgeModal.title')}</div>
-                  <div style={{ fontSize: 13, color: G.textSecondary, lineHeight: 1.6, marginTop: 8, maxWidth: 340 }}>{t('badgeModal.body', { count: unlocked.length })}</div>
-                  {latestId && (
-                    <div style={{ marginTop: 15, padding: '10px 14px', background: 'rgba(201,162,75,.08)', border: `1px solid ${G.borderGold}`, borderRadius: 12, width: '100%', maxWidth: 340 }}>
-                      <div style={{ fontSize: 9.5, letterSpacing: '.1em', textTransform: 'uppercase', color: G.textMuted, marginBottom: 3 }}>{t('badgeModal.latestLabel')}</div>
-                      <div style={{ fontFamily: 'Cinzel, serif', fontSize: 15, fontWeight: 700, color: G.gold }}>{achName(latestId)}</div>
-                    </div>
-                  )}
+                  <div style={{ fontSize: 13, color: G.textSecondary, lineHeight: 1.6, marginTop: 8, maxWidth: 340 }}>{t('badgeModal.body', { count: (save.unlockedAchievements || []).length })}</div>
+                  <div style={{ marginTop: 15, padding: '10px 14px', background: 'rgba(201,162,75,.08)', border: `1px solid ${G.borderGold}`, borderRadius: 12, width: '100%', maxWidth: 340 }}>
+                    <div style={{ fontSize: 9.5, letterSpacing: '.1em', textTransform: 'uppercase', color: G.textMuted, marginBottom: 3 }}>{t('badgeModal.latestLabel')}</div>
+                    <div style={{ fontFamily: 'Cinzel, serif', fontSize: 15, fontWeight: 700, color: G.gold }}>{achName('advanced_test')}</div>
+                  </div>
                   <button className="lbtn" style={{ marginTop: 18, width: '100%', maxWidth: 340 }}
                     onClick={() => { snd(playClick); setShowBadgeModal(false); setShowChallenges(true); }}>
                     {t('badgeModal.cta')}
@@ -2839,8 +2837,7 @@ export default function EliteCounter() {
                 </div>
               </div>
             </div>
-          );
-        })()}
+        )}
 
         {showPlacementHistory && (
           <div className="moverlay" onClick={() => setShowPlacementHistory(false)}>
