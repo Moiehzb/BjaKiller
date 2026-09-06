@@ -3480,7 +3480,7 @@ export default function EliteCounter() {
               <div style={{ padding: '14px 0', borderBottom: `1px solid ${G.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: G.textPrimary, fontSize: 13 }}>
                   <ScrollText size={15} color={G.gold} />
-                  <span>{t('header.tuto')}</span>
+                  <span>{t('settings.tutorialReplay')}</span>
                 </div>
                 <button onClick={() => { snd(playClick); setShowSettings(false); setShowTutorialReplay(true); }}
                   style={{ padding: '6px 14px', background: 'rgba(201,162,75,.15)', border: `1px solid ${G.borderGold}`, borderRadius: 6, color: G.gold, cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>

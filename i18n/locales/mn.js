@@ -226,6 +226,7 @@ const mn = {
 
   settings: {
     title: 'Скрипториум',
+    tutorialReplay: 'Зааварчилгааг дахин үзэх',
     sound: 'Дуу',
     music: "Хөгжим",
     haptics: "Чичиргээ",

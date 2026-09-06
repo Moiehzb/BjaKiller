@@ -228,6 +228,7 @@ const de = {
 
   settings: {
     title: 'Skriptorium',
+    tutorialReplay: 'Tutorial wiederholen',
     sound: 'Klang',
     music: "Musik",
     haptics: "Vibration",

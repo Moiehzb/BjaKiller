@@ -226,6 +226,7 @@ const ko = {
 
   settings: {
     title: '필경실',
+    tutorialReplay: '튜토리얼 다시 보기',
     sound: '소리',
     music: "음악",
     haptics: "진동",

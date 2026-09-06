@@ -225,6 +225,7 @@ const ar = {
 
   settings: {
     title: 'السكريبتوريوم',
+    tutorialReplay: 'إعادة تشغيل الدليل التعليمي',
     sound: 'الصوت',
     music: "الموسيقى",
     haptics: "الاهتزاز",

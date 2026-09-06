@@ -226,6 +226,7 @@ const pt = {
 
   settings: {
     title: 'Scriptorium',
+    tutorialReplay: 'Repetir o tutorial',
     sound: 'Som',
     music: "Música",
     haptics: "Vibração",

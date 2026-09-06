@@ -226,6 +226,7 @@ const zh = {
 
   settings: {
     title: '典籍室',
+    tutorialReplay: '重播教程',
     sound: '音效',
     music: "音乐",
     haptics: "振动",

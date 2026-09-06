@@ -226,6 +226,7 @@ const hi = {
 
   settings: {
     title: 'लिपिकागार',
+    tutorialReplay: 'ट्यूटोरियल फिर से चलाएं',
     sound: 'ध्वनि',
     music: "संगीत",
     haptics: "कंपन",

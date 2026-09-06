@@ -226,6 +226,7 @@ const sq = {
 
   settings: {
     title: 'Skriptorium',
+    tutorialReplay: 'Rishiko tutorialin',
     sound: 'Zë',
     music: "Muzika",
     haptics: "Dridhje",

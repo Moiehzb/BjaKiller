@@ -226,6 +226,7 @@ const fr = {
 
   settings: {
     title: 'Scriptorium',
+    tutorialReplay: 'Rejouer le tutoriel',
     sound: 'Sons',
     music: "Musique",
     haptics: 'Vibrations',

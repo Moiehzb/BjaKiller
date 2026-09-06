@@ -226,6 +226,7 @@ const ja = {
 
   settings: {
     title: '典籍室',
+    tutorialReplay: 'チュートリアルを再生',
     sound: '音',
     music: "音楽",
     haptics: "振動",

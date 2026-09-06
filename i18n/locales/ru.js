@@ -251,6 +251,7 @@ const ru = {
 
   settings: {
     title: 'Скрипторий',
+    tutorialReplay: 'Повторить обучение',
     sound: 'Звук',
     music: "Музыка",
     haptics: "Вибрация",
