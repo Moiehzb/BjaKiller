@@ -2627,8 +2627,10 @@ export default function EliteCounter() {
               <CertifiedSeal size={22} glow={false} />
             </button>
           )}
-          <div className="pill" style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }} onClick={() => { snd(playClick); setShowRankLadder(true); }}><RankSigil color={displayRank.color} size={13} /> {displayRank.name}</div>
-          <div className="pill" style={{ display: 'flex', alignItems: 'center', gap: 5 }}><Coin size={13} /> {save.coins}</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'flex-end' }}>
+            <div className="pill" style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }} onClick={() => { snd(playClick); setShowRankLadder(true); }}><RankSigil color={displayRank.color} size={13} /> {displayRank.name}</div>
+            <div className="pill" style={{ display: 'flex', alignItems: 'center', gap: 5 }}><Coin size={13} /> {save.coins}</div>
+          </div>
         </div>
       </div>
     </div>
@@ -2659,17 +2661,6 @@ export default function EliteCounter() {
             </React.Fragment>
           );
         })}
-        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-          <button onClick={() => { snd(playClick); setShowTutorialReplay(true); }} title={t('header.tuto')}
-            style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,.06)', border: `1px solid ${G.border}`, borderRadius: 6, padding: '4px 10px', cursor: 'pointer', color: G.textSecondary, fontSize: 11, fontWeight: 600, letterSpacing: '.04em' }}>
-            {t('header.tuto')}
-          </button>
-          <button onClick={() => { snd(playClick); setShowLangModal(true); }} title={t('header.language')}
-            style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,.06)', border: `1px solid ${G.border}`, borderRadius: 6, padding: '4px 9px', cursor: 'pointer', color: G.textSecondary }}>
-            <Globe size={12} />
-            <Flag code={lang} size={18} />
-          </button>
-        </div>
       </div>
     );
   };
@@ -3476,6 +3467,26 @@ export default function EliteCounter() {
             <div className="mdl" onClick={e => e.stopPropagation()}>
               <div className="mhndl" />
               <div className="mtitle">{t('settings.title')}</div>
+              <div style={{ padding: '14px 0', borderBottom: `1px solid ${G.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: G.textPrimary, fontSize: 13 }}>
+                  <Globe size={15} color={G.gold} />
+                  <span>{t('header.language')}</span>
+                </div>
+                <button onClick={() => { snd(playClick); setShowSettings(false); setShowLangModal(true); }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,.05)', border: `1px solid ${G.border}`, borderRadius: 6, padding: '5px 10px', cursor: 'pointer', color: G.textSecondary }}>
+                  <Flag code={lang} size={16} />
+                </button>
+              </div>
+              <div style={{ padding: '14px 0', borderBottom: `1px solid ${G.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: G.textPrimary, fontSize: 13 }}>
+                  <ScrollText size={15} color={G.gold} />
+                  <span>{t('header.tuto')}</span>
+                </div>
+                <button onClick={() => { snd(playClick); setShowSettings(false); setShowTutorialReplay(true); }}
+                  style={{ padding: '6px 14px', background: 'rgba(201,162,75,.15)', border: `1px solid ${G.borderGold}`, borderRadius: 6, color: G.gold, cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>
+                  {t('header.tuto')}
+                </button>
+              </div>
               <div style={{ padding: '14px 0', borderBottom: `1px solid ${G.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: G.textPrimary, fontSize: 13 }}>
                   {save.soundEnabled !== false ? <Volume2 size={15} color={G.gold} /> : <VolumeX size={15} color={G.textSecondary} />}
