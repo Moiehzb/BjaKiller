@@ -2147,6 +2147,20 @@ export default function EliteCounter() {
     }, 1000);
   };
 
+  // ── Resume from paused state (used by training pause + ranked abandon dialog) ──
+  const resumeGame = () => {
+    setGameState('playing');
+    setStartTime(Date.now() - elapsedTime);
+    const tl = timeLimitUsedRef.current;
+    const interval = (tl * 1000) / deck.length;
+    let ci = currentIndex;
+    autoPlayRef.current = setInterval(() => {
+      ci++;
+      if (ci <= deck.length) setCurrentIndex(ci);
+      else clearInterval(autoPlayRef.current);
+    }, interval);
+  };
+
   // ── Toggle pause (training only) ──────────────────────────────
   const togglePause = () => {
     if (gameModeRef.current !== 'training') return; // pause disabled in ranked/placement/promo
@@ -2154,16 +2168,7 @@ export default function EliteCounter() {
       setGameState('paused');
       clearInterval(autoPlayRef.current);
     } else if (gameState === 'paused') {
-      setGameState('playing');
-      setStartTime(Date.now() - elapsedTime);
-      const tl = timeLimitUsedRef.current;
-      const interval = (tl * 1000) / deck.length;
-      let ci = currentIndex;
-      autoPlayRef.current = setInterval(() => {
-        ci++;
-        if (ci <= deck.length) setCurrentIndex(ci);
-        else clearInterval(autoPlayRef.current);
-      }, interval);
+      resumeGame();
     }
   };
 
@@ -4330,7 +4335,7 @@ export default function EliteCounter() {
               </div>
               <div style={{ display: 'flex', gap: 10 }}>
                 <button style={{ flex: 1, padding: '12px 0', background: 'rgba(255,255,255,.05)', border: `1px solid ${G.border}`, borderRadius: 9, color: G.textPrimary, cursor: 'pointer', fontSize: 13, fontWeight: 600 }}
-                  onClick={() => { snd(playClick); setShowAbandon(false); togglePause(); }}>{t('common.continue')}</button>
+                  onClick={() => { snd(playClick); setShowAbandon(false); resumeGame(); }}>{t('common.continue')}</button>
                 <button style={{ flex: 1, padding: '12px 0', background: 'rgba(192,57,43,.15)', border: `1px solid rgba(192,57,43,.4)`, borderRadius: 9, color: G.red, cursor: 'pointer', fontSize: 13, fontWeight: 600 }}
                   onClick={() => { snd(playClick); doAbandon(); }}>{t('game.abandon')}</button>
               </div>

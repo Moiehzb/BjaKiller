@@ -27,6 +27,7 @@
 
 **À faire par Claude après ta validation :**
 - [x] **Bug corrigé (2026-09-06)** : deux affichages oubliés lors du passage à l'abandon scalé codaient encore « −25 » en dur — `rankedConfig.abandonWarn` (texte rouge sous le bouton « Se présenter aux Portes ») et `game.abandonMmr` (popup de confirmation en cours de partie). Passés en fonctions `({ abandon })`/`({ mmr })` et câblés sur `rank.mmrPerLoss` / `currentRank.mmrPerLoss` dans EliteCounter.jsx — fr.js only pour l'instant.
+- [x] **Bug corrigé (2026-09-06)** : cliquer « Continuer » dans le popup d'abandon (ranked) laissait la partie bloquée sur l'overlay « Pause » sans jamais reprendre, car le bouton appelait `togglePause()` — qui est un no-op hors Salle d'Étude (`gameModeRef.current !== 'training'`). Extrait la moitié « reprise » de `togglePause` dans une nouvelle fonction `resumeGame()` (sans garde de mode), appelée directement par le bouton « Continuer » du popup d'abandon. `togglePause` reste inchangé pour le bouton pause de la Salle d'Étude.
 - [ ] ⏳ **Propager l'i18n aux 13 autres locales** : l'affichage de l'abandon dynamique n'est fait qu'en **fr.js** (`lobby.rankedSub`, `rankedConfig.rankedSub`, `rankedConfig.abandonWarn`, `game.abandonMmr`). Les 13 autres locales codent encore « −25 » en dur → à mettre à jour (règle « français d'abord »).
 
 ## 🛠️ Features en attente (backlog)
