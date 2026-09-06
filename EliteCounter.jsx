@@ -2148,17 +2148,26 @@ export default function EliteCounter() {
   };
 
   // ── Resume from paused state (used by training pause + ranked abandon dialog) ──
+  // The current card was already showing for part of its slot when we paused —
+  // resume must wait only the remaining time on that card, not a fresh full interval,
+  // otherwise the card appears frozen for up to 2x its normal duration.
   const resumeGame = () => {
     setGameState('playing');
     setStartTime(Date.now() - elapsedTime);
     const tl = timeLimitUsedRef.current;
     const interval = (tl * 1000) / deck.length;
     let ci = currentIndex;
-    autoPlayRef.current = setInterval(() => {
+    const remaining = interval - (elapsedTime % interval);
+    autoPlayRef.current = setTimeout(() => {
       ci++;
-      if (ci <= deck.length) setCurrentIndex(ci);
-      else clearInterval(autoPlayRef.current);
-    }, interval);
+      if (ci > deck.length) return;
+      setCurrentIndex(ci);
+      autoPlayRef.current = setInterval(() => {
+        ci++;
+        if (ci <= deck.length) setCurrentIndex(ci);
+        else clearInterval(autoPlayRef.current);
+      }, interval);
+    }, remaining);
   };
 
   // ── Toggle pause (training only) ──────────────────────────────
