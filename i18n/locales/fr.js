@@ -270,7 +270,7 @@ const fr = {
     launchGate: ({ n, total }) => `Porte ${n}/${total}`,
     launchPromo: 'Tenter l\'Ascension',
     launchRanked: '♠ Se présenter aux Portes',
-    abandonWarn: 'Abandonner en cours de partie = −25 MMR',
+    abandonWarn: ({ abandon }) => `Abandonner en cours de partie = ${abandon} MMR`,
   },
 
   trainingConfig: {
@@ -349,7 +349,7 @@ const fr = {
     count: ({ value }) => `Compte : ${value}`,
     abandonTitle: 'Abandonner la partie ?',
     abandonBody1: 'L\'abandon compte comme une défaite.',
-    abandonMmr: '−25 MMR',
+    abandonMmr: ({ mmr }) => `${mmr} MMR`,
     abandonBody2: ' seront déduits immédiatement.',
     abandon: 'Abandonner',
     countdownSpeedrun: 'LA RAFALE',

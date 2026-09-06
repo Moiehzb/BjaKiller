@@ -3695,7 +3695,7 @@ export default function EliteCounter() {
                 : t('rankedConfig.launchGate', { n: save.placementGames + 1, total: PLACEMENT_TOTAL })
               : t('rankedConfig.launchRanked')}
           </button>
-          <div style={{ fontSize: 11, color: G.red, textAlign: 'center', marginTop: 8 }}>{t('rankedConfig.abandonWarn')}</div>
+          <div style={{ fontSize: 11, color: G.red, textAlign: 'center', marginTop: 8 }}>{t('rankedConfig.abandonWarn', { abandon: rank.mmrPerLoss })}</div>
         </div>
       </div>
     );
@@ -4326,7 +4326,7 @@ export default function EliteCounter() {
               <div style={{ fontFamily: 'Cinzel, serif', fontSize: 19, fontWeight: 700, marginBottom: 6, color: G.textPrimary }}>{t('game.abandonTitle')}</div>
               <div style={{ fontSize: 13, color: G.textSecondary, marginBottom: 20, lineHeight: 1.5 }}>
                 {t('game.abandonBody1')}<br />
-                <span style={{ color: G.red, fontWeight: 600 }}>{t('game.abandonMmr')}</span>{t('game.abandonBody2')}
+                <span style={{ color: G.red, fontWeight: 600 }}>{t('game.abandonMmr', { mmr: currentRank.mmrPerLoss })}</span>{t('game.abandonBody2')}
               </div>
               <div style={{ display: 'flex', gap: 10 }}>
                 <button style={{ flex: 1, padding: '12px 0', background: 'rgba(255,255,255,.05)', border: `1px solid ${G.border}`, borderRadius: 9, color: G.textPrimary, cursor: 'pointer', fontSize: 13, fontWeight: 600 }}

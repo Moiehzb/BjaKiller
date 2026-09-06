@@ -26,7 +26,8 @@
 - [ ] Ressenti de montée : plus rapide qu'avant partout, exigeant en haut. **Si Adamantium (ou le haut de ladder) semble encore trop lent → me dire, je baisse juste les défaites** (garde les gains, durcit à peine les seuils). À l'inverse je peux remonter/baisser toute la table.
 
 **À faire par Claude après ta validation :**
-- [ ] ⏳ **Propager l'i18n aux 13 autres locales** : l'affichage de l'abandon dynamique n'est fait qu'en **fr.js** (`lobby.rankedSub` reçoit un param `abandon` ; `rankedConfig.rankedSub` réutilise `loss`). Les 13 autres locales codent encore « −25 » en dur → à mettre à jour (règle « français d'abord »).
+- [x] **Bug corrigé (2026-09-06)** : deux affichages oubliés lors du passage à l'abandon scalé codaient encore « −25 » en dur — `rankedConfig.abandonWarn` (texte rouge sous le bouton « Se présenter aux Portes ») et `game.abandonMmr` (popup de confirmation en cours de partie). Passés en fonctions `({ abandon })`/`({ mmr })` et câblés sur `rank.mmrPerLoss` / `currentRank.mmrPerLoss` dans EliteCounter.jsx — fr.js only pour l'instant.
+- [ ] ⏳ **Propager l'i18n aux 13 autres locales** : l'affichage de l'abandon dynamique n'est fait qu'en **fr.js** (`lobby.rankedSub`, `rankedConfig.rankedSub`, `rankedConfig.abandonWarn`, `game.abandonMmr`). Les 13 autres locales codent encore « −25 » en dur → à mettre à jour (règle « français d'abord »).
 
 ## 🛠️ Features en attente (backlog)
 
