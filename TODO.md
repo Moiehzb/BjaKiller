@@ -6,7 +6,7 @@
 ## 🎯 Retours UI/Gameplay — session 05/09/2026 (à faire)
 
 ### Onboarding Salle d'Étude
-- [x] **Préconiser "Le Déchiffrement" au 1er passage (2026-09-05)** — carte **Déchiffrement** mise en avant sur l'écran de sous-mode (`trainSubMode === null`, EliteCounter.jsx) tant que `save.studyHallOnboarded === false` (défaut dans `DEFAULT_SAVE`) : glow doré pulsé (`.card.beginner-glow` / `@keyframes study-glow`) + mini-badge `trainingSubMode.beginnerHint` (« Pour débuter », FR only pour l'instant). Flag passé à `true` au clic sur n'importe quelle carte (Forge/Rafale/Déchiffrement) ou au retour → le glow ne réapparaît plus jamais ensuite. Build OK, **à vérifier au retour**.
+- [x] **Préconiser "Le Déchiffrement" au 1er passage (2026-09-05, i18n complétée 2026-09-06)** — carte **Déchiffrement** mise en avant sur l'écran de sous-mode (`trainSubMode === null`, EliteCounter.jsx) tant que `save.studyHallOnboarded === false` (défaut dans `DEFAULT_SAVE`) : glow doré pulsé (`.card.beginner-glow` / `@keyframes study-glow`) + mini-badge `trainingSubMode.beginnerHint` (« Pour débuter » — traduit dans les 14 locales). Flag passé à `true` au clic sur n'importe quelle carte (Forge/Rafale/Déchiffrement) ou au retour → le glow ne réapparaît plus jamais ensuite. Build OK, vérifié au retour.
 
 ### Navigation / HUD
 - [x] ~~Logo cliquable partout, fil d'Ariane avec sous-modes, HUD toujours visible, "Le Hall" cliquable~~ → fait (voir ✅ Fait).

@@ -386,6 +386,7 @@ const pt = {
     standardTitle: 'A Forja', standardSub: 'Configuração livre, pausa permitida — forja os teus reflexos sem pressão de rank.',
     speedrunTitle: 'A Tempestade', speedrunSub: 'Carta a carta no toque · cronômetro · conta final',
     quizTitle: 'A Decifração', quizSub: 'Identifica o valor Hi-Lo de cada carta: +1, 0 ou −1',
+    beginnerHint: 'Para começar',
   },
   speedrunConfig: {
     title: 'A Tempestade', sub: 'Carta a carta no toque · cronômetro · conta final',

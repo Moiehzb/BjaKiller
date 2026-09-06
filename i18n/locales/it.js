@@ -385,6 +385,7 @@ const it = {
     standardTitle: 'La Fucina', standardSub: 'Configurazione libera, pausa consentita — forgia i tuoi riflessi senza pressione di rango.',
     speedrunTitle: 'La Tempesta', speedrunSub: 'Carta a carta al tocco · cronometro · conto finale',
     quizTitle: 'La Decifrazione', quizSub: 'Identifica il valore Hi-Lo di ogni carta: +1, 0 o −1',
+    beginnerHint: 'Per iniziare',
   },
   speedrunConfig: {
     title: 'La Tempesta', sub: 'Avanza le carte toccando · l\'orologio gira · dai il conto finale',

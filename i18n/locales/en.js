@@ -389,6 +389,7 @@ const en = {
     speedrunSub: 'Card by card on tap · stopwatch · final count',
     quizTitle: 'The Decipherment',
     quizSub: 'Identify the Hi-Lo value of each card: +1, 0 or −1',
+    beginnerHint: 'To start',
   },
 
   speedrunConfig: {

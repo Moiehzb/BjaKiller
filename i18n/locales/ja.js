@@ -386,6 +386,7 @@ const ja = {
     standardTitle: '鍛冶場', standardSub: '自由設定、ポーズ可 — ランクの重圧なしに反射神経を鍛えろ。',
     speedrunTitle: '嵐', speedrunSub: 'カードをタップ · ストップウォッチ · 最終カウント',
     quizTitle: '解読', quizSub: '各カードのHi-Lo値を識別せよ：+1、0、−1',
+    beginnerHint: '入門におすすめ',
   },
   speedrunConfig: {
     title: '嵐', sub: '1枚ずつタップ · ストップウォッチ · 最終カウント',

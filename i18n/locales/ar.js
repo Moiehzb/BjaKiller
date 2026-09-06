@@ -385,6 +385,7 @@ const ar = {
     standardTitle: 'المسبك', standardSub: 'إعداد حر، إيقاف مسموح — اصنع ردود أفعالك دون ضغط الرتبة.',
     speedrunTitle: 'العاصفة', speedrunSub: 'بطاقة بعد بطاقة · إيقاف الوقت · الحساب النهائي',
     quizTitle: 'فك الشيفرة', quizSub: 'حدّد قيمة Hi-Lo لكل ورقة: +1، 0 أو −1',
+    beginnerHint: 'للبدء',
   },
   speedrunConfig: {
     title: 'العاصفة', sub: 'ورقة بورقة بالضغط · ساعة إيقاف · العد النهائي',

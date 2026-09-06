@@ -386,6 +386,7 @@ const ko = {
     standardTitle: '대장간', standardSub: '자유 설정, 일시정지 허용 — 랭크 압박 없이 반사 신경을 단련하라.',
     speedrunTitle: '폭풍', speedrunSub: '카드를 탭 · 초시계 · 최종 카운트',
     quizTitle: '해독', quizSub: '각 카드의 Hi-Lo 값을 식별하라: +1, 0 또는 −1',
+    beginnerHint: '입문 추천',
   },
   speedrunConfig: {
     title: '폭풍', sub: '카드마다 탭 · 스톱워치 · 최종 카운트',

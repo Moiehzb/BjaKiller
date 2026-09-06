@@ -389,6 +389,7 @@ const es = {
     speedrunSub: 'Carta a carta al toque · cronómetro · cuenta final',
     quizTitle: 'El Desciframiento',
     quizSub: 'Identifica el valor Hi-Lo de cada carta: +1, 0 o −1',
+    beginnerHint: 'Para empezar',
   },
 
   speedrunConfig: {

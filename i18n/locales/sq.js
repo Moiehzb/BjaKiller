@@ -386,6 +386,7 @@ const sq = {
     standardTitle: 'Farkëtaria', standardSub: 'Konfigurim i lirë, pauzë e lejuar — farkëto reflekset e tua pa presionin e rangut.',
     speedrunTitle: 'Stuhia', speedrunSub: 'Kartë pas karte · kohëmatës · numërim final',
     quizTitle: 'Deshifrimi', quizSub: 'Identifiko vlerën Hi-Lo të çdo karte: +1, 0 ose −1',
+    beginnerHint: 'Për të filluar',
   },
   speedrunConfig: {
     title: 'Stuhia', sub: 'Kartë pas karte me prekje · kronometër · numërim final',

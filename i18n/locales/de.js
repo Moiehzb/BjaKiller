@@ -391,6 +391,7 @@ const de = {
     speedrunSub: 'Karte für Karte per Tippen · Stoppuhr · Endkonto',
     quizTitle: 'Die Entschlüsselung',
     quizSub: 'Erkenne den Hi-Lo-Wert jeder Karte: +1, 0 oder −1',
+    beginnerHint: 'Zum Einstieg',
   },
 
   speedrunConfig: {

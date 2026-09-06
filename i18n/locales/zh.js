@@ -386,6 +386,7 @@ const zh = {
     standardTitle: '锻造场', standardSub: '自由配置，可暂停 — 在无段位压力的情况下锻造你的反射弧。',
     speedrunTitle: '风暴', speedrunSub: '逐张点击 · 秒表 · 最终计数',
     quizTitle: '解读', quizSub: '识别每张牌的Hi-Lo值：+1、0或−1',
+    beginnerHint: '新手推荐',
   },
   speedrunConfig: {
     title: '风暴', sub: '逐张点击 · 秒表 · 最终计数',
