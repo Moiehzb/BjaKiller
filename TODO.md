@@ -15,17 +15,17 @@
 - [x] ~~Afficher la récompense de chaque haut fait dans la liste des Hauts Faits~~ → fait (voir ✅ Fait).
 - [x] ~~Nouveau haut fait "Le Test Avancé"~~ → fait (voir ✅ Fait).
 
-### MMR — variable par rang ✅ codé (2026-09-05), reste à valider en jeu
+### MMR — variable par rang ✅ codé et validé en jeu (2026-09-06)
 > Fait : `mmrPerWin`/`mmrPerLoss` ne sont plus fixes à +20/−15. Courbe « Douce +5 » (seuils conservés) — Cuivre +30/−12 (~29 % de victoires pour monter) → Adamantium +19/−35 (~65 %). Abandon scalé par rang (= `mmrPerLoss`, plancher 0, ne relègue jamais) au lieu de −25 fixe. Granularité par rang. Build OK. Détail complet dans ✅ Fait.
 
 **Table des valeurs (rappel rapide) :** Cuivre +30/−12 · Argent +28/−15 · Or +26/−17 · Émeraude +24/−21 · Saphir +21/−28 · Adamantium +19/−35.
 
-**À vérifier au retour (en jeu, FR) :**
-- [ ] Écran de config Ranked (« Les Portes de la Guilde ») : affiche bien +win / −loss / abandon corrects **selon le rang courant**.
-- [ ] Carte Ranked de l'accueil : le sous-titre affiche bien le bon abandon (plus « −25 » figé).
-- [ ] Ressenti de montée : plus rapide qu'avant partout, exigeant en haut. **Si Adamantium (ou le haut de ladder) semble encore trop lent → me dire, je baisse juste les défaites** (garde les gains, durcit à peine les seuils). À l'inverse je peux remonter/baisser toute la table.
+**Vérifié en jeu (FR) — 2026-09-06 :**
+- [x] Écran de config Ranked (« Les Portes de la Guilde ») : affiche bien +win / −loss / abandon corrects **selon le rang courant**.
+- [x] Carte Ranked de l'accueil : le sous-titre affiche bien le bon abandon (plus « −25 » figé).
+- [x] Ressenti de montée : validé, rien à ajuster.
 
-**À faire par Claude après ta validation :**
+**Fait par Claude suite aux bugs trouvés pendant la validation :**
 - [x] **Bug corrigé (2026-09-06)** : deux affichages oubliés lors du passage à l'abandon scalé codaient encore « −25 » en dur — `rankedConfig.abandonWarn` (texte rouge sous le bouton « Se présenter aux Portes ») et `game.abandonMmr` (popup de confirmation en cours de partie). Passés en fonctions `({ abandon })`/`({ mmr })` et câblés sur `rank.mmrPerLoss` / `currentRank.mmrPerLoss` dans EliteCounter.jsx — fr.js only pour l'instant.
 - [x] **Bug corrigé (2026-09-06)** : cliquer « Continuer » dans le popup d'abandon (ranked) laissait la partie bloquée sur l'overlay « Pause » sans jamais reprendre, car le bouton appelait `togglePause()` — qui est un no-op hors Salle d'Étude (`gameModeRef.current !== 'training'`). Extrait la moitié « reprise » de `togglePause` dans une nouvelle fonction `resumeGame()` (sans garde de mode), appelée directement par le bouton « Continuer » du popup d'abandon. `togglePause` reste inchangé pour le bouton pause de la Salle d'Étude.
 - [x] **Bug corrigé (2026-09-06)** : après le fix ci-dessus, reprendre après abandon relançait le timer de la carte courante à 0 (`resumeGame` redémarrait un `setInterval` de durée pleine), donc la carte pouvait rester affichée jusqu'à 2x sa durée normale alors que le temps global défilait. `resumeGame` calcule maintenant le temps déjà écoulé sur la carte en cours (`elapsedTime % interval`) et attend seulement le temps restant (`setTimeout`) avant le premier changement de carte, puis reprend un `setInterval` normal. `elapsedTime` était déjà gelé pendant la pause (son propre `setInterval` est coupé), donc le décompte affiché ne bougeait pas — seul le rythme de défilement des cartes était faux.
