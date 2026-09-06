@@ -1663,6 +1663,7 @@ export default function EliteCounter() {
   const casinoStepConfigRef = useRef(null); // config of the current casino step (decks, pen, spc)
   const dailyRef = useRef(null); // config du défi du jour en cours (seed, decks, pen, spc)
   const speedrunDecksRef = useRef(2); // nb de decks de la Rafale en cours (decksUsed n'est pas fiable en speedrun)
+  const speedrunPenRef = useRef(50);  // pénétration de la Rafale en cours (même raison)
 
   // ── abandon confirm dialog
   const [showAbandon, setShowAbandon] = useState(false);
@@ -1972,6 +1973,7 @@ export default function EliteCounter() {
     setNav('game');
     setShowCount(false);
     speedrunDecksRef.current = speedrunDecks; // pour le record s/carte (dès 2 decks)
+    speedrunPenRef.current = speedrunPen;
     // Build deck with selected decks/pen; clickMode=true (manual card advance)
     const newDeck = buildDeck(speedrunDecks, speedrunPen);
     launchGame(speedrunDecks, speedrunPen, 9999, 'speedrun', false, false, newDeck, true);
@@ -2309,11 +2311,14 @@ export default function EliteCounter() {
     const today = new Date().toDateString();
     const isCasinoMode = gameModeRef.current === 'casino';
     const isDailyMode = gameModeRef.current === 'daily';
+    const isSpeedrunMode = gameModeRef.current === 'speedrun';
     const decksUsed = isCasinoMode ? (casinoStepConfigRef.current?.decks ?? 1)
       : isDailyMode ? (dailyRef.current?.decks ?? 1)
+      : isSpeedrunMode ? speedrunDecksRef.current
       : rankUsedRef.current ? rankUsedRef.current.decks : trainDecks;
     const penUsed = isCasinoMode ? (casinoStepConfigRef.current?.penetration ?? 90)
       : isDailyMode ? (dailyRef.current?.penetration ?? 75)
+      : isSpeedrunMode ? speedrunPenRef.current
       : rankUsedRef.current ? rankUsedRef.current.penetration : trainPen;
     const cardsUsed = deck.length;
     const spcUsed = cardsUsed > 0 ? timeInSec / cardsUsed : 0;
