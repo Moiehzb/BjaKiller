@@ -517,7 +517,7 @@ const sq = {
     next: 'Hapi tjetër',
     title2: 'HI-LO ACADEMY II',
     desc2: 'Tavolina e gjallë: disa tavolina kazinoje të simuluara paralelisht, krupie dhe lojtarë, për ta mprehur numërimin tënd në kushte reale.',
-    cta2: 'Tashmë në dispozicion në Google Play Store.',
+    cta2: 'Së shpejti në Google Play Store.',
   },
 };
 

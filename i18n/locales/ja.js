@@ -517,7 +517,7 @@ const ja = {
     next: '次のステップ',
     title2: 'HI-LO ACADEMY II',
     desc2: '生きたテーブル：複数のカジノテーブルを同時にシミュレート、ディーラーとプレイヤーもいる、実戦さながらの環境でカウントを磨く。',
-    cta2: 'Google Play ストアで配信中。',
+    cta2: 'Google Play ストアで近日公開。',
   },
 };
 

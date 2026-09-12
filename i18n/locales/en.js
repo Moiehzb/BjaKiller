@@ -539,7 +539,7 @@ const en = {
     next: 'The next step',
     title2: 'HI-LO ACADEMY II',
     desc2: 'The living table: several simulated casino tables running in parallel, dealer and players, to sharpen your count under real conditions.',
-    cta2: 'Available on the Google Play Store.',
+    cta2: 'Coming soon to the Google Play Store.',
   },
 };
 

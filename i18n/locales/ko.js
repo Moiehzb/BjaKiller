@@ -517,7 +517,7 @@ const ko = {
     next: '다음 단계',
     title2: 'HI-LO ACADEMY II',
     desc2: '살아있는 테이블: 여러 카지노 테이블을 동시에 시뮬레이션, 딜러와 플레이어까지 갖춰 실전 같은 조건에서 카운트를 단련한다.',
-    cta2: 'Google Play 스토어에서 이용 가능합니다.',
+    cta2: 'Google Play 스토어에 곧 출시됩니다.',
   },
 };
 

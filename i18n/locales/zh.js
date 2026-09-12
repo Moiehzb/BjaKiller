@@ -517,7 +517,7 @@ const zh = {
     next: '下一步',
     title2: 'HI-LO ACADEMY II',
     desc2: '鲜活牌桌：多张模拟赌场牌桌同时进行，荷官与玩家俱全，在真实条件下磨练算牌。',
-    cta2: '现已在 Google Play 商店上架。',
+    cta2: '即将登陆 Google Play 商店。',
   },
 };
 

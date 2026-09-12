@@ -518,7 +518,7 @@ const it = {
     next: 'Il passo successivo',
     title2: 'HI-LO ACADEMY II',
     desc2: 'Il tavolo vivo: più tavoli da casinò simulati in parallelo, croupier e giocatori, per affinare il conteggio in condizioni reali.',
-    cta2: 'Disponibile sul Google Play Store.',
+    cta2: 'Prossimamente sul Google Play Store.',
   },
 };
 

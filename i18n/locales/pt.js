@@ -517,7 +517,7 @@ const pt = {
     next: 'O próximo passo',
     title2: 'HI-LO ACADEMY II',
     desc2: 'A mesa viva: várias mesas de cassino simuladas em paralelo, crupiê e jogadores, para afinar a tua contagem em condições reais.',
-    cta2: 'Disponível na Google Play Store.',
+    cta2: 'Em breve na Google Play Store.',
   },
 };
 

@@ -539,7 +539,7 @@ const es = {
     next: 'El siguiente paso',
     title2: 'HI-LO ACADEMY II',
     desc2: 'La mesa viva: varias mesas de casino simuladas en paralelo, crupier y jugadores, para afinar tu conteo en condiciones reales.',
-    cta2: 'Disponible en Google Play Store.',
+    cta2: 'Próximamente en Google Play Store.',
   },
 };
 
