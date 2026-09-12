@@ -35,8 +35,8 @@
 
 ### Assets Play Store (à préparer avant soumission)
 > Vérifié dans la Console (2026-09-12) — Fiche Play Store par défaut (FR), tout est vide sauf le nom :
-- [ ] Brève description (0/80 caractères)
-- [ ] Description complète (0/4000 caractères)
+- [x] Brève description (0/80 caractères) — faite par l'utilisateur (2026-09-13)
+- [x] Description complète (0/4000 caractères) — faite par l'utilisateur (2026-09-13)
 - [ ] Icône de l'app (PNG/JPEG, 512×512 px, ≤1 Mo)
 - [ ] Image de présentation / feature graphic (PNG/JPEG, 1024×500 px, ≤15 Mo)
 - [ ] Captures d'écran téléphone — **minimum 4** (16:9 ou 9:16, ≥1080 px de côté) pour avoir le droit de promouvoir l'app
