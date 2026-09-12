@@ -532,7 +532,7 @@ const fr = {
     next: 'L\'étape suivante',
     title2: 'HI-LO ACADEMY II',
     desc2: 'La table vivante : plusieurs tables de casino simulées en parallèle, croupier et joueurs, pour aiguiser ton compte dans des conditions réelles.',
-    cta2: 'Disponible sur le Google Play Store.',
+    cta2: 'Bientôt disponible sur le Google Play Store.',
   },
 };
 
