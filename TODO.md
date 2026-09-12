@@ -42,7 +42,7 @@
 Le code du paywall est branché (Play Billing). Les achats ne marchent **que** via une app connue de la Play Console, installée depuis le Play Store. Le mécanisme « testeur de licence » permet de tester avec le vrai prix affiché mais une carte de test (jamais débité).
 
 **Étapes utilisateur (manuelles) :**
-- [x] 1. Créer un **compte développeur Google Play** (25 $ une fois) — vérification d'identité en cours
+- [x] 1. Créer un **compte développeur Google Play** (25 $ une fois) — vérification d'identité validée (2026-09-12)
 - [x] 2. Créer le **profil de paiement marchand** (Console → Paramètres) ✓
 - [ ] 3. Créer l'app dans la console : « Hi-Lo Academy I », package `com.blackjackacademy.app`
 - [ ] 4. Uploader l'**AAB signé** en piste **Test interne** (l'AAB est préparé par Claude, voir plus bas — dispo en quelques minutes, pas de review complète)
