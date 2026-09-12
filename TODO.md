@@ -34,9 +34,13 @@
 ## 🛠️ Features en attente (backlog)
 
 ### Assets Play Store (à préparer avant soumission)
-- [ ] Screenshots (4–8) — à faire depuis navigateur ou émulateur
-- [ ] Feature graphic (1024×500 px) — bannière affichée en haut de la fiche Play Store
-- [ ] Descriptions courte + longue FR/EN pour la fiche Play Store
+> Vérifié dans la Console (2026-09-12) — Fiche Play Store par défaut (FR), tout est vide sauf le nom :
+- [ ] Brève description (0/80 caractères)
+- [ ] Description complète (0/4000 caractères)
+- [ ] Icône de l'app (PNG/JPEG, 512×512 px, ≤1 Mo)
+- [ ] Image de présentation / feature graphic (PNG/JPEG, 1024×500 px, ≤15 Mo)
+- [ ] Captures d'écran téléphone — **minimum 4** (16:9 ou 9:16, ≥1080 px de côté) pour avoir le droit de promouvoir l'app
+- [ ] (optionnel) Captures d'écran tablette 7 pouces — jusqu'à 8
 
 ### Publication Play Store — tester les achats à 4,99 € sans payer (checklist, dans l'ordre)
 Le code du paywall est branché (Play Billing). Les achats ne marchent **que** via une app connue de la Play Console, installée depuis le Play Store. Le mécanisme « testeur de licence » permet de tester avec le vrai prix affiché mais une carte de test (jamais débité).
@@ -44,7 +48,7 @@ Le code du paywall est branché (Play Billing). Les achats ne marchent **que** v
 **Étapes utilisateur (manuelles) :**
 - [x] 1. Créer un **compte développeur Google Play** (25 $ une fois) — vérification d'identité validée (2026-09-12)
 - [x] 2. Créer le **profil de paiement marchand** (Console → Paramètres) ✓
-- [ ] 3. Créer l'app dans la console : « Hi-Lo Academy I », package `com.blackjackacademy.app`
+- [x] 3. Créer l'app dans la console : « HI-LO Academy I », package `com.blackjackacademy.app` — app créée (état Brouillon), déclarations de contenu en cours (2026-09-12)
 - [ ] 4. Uploader l'**AAB signé** en piste **Test interne** (l'AAB est préparé par Claude, voir plus bas — dispo en quelques minutes, pas de review complète)
 - [ ] 5. Créer les **10 produits in-app** (Monétiser → Produits → Produits intégrés) : **non consommables**, **4,99 €**, IDs **exacts** : `sp_steampunk`, `sp_cyber`, `sp_vapor`, `sp_eldritch`, `sp_norse`, `sp_synth`, `sp_noir`, `sp_cosmos`, `sp_bio`, `sp_graffiti` — puis les **activer**
 - [ ] 6. S'ajouter en **testeur de licence** (Console, page d'accueil → Paramètres → Test de licence → son Gmail) → la feuille de paiement affichera 4,99 € avec « Carte de test, toujours approuvée »
