@@ -37,7 +37,7 @@
 > Vérifié dans la Console (2026-09-12) — Fiche Play Store par défaut (FR), tout est vide sauf le nom :
 - [x] Brève description (0/80 caractères) — faite par l'utilisateur (2026-09-13)
 - [x] Description complète (0/4000 caractères) — faite par l'utilisateur (2026-09-13)
-- [x] **Icône de l'app (2026-09-13)** — générée depuis les SVG sources (`assets/icon-background.svg`+`icon-foreground.svg`, motif œil+cartes) en 512×512, uploadée et enregistrée dans la Fiche Play Store. Fichier : `assets/playstore-icon-512.png`.
+- [x] **Icône de l'app (2026-09-13)** — remplacée par le vrai logo `AppLogo` de l'app (celui du header/logo cliquable : œil avec cartes As+10 et jetons texte "−1"/"+1", au lieu du motif générique de `icon-foreground.svg`), rendu en HTML/Chrome avec la police Cinzel du projet pour un texte net, sur le fond violet radial habituel, exporté 512×512. Uploadée et enregistrée dans la Fiche Play Store. Fichier : `assets/playstore-icon-512.png`.
 - [x] **Image de présentation / feature graphic (2026-09-13)** — composée en HTML/CSS avec les vraies polices du projet (Cinzel + EB Garamond, palette `G`), rendue dans Chrome et exportée en 1024×500 : icône à gauche, « HI-LO ACADEMY I » + « L'Académie Secrète des Compteurs ». Uploadée et enregistrée. Fichier : `assets/playstore-feature-graphic-1024x500.png`.
 - [ ] **Captures d'écran téléphone — minimum 4** (16:9 ou 9:16, ≥1080 px de côté) pour avoir le droit de promouvoir l'app — nécessite de vraies captures du jeu en action (lobby, une partie, stats/hauts faits…), pas généré automatiquement. **À faire manuellement** (ou lancer une session dédiée avec le jeu ouvert dans le navigateur/l'APK pour les prendre).
 - [ ] (optionnel) Captures d'écran tablette 7 pouces — jusqu'à 8
