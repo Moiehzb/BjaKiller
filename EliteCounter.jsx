@@ -1702,6 +1702,7 @@ export default function EliteCounter() {
 
   const timerRef = useRef(null);
   const autoPlayRef = useRef(null);
+  const countdownRef = useRef(null);
   const soundEnabledRef = useRef(true);
 
   // ── Load save ─────────────────────────────────────────────────
@@ -1911,11 +1912,11 @@ export default function EliteCounter() {
       setCountdown(3);
       snd(() => playCountdown(3));
       let cnt = 3;
-      const iv = setInterval(() => {
+      countdownRef.current = setInterval(() => {
         cnt--;
         setCountdown(cnt);
         if (cnt === 0) {
-          clearInterval(iv);
+          clearInterval(countdownRef.current);
           snd(playGo);
           startPlaying();
         } else {
@@ -2187,6 +2188,7 @@ export default function EliteCounter() {
   const doAbandon = () => {
     clearInterval(timerRef.current);
     clearInterval(autoPlayRef.current);
+    clearInterval(countdownRef.current);
     const isRanked = ['ranked', 'placement', 'promo'].includes(gameModeRef.current);
     if (isRanked && save) {
       applyMMRChange(false, true);
@@ -2506,6 +2508,7 @@ export default function EliteCounter() {
   const goBack = () => {
     clearInterval(timerRef.current);
     clearInterval(autoPlayRef.current);
+    clearInterval(countdownRef.current);
     clearInterval(casinoCountdownRef.current);
     setCasinoCountdown(null);
     setCasinoActive(false);
