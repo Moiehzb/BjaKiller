@@ -2428,7 +2428,7 @@ export default function EliteCounter() {
       lastPlayDate: today,
       stats: newStats,
       unlockedAchievements: newUnlockedAchievements,
-      ...(gameModeRef.current === 'training' && !save.trainingDone ? { trainingDone: true } : {}),
+      ...(['training', 'speedrun', 'quiz'].includes(gameModeRef.current) && !save.trainingDone ? { trainingDone: true } : {}),
       ...(['ranked', 'placement', 'promo'].includes(gameModeRef.current) && !save.rankedDone ? { rankedDone: true } : {}),
       ...(gameModeRef.current === 'speedrun' && correct && (!save.speedrunBestTime || timeInSec < save.speedrunBestTime) ? { speedrunBestTime: timeInSec } : {}),
       ...(gameModeRef.current === 'speedrun' && correct && speedrunDecksRef.current >= 2 && (save.speedrunBestSpc == null || spcUsed < save.speedrunBestSpc) ? { speedrunBestSpc: spcUsed } : {}),
