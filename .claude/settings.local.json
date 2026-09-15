@@ -45,7 +45,12 @@
       "PowerShell($c = Get-NetTCPConnection -LocalPort 5175 -State Listen -ErrorAction SilentlyContinue; if \\($c\\) { Stop-Process -Id $c.OwningProcess -Force; \"stopped PID $\\($c.OwningProcess\\)\" } else { \"no listener on 5175\" })",
       "Bash(grep -v \"^.*//\")",
       "Bash(python -c ' *)",
-      "Bash(python3 -c ' *)"
+      "Bash(python3 -c ' *)",
+      "Bash(where lmms *)",
+      "Read(//c/Program Files/**)",
+      "Read(//c/Program Files \\\\\\(x86\\\\\\)/**)",
+      "Read(//d//**)",
+      "Bash(reg query *)"
     ],
     "defaultMode": "default"
   },
