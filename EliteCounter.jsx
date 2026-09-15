@@ -2580,7 +2580,7 @@ export default function EliteCounter() {
     return <TutorialOverlay
       t={t}
       onComplete={() => { patchSave({ tutorialDone: true }); setNav('mode-training'); }}
-      onSkip={() => patchSave({ tutorialDone: true, trainingDone: true, rankedDone: true })}
+      onSkip={() => patchSave({ tutorialDone: true })}
     />;
   }
 
