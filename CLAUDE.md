@@ -77,7 +77,7 @@ Achats réels des artefacts du Marchand via `cordova-plugin-purchase` (Play Bill
 - **Web/dev** : déblocage démo direct en localStorage (comme avant).
 - Bouton « Restaurer mes achats » (`shop.restore`) sous la liste du Marchand, natif uniquement.
 - ⚠️ Les achats ne marchent qu'avec l'app uploadée sur la Play Console (produits créés + testeur de licence) — étapes dans `TODO.md`.
-- Android : compileSdk/targetSdk 35, AGP 8.7.2, Gradle 8.11.1 (exigés par la Play Billing Library 9).
+- Android : compileSdk/targetSdk 36 (exigence Play Console, sept. 2026), AGP 8.7.2, Gradle 8.11.1.
 
 ## Backlog prioritaire
 1. Publication Play Store (keystore + AAB signé + config console — étapes manuelles dans `TODO.md`)

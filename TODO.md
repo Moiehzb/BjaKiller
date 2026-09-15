@@ -67,6 +67,8 @@ Le code du paywall est branché (Play Billing). Les achats ne marchent **que** v
 
 ## ✅ Fait
 
+- [x] **Fix erreur bloquante Play Console — niveau d'API cible (2026-09-15)** — la release brouillon (Test interne) affichait une erreur bloquante dans Play Console : « Votre appli cible actuellement le niveau d'API 35. Elle doit cibler au minimum le niveau d'API 36. » `android/variables.gradle` : `compileSdkVersion`/`targetSdkVersion` 35→36. Plateforme Android 36 installée dans `D:\android-build-tools\sdk` (build-tools 34.0.0 existants suffisent, juste un avertissement AGP non-bloquant « testé jusqu'à compileSdk 35 »). AAB release re-signé avec le keystore existant → `Hi-Lo-Academy.aab` (12,9 Mo) à la racine, **prêt à ré-uploader en Test interne** (remplace l'ancien brouillon en erreur — étape 4 de la checklist Play Store ci-dessous, toujours en attente).
+
 - [x] **Outil dev « définir le rang » retiré du Scriptorium + AAB régénéré (2026-09-15)** — bloc de debug (EliteCounter.jsx, réglages) qui permettait de fixer rang/sous-rang manuellement sans passer par le placement, supprimé avant publication (clés i18n `settings.devRankTitle/devRankHint` laissées en données mortes dans les 14 locales, même convention que les autres retraits UI). Build web + Capacitor sync + AAB release re-signé → `Hi-Lo-Academy.aab` (12,9 Mo) mis à jour à la racine, toujours à uploader en Test interne (étape 4 de la checklist Play Store ci-dessus, inchangée).
 
 - [x] **MMR variable par rang + abandon scalé (2026-09-05)** *(implémenté + build OK, à vérifier au retour)*
