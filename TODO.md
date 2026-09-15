@@ -67,6 +67,8 @@ Le code du paywall est branché (Play Billing). Les achats ne marchent **que** v
 
 ## ✅ Fait
 
+- [x] **Outil dev « définir le rang » retiré du Scriptorium + AAB régénéré (2026-09-15)** — bloc de debug (EliteCounter.jsx, réglages) qui permettait de fixer rang/sous-rang manuellement sans passer par le placement, supprimé avant publication (clés i18n `settings.devRankTitle/devRankHint` laissées en données mortes dans les 14 locales, même convention que les autres retraits UI). Build web + Capacitor sync + AAB release re-signé → `Hi-Lo-Academy.aab` (12,9 Mo) mis à jour à la racine, toujours à uploader en Test interne (étape 4 de la checklist Play Store ci-dessus, inchangée).
+
 - [x] **MMR variable par rang + abandon scalé (2026-09-05)** *(implémenté + build OK, à vérifier au retour)*
   - **Avant** : `mmrPerWin`/`mmrPerLoss` fixes à +20/−15 pour les 6 rangs → seuil de progression identique partout (~43 % de victoires).
   - **Après** : valeurs **variables par rang** dans `RANKS_DEF` — base « Douce » avec **+5 MMR sur chaque victoire** et défaites remontées pour **conserver les mêmes seuils** (seuil = perte / (gain + perte)) : Cuivre +30/−12 (~29 %), Argent +28/−15 (~35 %), Or +26/−17 (~40 %), Émeraude +24/−21 (~47 %), Saphir +21/−28 (~57 %), Adamantium +19/−35 (~65 %). Montée quasi garantie en bas de ladder, exigeante en haut, et **plus rapide qu'avant** (fini le +20 uniforme).
