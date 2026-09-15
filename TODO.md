@@ -39,22 +39,29 @@
 - [x] Description complète (0/4000 caractères) — faite par l'utilisateur (2026-09-13)
 - [x] **Icône de l'app (2026-09-13)** — remplacée par le vrai logo `AppLogo` de l'app (celui du header/logo cliquable : œil avec cartes As+10 et jetons texte "−1"/"+1", au lieu du motif générique de `icon-foreground.svg`), rendu en HTML/Chrome avec la police Cinzel du projet pour un texte net, sur le fond violet radial habituel, exporté 512×512. Uploadée et enregistrée dans la Fiche Play Store. Fichier : `assets/playstore-icon-512.png`.
 - [x] **Image de présentation / feature graphic (2026-09-13)** — composée en HTML/CSS avec les vraies polices du projet (Cinzel + EB Garamond, palette `G`), rendue dans Chrome et exportée en 1024×500 : logo `AppLogo` (As+10, jetons "−1"/"+1", même version que l'icône) à gauche, « HI-LO ACADEMY I » + « L'Académie Secrète des Compteurs » à droite. Uploadée et enregistrée. Fichier : `assets/playstore-feature-graphic-1024x500.png`.
-- [ ] **Captures d'écran téléphone — minimum 4** (16:9 ou 9:16, ≥1080 px de côté) pour avoir le droit de promouvoir l'app — nécessite de vraies captures du jeu en action (lobby, une partie, stats/hauts faits…), pas généré automatiquement. **À faire manuellement** (ou lancer une session dédiée avec le jeu ouvert dans le navigateur/l'APK pour les prendre).
+- [x] **Captures d'écran téléphone (constaté dans la Console le 2026-09-15)** — 5 captures uploadées sur la fiche Play Store par défaut (FR), au-dessus du minimum de 4 requis pour le droit de promotion.
 - [ ] (optionnel) Captures d'écran tablette 7 pouces — jusqu'à 8
 
 ### Publication Play Store — tester les achats à 4,99 € sans payer (checklist, dans l'ordre)
 Le code du paywall est branché (Play Billing). Les achats ne marchent **que** via une app connue de la Play Console, installée depuis le Play Store. Le mécanisme « testeur de licence » permet de tester avec le vrai prix affiché mais une carte de test (jamais débité).
 
+> **État constaté dans la Console le 2026-09-15** (revue complète, rien modifié) — voir aussi le point bloquant tout en bas.
+
 **Étapes utilisateur (manuelles) :**
 - [x] 1. Créer un **compte développeur Google Play** (25 $ une fois) — vérification d'identité validée (2026-09-12)
 - [x] 2. Créer le **profil de paiement marchand** (Console → Paramètres) ✓
 - [x] 3. Créer l'app dans la console : « HI-LO Academy I », package `com.blackjackacademy.app` — app créée (état Brouillon), déclarations de contenu en cours (2026-09-12)
-- [ ] 4. Uploader l'**AAB signé** en piste **Test interne** (l'AAB est préparé par Claude, voir plus bas — dispo en quelques minutes, pas de review complète)
-- [ ] 5. Créer les **10 produits in-app** (Monétiser → Produits → Produits intégrés) : **non consommables**, **4,99 €**, IDs **exacts** : `sp_steampunk`, `sp_cyber`, `sp_vapor`, `sp_eldritch`, `sp_norse`, `sp_synth`, `sp_noir`, `sp_cosmos`, `sp_bio`, `sp_graffiti` — puis les **activer**
-- [ ] 6. S'ajouter en **testeur de licence** (Console, page d'accueil → Paramètres → Test de licence → son Gmail) → la feuille de paiement affichera 4,99 € avec « Carte de test, toujours approuvée »
-- [ ] 7. S'ajouter aussi en **testeur interne** de l'app, ouvrir le lien d'opt-in, **installer depuis le Play Store** (⚠️ pas l'APK debug transféré à la main — les achats n'y marcheront pas)
+- [x] 4. Uploader l'**AAB signé** en piste **Test interne** — **fait** : version 1.0 présente en Test interne (constaté le 2026-09-15, uploadée moins d'1h avant). Un 2e canal **« Tests fermés - Alpha »** existe aussi en parallèle (brouillon, 177 pays/régions configurés, 1 testeur), pas encore envoyé pour examen.
+- [ ] 5. Créer les **10 produits in-app** (Monétiser → Produits → Produits intégrés) : **non consommables**, **4,99 €**, IDs **exacts** : `sp_steampunk`, `sp_cyber`, `sp_vapor`, `sp_eldritch`, `sp_norse`, `sp_synth`, `sp_noir`, `sp_cosmos`, `sp_bio`, `sp_graffiti` — puis les **activer**. Confirmé vide dans la Console (2026-09-15) : section « Monétiser avec Play » jamais initialisée, 0 produit créé.
+- [ ] 6. S'ajouter en **testeur de licence** (Console → Paramètres → Test de licence) → la feuille de paiement affichera 4,99 € avec « Carte de test, toujours approuvée ». **Presque fait** : la liste de diffusion « 1 » (axel.jouannic@gmail.com, réutilisée depuis les testeurs internes) existe déjà sur cette page, mais sa case n'est **pas cochée** — il suffit de la cocher puis Enregistrer.
+- [ ] 7. S'ajouter aussi en **testeur interne** de l'app, ouvrir le lien d'opt-in, **installer depuis le Play Store** (⚠️ pas l'APK debug transféré à la main — les achats n'y marcheront pas). L'adresse axel.jouannic@gmail.com est déjà dans la liste de diffusion des Tests internes — reste à confirmer que le lien d'opt-in a été ouvert et l'app installée depuis le Store (impossible tant que rien n'est envoyé pour examen, voir ci-dessous).
 - [ ] 8. Tester : achat d'un artefact (prix affiché 4,99 €, paiement test), puis « Restaurer mes achats » après désinstall/réinstall
 - 💡 Re-tester un achat déjà fait : le rembourser dans la console (Gestion des commandes → Rembourser) → l'app le reverra comme non possédé
+
+**⚠️ Point bloquant découvert le 2026-09-15 — rien n'a encore été envoyé à Google :**
+Tout est préparé (releases Test interne + Tests fermés, fiches Play Store dans 14 langues, déclarations de contenu — cible/âge 18+, politique de confidentialité, annonces, sécurité des données, apps de santé — catégorie « Jeu de cartes »), mais la page **« Vue d'ensemble de la publication »** affiche **40 modifications non envoyées pour examen** avec un bouton « Envoyer 40 modifications pour examen » jamais cliqué. Tant que ce n'est pas envoyé, les testeurs ne peuvent rejoindre aucun canal via le Play Store (le lien d'opt-in ne fonctionnera pas), donc l'étape 7 est bloquée par ça.
+
+**⚠️ Nouvelle exigence découverte pour l'accès Production :** le tableau de bord de l'app précise que l'accès Production nécessite d'exécuter le test **« Tests fermés »** (pas juste Test interne) avec **au moins 12 testeurs pendant au moins 14 jours** avant de pouvoir cliquer « Demander à publier en production ». Actuellement 0 testeur inscrit sur ce critère (seule la liste avec 1 testeur — l'utilisateur — est rattachée). Il faudra recruter au moins 12 testeurs (amis, forums) pour ce canal avant la sortie publique, en plus du testeur de licence pour valider les achats.
 
 **Étapes Claude (demander quand prêt — « go keystore ») :**
 - [x] Générer le **keystore de signature** release → `android/hilo-academy.jks` (alias `hilo-academy`) — ⚠️ **À sauvegarder précieusement** avec `android/key.properties`
